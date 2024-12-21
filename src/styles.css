@@ -1,1 +1,66 @@
-/* You can add global styles to this file, and also import other style files */
+/* Styles globaux pour l'ensemble du site */
+
+/* Définition de la base */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Special Elite', cursive; /* Police de style "enquête mystère" */
+    background: #000; /* Fond noir */
+    color: #f5f5f5; /* Texte gris clair */
+    overflow-x: hidden; /* Évite le défilement horizontal */
+    position: relative;
+  }
+  
+  /* Effet de reflets bleu néon */
+  body::before,
+  body::after {
+    content: "";
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: rgba(0, 132, 255, 0.7); /* Bleu néon avec opacité */
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+  }
+  body::before {
+    top: 10%;
+    left: -50px;
+    animation: float 10s infinite ease-in-out;
+  }
+  body::after {
+    bottom: 10%;
+    right: -50px;
+    animation: float 12s infinite ease-in-out reverse;
+  }
+  
+  /* Animation de déplacement des reflets */
+  @keyframes float {
+    0%, 100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(30px, 30px);
+    }
+  }
+  
+  /* Scrollbar personnalisée (pour Chrome, Edge, Safari) */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #000;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #00bfff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #00bfff;
+  }
+  
+  /* Sélection de texte en bleu néon */
+  ::selection {
+    background: #00bfff;
+    color: #000;
+  }
+  

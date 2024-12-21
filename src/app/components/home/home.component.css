@@ -1,0 +1,86 @@
+/* Styles de la page accueil */
+
+  .accueil-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 40px;
+    background: rgba(0, 0, 0, 0.7);
+  }
+  
+  /* Animation texte typewriter */
+  #typewriter-text-container {
+    filter: blur(80%);
+    width: 950px;
+    height: 250px;
+    overflow: hidden;
+    font-size: 28px;
+    color: #00bfff;
+    line-height: 1.5;
+    margin: 0 auto;
+    text-align: left;
+    padding: 20px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    position: relative;
+    box-shadow: 2px 2px 10px #dcd3d391;
+    border-radius: 25px;
+    
+  }
+  
+  #typewriter-text {
+    display: inline-block;    /* Permet au texte d'être écrit en ligne */
+    white-space: pre-wrap;
+    text-align: center;
+  }
+  
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 80%; }
+  }
+  @keyframes blink {
+    50% { border-color: transparent; }
+  }
+  
+  /* Contenu principal */
+
+  .content{
+    max-width: 80%;
+    margin-top: 40px;
+  }
+
+
+  .content h1 {
+    font-size: 48px;
+    margin: 10px 0;
+    text-shadow: 2px 2px 10px #dcd3d391;
+  }
+  .mission {
+    font-size: 22px;
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+  
+  /* Bouton interactif */
+  .btn-container {
+    margin-top: 20px;
+  }
+  .start-btn {
+    background-color: #ffc107;
+    color: #000;
+    font-size: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  .start-btn:hover {
+    background-color: #e0a800;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
+  }
+  
