@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ProgressionBarComponent } from "../progression-bar/progression-bar.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
+  imports: [ProgressionBarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -20,16 +21,8 @@ export class HomeComponent implements OnInit{
     this.router.navigate(['/cv']);
   }
 
-  playSound() {
-    const audio = new Audio();
-    audio.src = "audio/song.mp3";
-    audio.load();
-    audio.play();
-    audio.volume = 0.3
-  }
-
   typewriterEffect() {
-    const text = "L'affaire la plus complexe de votre carrière vous attend. Les indices sont éparpillés, les mystères sont nombreux, et votre esprit est votre seul allié pour résoudre l'énigme qui se cache derrière un parcours fascinant et énigmatique... \n\n C'est vous le DETECTIVE 🕵️, à vous de jouer ";
+    const text = "L'affaire la plus complexe de votre carrière vous attend. Les indices sont éparpillés, les mystères sont nombreux, et votre esprit est votre seul allié pour résoudre l'énigme qui se cache derrière un parcours fascinant et énigmatique... \n\n C'est vous le DETECTIVE, à vous de jouer ";
     let i = 0;
     let currentLine = '';
     const speed = 100;
