@@ -1,1 +1,49 @@
-<p>competences works!</p>
+<div class="competences-container">
+    <!-- Introduction de l'enquête -->
+    <div class="intro-section">
+      <h1 class="section-title">🕵️‍♂️ L'Enquête des Compétences</h1>
+      <p class="intro-text">Bienvenue détective. Chaque compétence que vous débloquez vous rapproche de la résolution de l'enquête. Soyez vigilant, car chaque indice compte. Commencez à explorer les compétences pour avancer dans votre investigation.</p>
+    </div>
+  
+    <!-- Barre de progression de l'enquête -->
+    <div class="progress-bar-container">
+      <div class="progress-bar" [style.width]="(unlockedCount / skills.length * 100) + '%'">
+        <span>{{ unlockedCount }} / {{ skills.length }} compétences débloquées</span>
+      </div>
+    </div>
+  
+    <!-- Liste des catégories et compétences -->
+    <div class="category-list">
+      <div *ngFor="let category of categories" class="category-card">
+        <h2>{{ category }}</h2>
+        <div class="skills-grid">
+          <div 
+            *ngFor="let skill of getSkillsByCategory(category)" 
+            class="skill-card" 
+            [class.unlocked]="skill.isUnlocked"
+            (click)="unlockSkill(skill)"
+          >
+            <div class="skill-icon">
+              <img src="assets/icons/{{ skill.name.toLowerCase() }}.png" alt="{{ skill.name }}">
+            </div>
+            <div class="skill-info">
+              <h3>{{ skill.name }}</h3>
+              <p *ngIf="skill.isUnlocked">{{ skill.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Section de l'indice -->
+    <div class="clue-section" *ngIf="currentClue">
+      <p class="clue-text">{{ currentClue }}</p>
+    </div>
+  
+    <!-- Message de réussite -->
+    <div class="completion-message" *ngIf="allSkillsUnlocked()">
+      <h2>Félicitations détective !</h2>
+      <p>Vous avez résolu l'enquête et maîtrisé toutes les compétences nécessaires. Le mystère est désormais résolu. 🌟</p>
+    </div>
+  </div>
+  

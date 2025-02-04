@@ -22,9 +22,12 @@
   </div>
 
   <!-- Afficher l'image complète si complété -->
-  <div *ngIf="isCompleted" class="completed-image">
+  <div *ngIf="!isCompleted" class="completed-image">
     <img src="img/cv_puzzle/cv.jpg" alt="CV complet">
     <p class="success-message">Félicitations ! Vous avez complété le puzzle.</p>
-    <a [href]="cvFileUrl" download="CV_Full.pdf" class="download-btn">Télécharger le CV</a>
+    <div class="button">
+      <a [href]="cvFileUrl" download="CV_Full.pdf" class="download-btn">Télécharger le CV</a>
+      <a href="competences" class="download-btn">Continuer</a>
+    </div>
   </div>
 </div>

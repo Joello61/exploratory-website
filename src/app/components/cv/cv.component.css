@@ -52,6 +52,13 @@
     margin-top: 10px;
   }
 
+  .btn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+  }
+
   .download-btn {
     display: inline-block;
     margin-top: 15px;
