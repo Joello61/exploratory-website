@@ -1,49 +1,53 @@
-<div class="competences-container">
-    <!-- Introduction de l'enquête -->
-    <div class="intro-section">
-      <h1 class="section-title">🕵️‍♂️ L'Enquête des Compétences</h1>
-      <p class="intro-text">Bienvenue détective. Chaque compétence que vous débloquez vous rapproche de la résolution de l'enquête. Soyez vigilant, car chaque indice compte. Commencez à explorer les compétences pour avancer dans votre investigation.</p>
-    </div>
-  
-    <!-- Barre de progression de l'enquête -->
-    <div class="progress-bar-container">
-      <div class="progress-bar" [style.width]="(unlockedCount / skills.length * 100) + '%'">
-        <span>{{ unlockedCount }} / {{ skills.length }} compétences débloquées</span>
+<div class="skills-container">
+  <!-- Titre et description -->
+  <div class="skills-header text-center">
+    <h1 class="title">🔍 Découvrez mes compétences</h1>
+    <p class="skills-description">
+      Résolvez les énigmes pour débloquer mes compétences. Attention, le temps est limité !
+    </p>
+  </div>
+
+  <!-- Grille de dossiers verrouillés -->
+  <div class="skills-grid">
+    <div
+      class="skill-card"
+      *ngFor="let skill of skills; let i = index"
+      (click)="openModal(skill)"
+    >
+      <div class="skill-icon">
+        <i [class]="skill.isUnlocked ? skill.icon : 'fas fa-lock'"></i>
       </div>
-    </div>
-  
-    <!-- Liste des catégories et compétences -->
-    <div class="category-list">
-      <div *ngFor="let category of categories" class="category-card">
-        <h2>{{ category }}</h2>
-        <div class="skills-grid">
-          <div 
-            *ngFor="let skill of getSkillsByCategory(category)" 
-            class="skill-card" 
-            [class.unlocked]="skill.isUnlocked"
-            (click)="unlockSkill(skill)"
-          >
-            <div class="skill-icon">
-              <img src="assets/icons/{{ skill.name.toLowerCase() }}.png" alt="{{ skill.name }}">
-            </div>
-            <div class="skill-info">
-              <h3>{{ skill.name }}</h3>
-              <p *ngIf="skill.isUnlocked">{{ skill.description }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  
-    <!-- Section de l'indice -->
-    <div class="clue-section" *ngIf="currentClue">
-      <p class="clue-text">{{ currentClue }}</p>
-    </div>
-  
-    <!-- Message de réussite -->
-    <div class="completion-message" *ngIf="allSkillsUnlocked()">
-      <h2>Félicitations détective !</h2>
-      <p>Vous avez résolu l'enquête et maîtrisé toutes les compétences nécessaires. Le mystère est désormais résolu. 🌟</p>
+      <h3 class="skill-name">{{ skill.isUnlocked ? skill.name : 'Compétence ' + (i + 1) }}</h3>
+
     </div>
   </div>
-  
+
+  <!-- Modale pour les énigmes -->
+  <div class="modal" *ngIf="isModalOpen">
+    <div class="modal-content">
+      <h2>{{ currentSkill?.question }}</h2>
+      <div class="timer">Temps restant : {{ countdown }}s</div>
+      <div class="answers">
+        <button
+          *ngFor="let answer of currentSkill?.answers"
+          (click)="checkAnswer(answer)"
+          [disabled]="isAnswerSelected"
+        >
+          {{ answer.text }}
+        </button>
+      </div>
+      <div class="jokers">
+        <button (click)="useJoker('50-50')" [disabled]="jokersUsed.includes('50-50')">
+          50:50
+        </button>
+        <button (click)="useJoker('audience')" [disabled]="jokersUsed.includes('audience')">
+          👥 L'avis du public
+        </button>
+        <button (click)="useJoker('pause')" [disabled]="jokersUsed.includes('pause')">
+          ⏳ Pause chrono
+        </button>
+      </div>
+      <button (click)="closeModal()">Fermer</button>
+    </div>
+  </div>
+</div>

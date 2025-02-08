@@ -1,24 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProgressionBarComponent } from "../progression-bar/progression-bar.component";
+
 
 @Component({
   selector: 'app-home',
-  standalone: true,
-  imports: [ProgressionBarComponent],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit{
+export class HomeComponent implements OnInit {
 
   constructor(private router: Router) { }
 
   ngOnInit(): void {
     this.typewriterEffect();
+    this.initAmbianceSound();
+    this.initMouseLightEffect();
   }
 
   commencerEnquete() {
-    this.router.navigate(['/cv']);
+    const container = document.querySelector('.accueil-container') as HTMLElement;
+    container.classList.add('fade-out');
+    setTimeout(() => {
+      this.router.navigate(['/cv']);
+    }, 1000); // Délai de 1 seconde pour la transition
   }
 
   typewriterEffect() {
@@ -47,6 +51,22 @@ export class HomeComponent implements OnInit{
       }, speed);
     }
   }
-  
 
+  initAmbianceSound() {
+    const audio = document.getElementById('ambiance-sound') as HTMLAudioElement;
+    if (audio) {
+      audio.volume = 0.5; // Réduire le volume
+      audio.play();
+    }
+  }
+
+  initMouseLightEffect() {
+    document.addEventListener('mousemove', (e) => {
+      const lightEffect = document.querySelector('.light-effect') as HTMLElement;
+      if (lightEffect) {
+        lightEffect.style.setProperty('--x', `${e.clientX}px`);
+        lightEffect.style.setProperty('--y', `${e.clientY}px`);
+      }
+    });
+  }
 }

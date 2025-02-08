@@ -1,77 +1,180 @@
 .cv-container {
-    text-align: center;
-    background-color: #1a1a1a;
-    color: #fff;
-    padding: 20px;
-  }
-  
-  .cv-description {
-    margin-top: 20px;
-  }
-  
-  .cv-puzzle {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 10px;
-    width: 360px;
-    margin: 20px auto;
-  }
-  
-  .cv-item {
-    width: 100%;
-    height: 120px; /* Taille de chaque pièce */
-    background-size: cover;
-    cursor: grab;
-    border: 3px solid white;
-    transition: border-color 0.3s ease;
-  }
-  
-  .cv-item.correct {
-    border-color: green;
-  }
-  
-  .cv-item.incorrect {
-    border-color: red;
-  }
+  text-align: center;
+  background-color: #1a1a1a;
+  color: #fff;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../../../../public/img/layer-1.jpg') center/cover;
+}
 
-  .completed-image {
-    margin-top: 20px;
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
   }
-  
-  .completed-image img {
-    width: 300px;
-    height: auto;
-    border: 3px solid #28a745;
-    border-radius: 10px;
+  25% {
+    transform: translateY(-20px) translateX(-20px);
   }
-  
-  .success-message {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #28a745;
-    margin-top: 10px;
+  50% {
+    transform: translateY(20px) translateX(20px);
   }
+  75% {
+    transform: translateY(-20px) translateX(20px);
+  }
+}
 
-  .btn{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-  }
+.cv-description {
+  margin-top: 20px;
+  font-size: 1.2em;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  .download-btn {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    font-size: 1em;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+.cv-puzzle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 410px;
+  margin: 0 auto;
+}
+
+.cv-item {
+  height: auto;
+  border: 3px solid white;
+  padding: 4px;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+  animation: float 3s infinite ease-in-out;
+  overflow: hidden;
+}
+
+.cv-item.correct {
+  border-color: green;
+  animation: correct-glow 1s infinite alternate;
+}
+
+.cv-item.incorrect {
+  border-color: red;
+  animation: shake 0.5s;
+}
+
+.puzzle-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Pour que l'image remplisse la pièce */
+}
+
+.cv-img{
+  width: 60%;
+}
+
+@keyframes correct-glow {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
   }
-  
-  .download-btn:hover {
-    background-color: #0056b3;
+  100% {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 1);
   }
-  
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.completed-image {
+  margin-top: 20px;
+  animation: zoom-in 1s ease-in-out;
+}
+
+.completed-image img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border: 3px solid #28a745;
+  border-radius: 10px;
+}
+
+.success-message {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #28a745;
+  margin-top: 10px;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.download-btn {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  font-size: 1em;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.download-btn:hover {
+  background-color: #0056b3;
+}
+
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #ffcc00;
+  animation: confetti-fall 5s linear infinite;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+  }
+}
+
+@keyframes zoom-in {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.timer {
+  margin-top: 20px;
+  font-size: 1.2em;
+  color: #ffcc00;
+}

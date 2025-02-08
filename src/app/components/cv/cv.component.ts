@@ -19,27 +19,30 @@ export class CvComponent implements OnInit {
   cvPieces: CvPiece[] = [];
   currentOrder: number[] = [];
   draggedPieceIndex: number | null = null;
-  isCompleted: boolean = false; // Indique si le puzzle est terminé
+  isCompleted: boolean = false;
+  confettis: any[] = [];
+  elapsedTime: number = 0;
+  private timerInterval: any;
 
-  // Chemin du fichier CV à télécharger
   cvFileUrl: string = 'doc/cv.pdf';
 
   ngOnInit() {
     this.initializePuzzle();
+    this.startTimer();
+    this.generateConfettis();
   }
 
-  // Initialiser le puzzle
   initializePuzzle() {
     const pieces = [
-      { image: 'img/cv_puzzle/P1.png', correctIndex: 0 },
-      { image: 'img/cv_puzzle/P2.png', correctIndex: 1 },
-      { image: 'img/cv_puzzle/P3.png', correctIndex: 2 },
-      { image: 'img/cv_puzzle/P4.png', correctIndex: 3 },
-      { image: 'img/cv_puzzle/P5.png', correctIndex: 4 },
-      { image: 'img/cv_puzzle/P6.png', correctIndex: 5 },
-      { image: 'img/cv_puzzle/P7.png', correctIndex: 6 },
-      { image: 'img/cv_puzzle/P8.png', correctIndex: 7 },
-      { image: 'img/cv_puzzle/P9.png', correctIndex: 8 },
+      { image: 'img/cv_puzzle/P1.jpg', correctIndex: 0 },
+      { image: 'img/cv_puzzle/P2.jpg', correctIndex: 1 },
+      { image: 'img/cv_puzzle/P3.jpg', correctIndex: 2 },
+      { image: 'img/cv_puzzle/P4.jpg', correctIndex: 3 },
+      { image: 'img/cv_puzzle/P5.jpg', correctIndex: 4 },
+      { image: 'img/cv_puzzle/P6.jpg', correctIndex: 5 },
+      { image: 'img/cv_puzzle/P7.jpg', correctIndex: 6 },
+      { image: 'img/cv_puzzle/P8.jpg', correctIndex: 7 },
+      { image: 'img/cv_puzzle/P9.jpg', correctIndex: 8 },
     ];
 
     this.currentOrder = Array.from({ length: pieces.length }, (_, i) => i).sort(() => Math.random() - 0.5);
@@ -84,7 +87,26 @@ export class CvComponent implements OnInit {
       piece.isCorrect = piece.currentIndex === piece.correctIndex;
     });
 
-    // Vérifier si toutes les pièces sont correctes
     this.isCompleted = this.cvPieces.every(piece => piece.isCorrect);
+    if (this.isCompleted) {
+      clearInterval(this.timerInterval);
+    }
+  }
+
+  startTimer() {
+    this.timerInterval = setInterval(() => {
+      this.elapsedTime++;
+    }, 1000);
+  }
+
+  generateConfettis() {
+    const colors = ['#ffcc00', '#ff6666', '#66ccff', '#99ff99', '#cc99ff'];
+    this.confettis = Array.from({ length: 100 }, (_, i) => ({
+      style: {
+        left: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        backgroundColor: colors[Math.floor(Math.random() * colors.length)]
+      }
+    }));
   }
 }
