@@ -1,1 +1,53 @@
-<p>itineraire works!</p>
+<div class="timeline-container">
+    <!-- En-tête de la timeline -->
+    <div class="timeline-header">
+      <h1 class="title">🚀 Mon Itinéraire</h1>
+      <p class="timeline-description">
+        Découvrez mon parcours, étape par étape. Chaque phase de mon aventure est un mystère à résoudre. Cliquez sur une étape pour en découvrir les secrets.
+      </p>
+    </div>
+  
+    <!-- Timeline principale -->
+    <div class="timeline">
+      <div class="timeline-item" 
+           *ngFor="let item of timelineItems; let i = index" 
+           [ngClass]="{'left': i % 2 === 0, 'right': i % 2 !== 0}"
+           (click)="openDetails(item)">
+        <div class="timeline-icon">
+          <!-- L'icône de la timeline est un cadenas tant que l'élément est verrouillé -->
+          <i [class]="item.locked ? 'fas fa-lock' : item.icon"></i>
+        </div>
+        <div class="timeline-content">
+          <h3>{{ item.title }}</h3>
+          <p class="timeline-date">{{ item.date }}</p>
+          <p class="timeline-description">{{ item.locked ? "Cliquez pour résoudre l'énigme et débloquer cette étape." : item.description }}</p>
+          <button class="details-btn" *ngIf="item.locked">Voir l'énigme</button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Modale pour le quiz ou les détails -->
+    <div class="modal" *ngIf="isModalOpen">
+      <div class="modal-content">
+        <span class="close-btn" (click)="closeModal()">✖</span>
+        <!-- Affichage du quiz si l'étape est verrouillée -->
+        <div *ngIf="showPuzzle && currentPuzzle">
+          <h2>Résolvez l'énigme pour débloquer cette étape</h2>
+          <p class="puzzle-question">{{ currentPuzzle.question }}</p>
+          <div class="puzzle-options">
+            <button *ngFor="let option of currentPuzzle.options" (click)="checkPuzzleAnswer(option)">
+              {{ option }}
+            </button>
+          </div>
+          <p class="puzzle-response">{{ puzzleResponseMessage }}</p>
+        </div>
+        <!-- Sinon, affichage des détails complets -->
+        <div *ngIf="!showPuzzle && selectedItem">
+          <h2>{{ selectedItem.title }}</h2>
+          <p class="modal-date">{{ selectedItem.date }}</p>
+          <p class="modal-description">{{ selectedItem.details }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  

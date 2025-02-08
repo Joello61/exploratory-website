@@ -1,1 +1,33 @@
-<p>attentes works!</p>
+<div class="expectations-container">
+    <!-- Boîte verrouillée -->
+    <div class="locked-box" (click)="openModal()">
+      <div class="box-icon">🔒</div>
+      <p>Cliquez pour déverrouiller vos attentes</p>
+    </div>
+  
+    <!-- Modal pour la question -->
+    <div class="modal" *ngIf="isModalOpen">
+      <div class="modal-content">
+        <h2>{{ question.text }}</h2>
+        <div class="options">
+          <button
+            *ngFor="let option of question.options; let i = index"
+            (click)="checkAnswer(option)"
+            [disabled]="isAnswerSelected"
+          >
+            {{ option }}
+          </button>
+        </div>
+        <p *ngIf="isAnswerSelected && !isCorrect" class="error-message">
+          Dommage... essaie encore !
+        </p>
+      </div>
+    </div>
+  
+    <!-- Boîte déverrouillée -->
+    <div class="unlocked-box" *ngIf="!boxLocked">
+      <div class="box-icon">🎁</div>
+      <p>Félicitations ! Vous avez déverrouillé vos attentes.</p>
+      <p class="expectation-message">{{ expectationMessage }}</p>
+    </div>
+  </div>

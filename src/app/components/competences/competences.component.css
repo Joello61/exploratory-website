@@ -75,12 +75,15 @@
   }
   
   .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
     background: #1a1a1a;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
     width: 90%;
-    max-width: 500px;
   }
   
   .timer {
@@ -101,12 +104,33 @@
     cursor: pointer;
     transition: background 0.3s ease;
   }
+
+  .close-button{
+    font-size: 35px;
+    color : #00e5ff;
+    border: none;
+    background: none;
+    align-self: flex-end;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    width: 40px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .close-button:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+    cursor: pointer;
+  }
   
-  .answers button:hover {
+  .answers button{
     background: #555;
   }
   
-  .jokers button {
+  .jokers button{
     margin: 5px;
     padding: 5px 10px;
     background: #444;

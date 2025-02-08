@@ -1,1 +1,65 @@
-<p>personnalite works!</p>
+<div class="personality-container">
+    <!-- Titre et description -->
+    <div class="personality-header text-center">
+      <h1 class="title">🌟 Ma Personnalité</h1>
+      <p class="personality-description">
+        Découvrez qui je suis, mes passions, mes valeurs et ce qui m'inspire au quotidien.
+      </p>
+    </div>
+  
+    <!-- Sections thématiques -->
+    <div class="personality-sections">
+      <!-- Section Valeurs -->
+      <div class="section">
+        <h2>Mes Valeurs</h2>
+        <div class="cards">
+          <div class="card" *ngFor="let value of values">
+            <div class="card-icon">
+              <i [class]="value.icon"></i>
+            </div>
+            <h3>{{ value.title }}</h3>
+            <p>{{ value.description }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Section Passions -->
+      <div class="section">
+        <h2>Mes Passions</h2>
+        <div class="cards">
+          <div class="card" *ngFor="let passion of passions">
+            <div class="card-icon">
+              <i [class]="passion.icon"></i>
+            </div>
+            <h3>{{ passion.title }}</h3>
+            <p>{{ passion.description }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Section Centres d'intérêt -->
+      <div class="section">
+        <h2>Mes Centres d'Intérêt</h2>
+        <div class="cards">
+          <div class="card" *ngFor="let interest of interests">
+            <div class="card-icon">
+              <i [class]="interest.icon"></i>
+            </div>
+            <h3>{{ interest.title }}</h3>
+            <p>{{ interest.description }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Section Citations -->
+      <div class="section">
+        <h2>Citations Inspirantes</h2>
+        <div class="quotes">
+          <div class="quote" *ngFor="let quote of quotes">
+            <p>"{{ quote.text }}"</p>
+            <p class="author">- {{ quote.author }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

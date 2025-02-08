@@ -25,29 +25,40 @@
   <!-- Modale pour les énigmes -->
   <div class="modal" *ngIf="isModalOpen">
     <div class="modal-content">
-      <h2>{{ currentSkill?.question }}</h2>
-      <div class="timer">Temps restant : {{ countdown }}s</div>
-      <div class="answers">
-        <button
-          *ngFor="let answer of currentSkill?.answers"
-          (click)="checkAnswer(answer)"
-          [disabled]="isAnswerSelected"
-        >
-          {{ answer.text }}
-        </button>
+      <button class = "close-button" (click)="closeModal()"><i class="fas fa-xmark"></i></button>
+      <div class="row">
+        <div class="col-md-8">
+          <h2>{{ currentSkill?.question }}</h2>
+          <div class="timer">Temps restant : {{ countdown }}s</div>
+        </div>
+        <div class="col-md-4">
+          <div class="answers">
+            <ng-container *ngFor="let answer of currentSkill?.answers">
+              <button *ngIf="!answer.hidden" (click)="checkAnswer(answer)" [disabled]="isAnswerSelected">
+                {{ answer.text }}
+              </button>
+            </ng-container>
+
+            <div *ngIf="showAudienceResults">
+              <p *ngFor="let answer of currentSkill?.answers">
+                  {{ answer.text }} : {{ answer.votes }}%
+              </p>
+          </div>          
+            
+          </div>
+          <div class="jokers">
+            <button (click)="useJoker('50-50')" [disabled]="jokersUsed.includes('50-50')">
+              50:50
+            </button>
+            <button (click)="useJoker('audience')" [disabled]="jokersUsed.includes('audience')">
+              👥 L'avis du public
+            </button>
+            <button (click)="useJoker('pause')" [disabled]="jokersUsed.includes('pause')">
+              ⏳ Pause chrono
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="jokers">
-        <button (click)="useJoker('50-50')" [disabled]="jokersUsed.includes('50-50')">
-          50:50
-        </button>
-        <button (click)="useJoker('audience')" [disabled]="jokersUsed.includes('audience')">
-          👥 L'avis du public
-        </button>
-        <button (click)="useJoker('pause')" [disabled]="jokersUsed.includes('pause')">
-          ⏳ Pause chrono
-        </button>
-      </div>
-      <button (click)="closeModal()">Fermer</button>
     </div>
   </div>
 </div>

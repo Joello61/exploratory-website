@@ -1,0 +1,113 @@
+.personality-container {
+    padding: 40px 20px;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .personality-header {
+    max-width: 800px;
+    margin-bottom: 40px;
+  }
+  
+  .title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #00e5ff;
+    text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
+    margin-bottom: 20px;
+  }
+  
+  .personality-description {
+    font-size: 1.2rem;
+    color: #ccc;
+  }
+  
+  .personality-sections {
+    width: 100%;
+    max-width: 1200px;
+  }
+  
+  .section {
+    margin-bottom: 40px;
+  }
+  
+  .section h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #00e5ff;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .card {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00e5ff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  }
+  
+  .card-icon {
+    font-size: 3rem;
+    color: #00e5ff;
+    margin-bottom: 15px;
+  }
+  
+  .card h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  
+  .card p {
+    font-size: 1rem;
+    color: #ccc;
+  }
+  
+  .quotes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .quote {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00e5ff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .quote:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  }
+  
+  .quote p {
+    font-size: 1.2rem;
+    color: #fff;
+    font-style: italic;
+  }
+  
+  .quote .author {
+    font-size: 1rem;
+    color: #ccc;
+    margin-top: 10px;
+  }

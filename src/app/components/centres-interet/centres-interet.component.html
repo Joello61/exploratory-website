@@ -1,1 +1,28 @@
-<p>centres-interet works!</p>
+<div class="interests-container">
+    <!-- En-tête de la page -->
+    <div class="interests-header text-center">
+      <h1 class="title">🌍 Mes Centres d'Intérêt</h1>
+      <p class="interests-description">
+        Dans cette enquête, chaque indice révèle une passion qui m'inspire. Cliquez sur un dossier pour dévoiler le secret derrière chacun de mes centres d'intérêt.
+      </p>
+    </div>
+    
+    <!-- Grille des centres d'intérêt -->
+    <div class="interests-grid">
+      <div class="interest-card" 
+           *ngFor="let interest of interests" 
+           (click)="revealInterest(interest)">
+        <div class="card-content">
+          <div class="card-icon">
+            <!-- Si l'intérêt est révélé, affiche l'icône, sinon un point d'interrogation -->
+            <i [class]="interest.revealed ? interest.icon : 'fas fa-question'"></i>
+          </div>
+          <h3 class="card-title">{{ interest.revealed ? interest.title : '???' }}</h3>
+          <p class="card-description">
+            {{ interest.revealed ? interest.description : 'Cliquez pour résoudre l’énigme et révéler ce centre d\'intérêt.' }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  

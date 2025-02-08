@@ -1,1 +1,27 @@
-<p>motivation-socio-pro works!</p>
+<div class="motivations-container">
+    <!-- En-tête -->
+    <div class="motivations-header">
+      <h1 class="title">🔍 Mes Motivations Socio‑Professionnelles</h1>
+      <p class="motivations-description">
+        Dans le grand dossier de ma carrière, chaque motivation représente une piste qui m'inspire et me pousse à exceller. Cliquez sur un dossier pour dévoiler son secret.
+      </p>
+    </div>
+  
+    <!-- Grille des dossiers/motivations -->
+    <div class="motivations-grid">
+      <div class="motivation-card" *ngFor="let motivation of motivations" (click)="revealMotivation(motivation)">
+        <div class="card-content">
+          <div class="card-icon">
+            <!-- Si la motivation est verrouillée, on affiche un cadenas, sinon l'icône définie -->
+            <i [class]="motivation.revealed ? motivation.icon : 'fas fa-lock'"></i>
+          </div>
+          <h3 class="card-title">{{ motivation.revealed ? motivation.title : '???' }}</h3>
+          <p class="card-description">
+            {{ motivation.revealed ? motivation.description : 'Cliquez pour résoudre le mystère.' }}
+          </p>
+          <button class="reveal-btn" *ngIf="!motivation.revealed">Explorer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

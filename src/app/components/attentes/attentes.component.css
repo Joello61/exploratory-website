@@ -1,0 +1,90 @@
+.expectations-container {
+    padding: 40px 20px;
+    background-color: #1a1a1a;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .locked-box, .unlocked-box {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00e5ff;
+    border-radius: 10px;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .locked-box:hover, .unlocked-box:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  }
+  
+  .box-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00e5ff;
+    margin-bottom: 20px;
+  }
+  
+  .options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .options button {
+    padding: 10px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .options button:hover {
+    background: #555;
+  }
+  
+  .error-message {
+    color: #ff4444;
+    margin-top: 10px;
+  }
+  
+  .expectation-message {
+    font-size: 1.2rem;
+    color: #00e5ff;
+    margin-top: 10px;
+  }

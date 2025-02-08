@@ -12,9 +12,9 @@ export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'cv', component: CvComponent },
     { path: 'competences', component: CompetencesComponent },
-    { path: 'traits', component: PersonnaliteComponent },
+    { path: 'personnalite', component: PersonnaliteComponent },
     { path: 'centres', component: CentresInteretComponent },
     { path: 'attentes', component: AttentesComponent },
-    {path: 'itinéraire', component: ItineraireComponent},
+    {path: 'itineraire', component: ItineraireComponent},
     { path: 'motivations', component: MotivationSocioProComponent}
   ];

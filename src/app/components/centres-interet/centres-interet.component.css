@@ -1,0 +1,86 @@
+/* Conteneur principal */
+.interests-container {
+    padding: 40px 20px;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    background-size: cover;
+  }
+  
+  /* En-tête */
+  .interests-header {
+    max-width: 800px;
+    margin-bottom: 40px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.65);
+    padding: 20px;
+    border-radius: 10px;
+  }
+  
+  .title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #00e5ff;
+    text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
+    margin-bottom: 20px;
+  }
+  
+  .interests-description {
+    font-size: 1.2rem;
+    color: #ccc;
+  }
+  
+  /* Grille des cartes */
+  .interests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+  }
+  
+  /* Carte d'intérêt */
+  .interest-card {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00e5ff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .interest-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  }
+  
+  /* Contenu de la carte */
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .card-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #00e5ff;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  
+  .card-description {
+    font-size: 1rem;
+    color: #ccc;
+  }
+  
