@@ -1,146 +1,231 @@
+/* Container général */
 .skills-container {
-    padding: 40px 20px;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .skills-header {
-    max-width: 800px;
-    margin-bottom: 40px;
-  }
-  
-  .title {
-    font-size: 3rem;
-    font-weight: bold;
-    color: #00e5ff;
-    text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
-    margin-bottom: 20px;
-  }
-  
-  .skills-description {
-    font-size: 1.2rem;
-    color: #ccc;
-  }
-  
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    width: 100%;
-    max-width: 1200px;
-  }
-  
-  .skill-card {
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid #00e5ff;
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .skill-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
-  }
-  
-  .skill-icon {
-    font-size: 3rem;
-    color: #00e5ff;
-    margin-bottom: 15px;
-  }
-  
-  .skill-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #fff;
-    margin-bottom: 10px;
-  }
-  
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    position: relative;
-    background: #1a1a1a;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    width: 90%;
-  }
-  
-  .timer {
-    font-size: 1.5rem;
-    color: #ffcc00;
-    margin-bottom: 20px;
-  }
-  
-  .answers button {
-    display: block;
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    background: #333;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
+  padding: 40px 20px;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  .close-button{
-    font-size: 35px;
-    color : #00e5ff;
-    border: none;
-    background: none;
-    align-self: flex-end;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-    margin-bottom: 12px;
-    width: 40px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
+/* En-tête et titre */
+.skills-header {
+  max-width: 800px;
+  margin-bottom: 40px;
+}
 
-  .close-button:hover{
-    transform: translateY(-6px);
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
-    cursor: pointer;
-  }
-  
-  .answers button{
-    background: #555;
-  }
-  
-  .jokers button{
-    margin: 5px;
-    padding: 5px 10px;
-    background: #444;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .jokers button:hover {
-    background: #666;
-  }
+.title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #00e5ff;
+  text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
+  margin-bottom: 20px;
+}
+
+.skills-description {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
+/* Grille des compétences */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.skill-card {
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid #00e5ff;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skill-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+}
+
+.skill-icon {
+  font-size: 3rem;
+  color: #00e5ff;
+  margin-bottom: 15px;
+}
+
+.skill-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+/* Bouton pour passer à la section suivante */
+.next-section-button {
+  margin-top: 40px;
+}
+
+.next-section-button button {
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  background: #00e5ff;
+  border: none;
+  border-radius: 5px;
+  color: #000;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.next-section-button button:hover {
+  background: #00b8e6;
+}
+
+/* Modale */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 90%;
+  max-width: 800px;
+  overflow: hidden;
+  border: 2px solid #00e5ff;
+}
+
+/* Bouton de fermeture */
+.close-button {
+  font-size: 35px;
+  color: #00e5ff;
+  border: none;
+  background: none;
+  align-self: flex-end;
+  margin-bottom: 12px;
+  width: 40px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.close-button:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  cursor: pointer;
+}
+
+/* Barre de progression du timer */
+.timer-bar {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.timer-bar .progress {
+  height: 100%;
+  background: #ffcc00;
+  width: 100%;
+  transition: width 1s linear;
+}
+
+/* Texte du timer */
+.timer-text {
+  font-size: 1.5rem;
+  color: #ffcc00;
+  margin-bottom: 20px;
+}
+
+/* Section des réponses */
+.answers button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  background: #555;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Styles pour la réponse sélectionnée (avant finalisation) */
+.answers button.selected {
+  background: orange;
+}
+
+/* Styles pour la réponse finalisée correcte */
+.answers button.final-correct {
+  background: #28a745;
+}
+
+/* Styles pour la réponse finalisée incorrecte */
+.answers button.final-incorrect {
+  background: #ff3333;
+}
+
+/* Résultats de l'avis du public */
+.audience-results p {
+  font-size: 1rem;
+  color: #ccc;
+  margin: 5px 0;
+}
+
+/* Boutons des jokers */
+.jokers button {
+  margin: 5px;
+  padding: 5px 10px;
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.jokers button:hover {
+  background: #666;
+}
+
+/* Boutons des jokers désactivés */
+.jokers button:disabled {
+  background: #777;
+  cursor: not-allowed;
+}
+/* Bouton de validation immédiate */
+.validate-btn {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background: #00e5ff;
+  border: none;
+  border-radius: 5px;
+  color: #000;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.validate-btn:hover {
+  background: #00b8e6;
+}
+.validate-btn:disabled {
+  background: #777;
+  cursor: not-allowed;
+}

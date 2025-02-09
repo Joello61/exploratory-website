@@ -1,4 +1,4 @@
-/* Styles de la page accueil */
+/* Container principal */
 .accueil-container {
   display: flex;
   flex-direction: column;
@@ -12,19 +12,16 @@
   overflow: hidden;
 }
 
-/* Animation texte typewriter */
+/* Conteneur pour l'effet machine à écrire */
 #typewriter-text-container {
   width: 80%;
   max-width: 950px;
-  height: auto;
   font-size: 28px;
   color: #00e5ff;
   line-height: 1.5;
   margin: 0 auto;
-  text-align: center;
   padding: 20px;
   white-space: pre-wrap;
-  word-wrap: break-word;
   position: relative;
   border-radius: 25px;
   background: rgba(0, 0, 0, 0.5);
@@ -32,25 +29,46 @@
   box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
 }
 
-#typewriter-text {
+/* Curseur clignotant pour l'effet typewriter */
+.cursor {
   display: inline-block;
-  white-space: pre-wrap;
-  text-align: center;
-}
-
-@keyframes typing {
-  from { width: 0; }
-  to { width: 100%; }
+  width: 2px;
+  height: 1em;
+  background: #00e5ff;
+  margin-left: 2px;
+  animation: blink 0.7s infinite;
 }
 
 @keyframes blink {
-  50% { border-color: transparent; }
+  0%, 50% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Animation de chargement */
+.loader {
+  width: 100%;
+  height: 4px;
+  margin-top: 25px;
+  position: relative;
+}
+
+.scanner {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(0, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
+  animation: scan 2s infinite;
+}
+
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* Contenu principal */
 .content {
   max-width: 80%;
   margin-top: 40px;
+  transition: opacity 1s ease;
 }
 
 .content h1 {
@@ -131,45 +149,32 @@ em {
   height: 100%;
   background: radial-gradient(circle, rgba(0, 229, 255, 0.1), rgba(0, 0, 0, 0) 50%);
   animation: float 10s infinite ease-in-out;
-  z-index: -1;
+  z-index: -2;
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
-  }
-  25% {
-    transform: translateY(-20px) translateX(-20px);
-  }
-  50% {
-    transform: translateY(20px) translateX(20px);
-  }
-  75% {
-    transform: translateY(-20px) translateX(20px);
-  }
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-20px, -20px); }
+  50% { transform: translate(20px, 20px); }
+  75% { transform: translate(-20px, 20px); }
 }
 
-/* Animation de chargement */
-.loader {
-  width: 100%;
-  height: 4px;
-  margin-top: 25px;
-  position: relative;
+/* Effet de lumière suivant la souris */
+.light-effect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.5) 0%, transparent 60%);
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  z-index: -1;
 }
 
-.scanner {
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(0, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
-  animation: scan 2s infinite;
-}
-
-@keyframes scan {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Effet néon */
+/* Effet de scintillement néon pour le titre */
 @keyframes neon-flicker {
   0% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff; }
   100% { text-shadow: 0 0 20px #00bfff, 0 0 30px #00bfff, 0 0 40px #00bfff; }

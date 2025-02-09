@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { gsap } from 'gsap';
 
 interface Puzzle {
   question: string;
@@ -73,6 +74,18 @@ export class ItineraireComponent {
   currentPuzzle: Puzzle | undefined;
   puzzleResponseMessage: string = '';
 
+  secretCode: string = "2468";
+  userInput: string = "";
+  codeMessage: string = "";
+  timelineUnlocked: boolean = false;
+
+  // Indices subtils pour guider l'utilisateur
+  hints: string[] = [
+    "Le code se compose de 4 chiffres.",
+    "Tous les chiffres sont pairs.",
+    "L'ordre des chiffres est la clé de la réussite."
+  ];
+
   openDetails(item: TimelineItem) {
     this.selectedItem = item;
     if (item.locked && item.puzzle) {
@@ -82,26 +95,48 @@ export class ItineraireComponent {
       this.showPuzzle = false;
     }
     this.isModalOpen = true;
+    // Animation d'ouverture de la modale avec GSAP
+    setTimeout(() => {
+      gsap.fromTo('.modal-content', { opacity: 0, y: -50 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+    }, 0);
   }
 
   closeModal() {
-    this.isModalOpen = false;
-    this.selectedItem = null;
-    this.currentPuzzle = undefined;
-    this.puzzleResponseMessage = '';
+    // Animation de fermeture de la modale avec GSAP
+    gsap.to('.modal-content', {
+      opacity: 0,
+      y: -50,
+      duration: 0.5,
+      ease: 'power2.in',
+      onComplete: () => {
+        this.isModalOpen = false;
+        this.selectedItem = null;
+        this.currentPuzzle = undefined;
+        this.puzzleResponseMessage = '';
+      }
+    });
   }
 
   checkPuzzleAnswer(selectedOption: string) {
     if (this.currentPuzzle && this.selectedItem) {
       if (selectedOption === this.currentPuzzle.answer) {
         this.puzzleResponseMessage = 'Bien joué, détective ! Cette étape est maintenant débloquée.';
+        // Animation de succès (agrandissement et apparition du message)
+        gsap.fromTo('.puzzle-response', { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.7)' });
+        // Déverrouillage de l'étape
         this.selectedItem.locked = false;
-        setInterval(() => {
+        // Optionnel : lancer une animation de confettis ou changer la couleur de l'item pour marquer le succès
+        gsap.to('.timeline-item', { backgroundColor: '#1e1e1e', duration: 0.5 }); // Exemple de changement de fond
+        // Fermer la modale après 1,5 seconde
+        setTimeout(() => {
           this.closeModal();
-        }, 1500); // Déverrouille l'étape
+        }, 1500);
       } else {
         this.puzzleResponseMessage = 'Mauvaise réponse... Réessayez ou utilisez un joker.';
+        // Animation de secousse en cas de mauvaise réponse
+        gsap.fromTo('.modal-content', { x: -10 }, { x: 10, duration: 0.1, yoyo: true, repeat: 5, ease: 'power1.inOut' });
       }
     }
   }
+  
 }

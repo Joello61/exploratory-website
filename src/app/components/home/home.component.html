@@ -1,7 +1,7 @@
 <div class="accueil-container">
-  <!-- Animation d'introduction -->
+  <!-- Conteneur pour l'effet machine à écrire -->
   <div id="typewriter-text-container">
-    <div id="typewriter-text"></div>
+    <div id="typewriter-text" #typewriterText></div>
   </div>
 
   <!-- Animation de chargement -->
@@ -9,16 +9,15 @@
     <div class="scanner"></div>
   </div>
 
-  <!-- Section principale -->
-  <div class="content">
+  <!-- Contenu principal (invisible au départ, révélé après l'animation) -->
+  <div class="content" style="opacity: 0;">
     <h1 class="title neon-effect">Enquête Mystère</h1>
     <p class="mission">
-      <span class="highlight">Votre objectif ?</span> Découvrir les secrets cachés dans un parcours professionnel et personnel exceptionnel. 
-      <strong>Mais attention...</strong> chaque révélation comporte son propre défi. 
+      <span class="highlight">Votre objectif ?</span> Découvrir les secrets cachés dans un parcours professionnel et personnel exceptionnel.
+      <strong>Mais attention...</strong> chaque révélation comporte son propre défi.
       <em>"Dans chaque mystère, il y a un moment clé. Êtes-vous prêt à le découvrir ?"</em>
     </p>
-
-    <!-- Bouton pour démarrer -->
+    <!-- Bouton interactif pour démarrer l'enquête -->
     <div class="btn-container">
       <button (click)="commencerEnquete()" class="start-btn">
         <i class="fas fa-search"></i> Commencer l'enquête
@@ -27,5 +26,14 @@
   </div>
 </div>
 
+<!-- Élément d'effet de lumière suivant la souris -->
+<div class="light-effect"></div>
+
 <!-- Animation de fond dynamique -->
 <div class="background-animation"></div>
+
+<!-- Lecture du son d'ambiance en boucle -->
+<audio id="ambiance-sound" loop>
+  <source src="assets/sounds/ambiance.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>

@@ -7,7 +7,7 @@
     </p>
   </div>
 
-  <!-- Grille de dossiers verrouillés -->
+  <!-- Grille des compétences -->
   <div class="skills-grid">
     <div
       class="skill-card"
@@ -17,35 +17,58 @@
       <div class="skill-icon">
         <i [class]="skill.isUnlocked ? skill.icon : 'fas fa-lock'"></i>
       </div>
-      <h3 class="skill-name">{{ skill.isUnlocked ? skill.name : 'Compétence ' + (i + 1) }}</h3>
-
+      <h3 class="skill-name">
+        {{ skill.isUnlocked ? skill.name : 'Compétence ' + (i + 1) }}
+      </h3>
     </div>
+  </div>
+
+  <!-- Bouton pour passer à la section suivante -->
+  <div *ngIf="allSkillsUnlocked" class="next-section-button">
+    <button (click)="goToNextSection()">Passer à la section suivante</button>
   </div>
 
   <!-- Modale pour les énigmes -->
   <div class="modal" *ngIf="isModalOpen">
-    <div class="modal-content">
-      <button class = "close-button" (click)="closeModal()"><i class="fas fa-xmark"></i></button>
+    <div class="modal-content" #modalContent>
+      <button class="close-button" (click)="closeModal()">
+        <i class="fas fa-xmark"></i>
+      </button>
+      <!-- Barre de progression du timer -->
+      <div class="timer-bar">
+        <div class="progress" [style.width.%]="getProgressBarWidth()"></div>
+      </div>
       <div class="row">
         <div class="col-md-8">
           <h2>{{ currentSkill?.question }}</h2>
-          <div class="timer">Temps restant : {{ countdown }}s</div>
+          <div class="timer-text">Temps restant : {{ countdown }}s</div>
         </div>
         <div class="col-md-4">
           <div class="answers">
-            <ng-container *ngFor="let answer of currentSkill?.answers">
-              <button *ngIf="!answer.hidden" (click)="checkAnswer(answer)" [disabled]="isAnswerSelected">
+            <ng-container *ngFor="let answer of currentSkill?.answers; let i = index">
+              <button
+                *ngIf="!answer.hidden"
+                (click)="selectAnswer(answer)"
+                [attr.data-index]="i"
+                [ngClass]="{
+                  'selected': selectedAnswer?.text === answer.text && !finalized,
+                  'final-correct': finalized && selectedAnswer?.text === answer.text && finalAnswerCorrect,
+                  'final-incorrect': finalized && selectedAnswer?.text === answer.text && !finalAnswerCorrect
+                }"
+              >
                 {{ answer.text }}
               </button>
             </ng-container>
-
-            <div *ngIf="showAudienceResults">
+            <div *ngIf="showAudienceResults" class="audience-results">
               <p *ngFor="let answer of currentSkill?.answers">
-                  {{ answer.text }} : {{ answer.votes }}%
+                {{ answer.text }} : {{ answer.votes }}%
               </p>
-          </div>          
-            
+            </div>
           </div>
+          <!-- Bouton de validation immédiate -->
+          <button class="validate-btn" (click)="validateAnswer()" [disabled]="!selectedAnswer || finalized">
+            C'est mon dernier mot
+          </button>
           <div class="jokers">
             <button (click)="useJoker('50-50')" [disabled]="jokersUsed.includes('50-50')">
               50:50
@@ -61,4 +84,14 @@
       </div>
     </div>
   </div>
+
+  <!-- Sons pour les réponses -->
+  <audio id="correct-sound">
+    <source src="assets/sounds/correct.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+  <audio id="wrong-sound">
+    <source src="assets/sounds/wrong.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
 </div>
