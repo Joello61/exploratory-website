@@ -1,0 +1,144 @@
+<!-- Container principal -->
+<div class="case-file-container">
+    <!-- Dialog Box pour le contexte -->
+    <div class="dialog-container" *ngIf="isDialogOpen">
+      <div class="d-flex justify-content-end">
+        <div class="detective-container">
+          <img class="img" src="img/detective.png" alt="detective">
+        </div>
+      </div>
+      <div class="dialog-box">
+        <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+          <i class="bi bi-x-circle fs-3"></i>
+        </button>
+        <div class="message px-5">
+          <div #typewriterText></div>
+          <span class="cursor" *ngIf="isTyping"></span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Titre de la section avec informations de progression -->
+    <div class="section-header">
+      <h2 class="section-title">Dossier d'enquête: Expérience professionnelle</h2>
+      <div class="case-status">
+        <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
+        <span *ngIf="!isModuleCompleted" class="status-badge">En cours</span>
+        <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
+        <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
+        
+        <!-- Bouton pour afficher les notes -->
+        <button class="notes-button" (click)="toggleNotes()">
+          <i class="bi bi-journal-text"></i>
+          Notes
+        </button>
+      </div>
+    </div>
+  
+    <!-- Classeur de dossiers -->
+    <div class="case-folder">
+      <!-- Onglets des dossiers -->
+      <div class="folder-tabs">
+        <div *ngFor="let job of jobs; let i = index" 
+             class="folder-tab" 
+             [class.active]="selectedJobIndex === i"
+             (click)="selectJob(i)">
+          <div class="tab-label">Dossier {{i + 1}}</div>
+          <div class="confidence-level" *ngIf="jobCompletionStatus[i] > 0">
+            {{jobCompletionStatus[i]}}%
+          </div>
+        </div>
+      </div>
+  
+      <!-- Contenu du dossier sélectionné -->
+      <div class="folder-content" *ngIf="selectedJob">
+        <!-- En-tête du dossier avec info de base -->
+        <div class="folder-header">
+          <div class="folder-title">
+            <h3 class="confidential">CONFIDENTIEL</h3>
+            <h4 class="job-title">{{selectedJob.title}}</h4>
+            <div class="job-company">{{selectedJob.company}}</div>
+            <div class="job-period">{{selectedJob.period}}</div>
+          </div>
+          <div class="folder-stamp" [class.revealed]="isStampRevealed">
+            <div class="stamp-inner">DÉCLASSIFIÉ</div>
+          </div>
+        </div>
+  
+        <!-- Contenu principal - mission et indices -->
+        <div class="folder-body">
+          <!-- Description du job - initialement caché -->
+          <div class="job-description" [class.revealed]="isDescriptionRevealed">
+            <h5>Description de mission:</h5>
+            <p>{{selectedJob.description}}</p>
+          </div>
+  
+          <!-- Indices à découvrir -->
+          <div class="evidence-container">
+            <h5>Indices à examiner:</h5>
+            <div class="evidence-grid">
+              <div *ngFor="let clue of selectedJob.clues; let i = index" 
+                   class="evidence-item" 
+                   [class.discovered]="discoveredClues[selectedJobIndex] && discoveredClues[selectedJobIndex][i]"
+                   (click)="revealClue(i)">
+                <div class="evidence-cover">
+                  <i class="bi bi-lock"></i>
+                </div>
+                <div class="evidence-content">
+                  <div class="evidence-icon">
+                    <i [class]="'bi ' + clue.icon"></i>
+                  </div>
+                  <div class="evidence-text">
+                    <div class="evidence-title">{{clue.title}}</div>
+                    <div class="evidence-detail">{{clue.detail}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Compétences débloquées -->
+          <div class="skills-section" *ngIf="getDiscoveredSkills().length > 0">
+            <h5>Compétences identifiées:</h5>
+            <div class="skills-tags">
+              <div *ngFor="let skill of getDiscoveredSkills()" class="skill-tag">
+                {{skill}}
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Notes et hypothèses -->
+        <div class="investigation-notes" *ngIf="jobCompletionStatus[selectedJobIndex] >= 50">
+          <h5>Notes d'enquête:</h5>
+          <div class="notes-content">
+            <p>{{selectedJob.notes}}</p>
+          </div>
+        </div>
+  
+        <!-- Conclusions -->
+        <div class="case-conclusion" *ngIf="jobCompletionStatus[selectedJobIndex] === 100">
+          <h5>Conclusions:</h5>
+          <div class="conclusion-content">
+            <p>{{selectedJob.conclusion}}</p>
+          </div>
+          
+          <!-- Achievements débloqués -->
+          <div class="achievements">
+            <div class="achievement-badge">
+              <i class="bi bi-trophy"></i>
+              <span>{{selectedJob.achievement}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Message de confirmation de complétion du module -->
+    <div class="completion-message" *ngIf="isModuleCompleted">
+      <div class="alert alert-success">
+        <i class="bi bi-check-circle-fill"></i>
+        Module complété ! L'analyse des expériences professionnelles a été réalisée avec succès.
+      </div>
+    </div>
+  </div>

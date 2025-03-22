@@ -1,28 +1,246 @@
-<div class="interests-container">
-    <!-- En-tête de la page -->
-    <div class="interests-header text-center">
-      <h1 class="title">🌍 Mes Centres d'Intérêt</h1>
-      <p class="interests-description">
-        Dans cette enquête, chaque indice révèle une passion qui m'inspire. Cliquez sur un dossier pour dévoiler le secret derrière chacun de mes centres d'intérêt.
-      </p>
+<!-- Container principal -->
+<div class="profile-investigation-container">
+  <!-- Dialog Box pour le contexte - Utilise maintenant le DialogService -->
+  <div class="dialog-container" *ngIf="isDialogOpen">
+    <div class="d-flex justify-content-end">
+      <div class="detective-container">
+        <img class="img" src="img/detective.png" alt="detective">
+      </div>
+    </div>
+    <div class="dialog-box">
+      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+        <i class="bi bi-x-circle fs-3"></i>
+      </button>
+      <div class="message px-5">
+        <div #typewriterText></div>
+        <span class="cursor" *ngIf="isTyping"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Titre de la section avec informations de progression -->
+  <div class="section-header">
+    <h2 class="section-title">Investigation personnelle: Centres d'intérêt</h2>
+    <div class="investigation-status">
+      <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
+      <span *ngIf="!isModuleCompleted" class="status-badge">En analyse</span>
+      <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
+      <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
+      
+      <!-- Bouton pour afficher les notes -->
+      <button class="notes-button" (click)="toggleNotes()">
+        <i class="bi bi-journal-text"></i>
+        Notes
+      </button>
+    </div>
+  </div>
+
+  <!-- Bureau d'investigation -->
+  <div class="investigation-board">
+    <!-- Photo de profil entourée d'indices -->
+    <div class="suspect-profile">
+      <div class="polaroid-container">
+        <div class="polaroid" [class.flipped]="isPhotoFlipped" (click)="flipPhoto()">
+          <div class="polaroid-front">
+            <div class="photo-placeholder">
+              <i class="bi bi-person-badge"></i>
+            </div>
+            <div class="polaroid-caption">Suspect #1337</div>
+          </div>
+          <div class="polaroid-back">
+            <div class="profile-notes">
+              <h4>Notes d'enquête</h4>
+              <p>Le suspect démontre des centres d'intérêt variés qui révèlent une personnalité à multiple facettes et une curiosité intellectuelle prononcée.</p>
+              <p>Les activités identifiées pourraient expliquer certaines compétences développées dans le cadre professionnel.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Indices autour de la photo -->
+      <div class="evidence-pins">
+        <div *ngFor="let evidence of evidenceItems; let i = index" 
+             class="evidence-pin" 
+             [class.discovered]="evidence.discovered"
+             [style.--pin-angle]="(i * 360 / evidenceItems.length) + 'deg'"
+             [style.--pin-distance]="'120px'"
+             (click)="discoverEvidence(i)">
+          <div class="pin-connector" [class.active]="evidence.discovered"></div>
+          <div class="pin-content">
+            <i [class]="'bi ' + evidence.icon"></i>
+          </div>
+        </div>
+      </div>
     </div>
     
-    <!-- Grille des centres d'intérêt -->
-    <div class="interests-grid">
-      <div class="interest-card" 
-           *ngFor="let interest of interests" 
-           (click)="revealInterest(interest)">
-        <div class="card-content">
-          <div class="card-icon">
-            <!-- Si l'intérêt est révélé, affiche l'icône, sinon un point d'interrogation -->
-            <i [class]="interest.revealed ? interest.icon : 'fas fa-question'"></i>
+    <!-- Plateau d'enquête - Avec les catégories d'intérêts -->
+    <div class="investigation-categories">
+      <div class="categories-header">
+        <h3>Catégories d'intérêt identifiées</h3>
+        <div class="discovery-progress">
+          <span>{{getDiscoveredCount()}} / {{evidenceItems.length}} indices découverts</span>
+          <div class="progress-bar-container">
+            <div class="progress-bar" [style.width.%]="getDiscoveredPercentage()"></div>
           </div>
-          <h3 class="card-title">{{ interest.revealed ? interest.title : '???' }}</h3>
-          <p class="card-description">
-            {{ interest.revealed ? interest.description : 'Cliquez pour résoudre l’énigme et révéler ce centre d\'intérêt.' }}
-          </p>
+        </div>
+      </div>
+      
+      <div class="categories-grid">
+        <div *ngFor="let category of interestCategories" 
+             class="category-card" 
+             [class.unlocked]="isCategoryUnlocked(category.id)"
+             (click)="selectCategory(category.id)">
+          <div class="category-icon">
+            <i [class]="'bi ' + category.icon"></i>
+          </div>
+          <div class="category-title">{{category.name}}</div>
+          <div class="lock-indicator" *ngIf="!isCategoryUnlocked(category.id)">
+            <i class="bi bi-lock"></i>
+          </div>
         </div>
       </div>
     </div>
   </div>
   
+  <!-- Fenêtre d'analyse détaillée -->
+  <div class="analysis-window" *ngIf="selectedCategory">
+    <div class="window-header">
+      <div class="header-title">
+        <i [class]="'bi ' + getSelectedCategoryIcon()"></i>
+        <h3>{{getSelectedCategoryName()}}</h3>
+      </div>
+      <button class="close-btn" (click)="closeAnalysisWindow()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    
+    <div class="window-content">
+      <div class="interests-gallery">
+        <div *ngFor="let interest of getInterestsByCategory()" 
+             class="interest-item" 
+             [class.discovered]="isInterestDiscovered(interest.id)"
+             [class.hidden]="!showUndiscoveredInterests && !isInterestDiscovered(interest.id)">
+          <div class="interest-header">
+            <div class="interest-icon">
+              <i [class]="'bi ' + interest.icon"></i>
+            </div>
+            <h4>{{interest.name}}</h4>
+            <div class="interest-status" *ngIf="!isInterestDiscovered(interest.id)">
+              <i class="bi bi-lock"></i>
+            </div>
+          </div>
+          
+          <div class="interest-content" *ngIf="isInterestDiscovered(interest.id)">
+            <div class="interest-description">
+              <p>{{interest.description}}</p>
+            </div>
+            
+            <div class="interest-details">
+              <div class="detail-item" *ngIf="interest.since">
+                <i class="bi bi-calendar-check"></i>
+                <span>Depuis {{interest.since}}</span>
+              </div>
+              <div class="detail-item" *ngIf="interest.frequency">
+                <i class="bi bi-clock"></i>
+                <span>{{interest.frequency}}</span>
+              </div>
+              <div class="detail-item" *ngIf="interest.skillsRelated && interest.skillsRelated.length > 0">
+                <i class="bi bi-link-45deg"></i>
+                <span>Compétences liées: {{interest.skillsRelated.join(', ')}}</span>
+              </div>
+            </div>
+            
+            <div class="interest-gallery" *ngIf="interest.relatedImages && interest.relatedImages.length > 0">
+              <div class="gallery-title">
+                <i class="bi bi-images"></i>
+                <span>En images</span>
+              </div>
+              <div class="images-container">
+                <div *ngFor="let image of interest.relatedImages" class="image-item">
+                  <div class="image-placeholder">
+                    <i class="bi bi-image"></i>
+                    <span>{{image.caption}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="interest-highlight" *ngIf="interest.highlight">
+              <i class="bi bi-stars"></i>
+              <div class="highlight-content">
+                <h5>Fait intéressant</h5>
+                <p>{{interest.highlight}}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="interest-locked-content" *ngIf="!isInterestDiscovered(interest.id)">
+            <p>Information cryptée. Trouvez plus d'indices pour débloquer ce contenu.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="window-footer">
+      <div class="filter-options">
+        <label class="toggle-container">
+          <input type="checkbox" [(ngModel)]="showUndiscoveredInterests">
+          <span class="toggle-label">Afficher centres d'intérêt non découverts</span>
+        </label>
+      </div>
+      <div class="navigation-buttons" *ngIf="getInterestsByCategory().length > 0">
+        <button class="nav-btn" (click)="showPreviousInterest()" [disabled]="currentInterestIndex <= 0">
+          <i class="bi bi-arrow-left"></i>
+          Précédent
+        </button>
+        <div class="nav-indicator">
+          {{currentInterestIndex + 1}} / {{getInterestsByCategory().length}}
+        </div>
+        <button class="nav-btn" (click)="showNextInterest()" [disabled]="currentInterestIndex >= getInterestsByCategory().length - 1">
+          Suivant
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal de découverte d'indice -->
+  <div class="evidence-modal" *ngIf="showEvidenceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4>Nouvel indice découvert!</h4>
+        <button class="close-modal-btn" (click)="closeEvidenceModal()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="evidence-icon">
+          <i [class]="'bi ' + (currentEvidence ? currentEvidence.icon : 'bi-question')"></i>
+        </div>
+        <div class="evidence-details">
+          <h5>{{currentEvidence ? currentEvidence.name : 'Indice'}}</h5>
+          <p>{{currentEvidence ? currentEvidence.description : 'Description de l\'indice'}}</p>
+          <div class="evidence-unlocks" *ngIf="currentEvidence && currentEvidence.unlocksInterests && currentEvidence.unlocksInterests.length > 0">
+            <h6>Centres d'intérêt débloqués:</h6>
+            <ul>
+              <li *ngFor="let interestId of currentEvidence.unlocksInterests">
+                {{getInterestName(interestId)}}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="continue-btn" (click)="closeEvidenceModal()">Continuer l'enquête</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message de confirmation de complétion du module -->
+  <div class="completion-message" *ngIf="isModuleCompleted">
+    <div class="alert alert-success">
+      <i class="bi bi-check-circle-fill"></i>
+      Module complété ! L'enquête sur les centres d'intérêt du sujet a été menée avec succès.
+    </div>
+  </div>
+</div>

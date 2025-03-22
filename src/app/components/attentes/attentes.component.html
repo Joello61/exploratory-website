@@ -1,33 +1,250 @@
-<div class="expectations-container">
-    <!-- Boîte verrouillée -->
-    <div class="locked-box" (click)="openModal()">
-      <div class="box-icon">🔒</div>
-      <p>Cliquez pour déverrouiller vos attentes</p>
-    </div>
-  
-    <!-- Modal pour la question -->
-    <div class="modal" *ngIf="isModalOpen">
-      <div class="modal-content">
-        <h2>{{ question.text }}</h2>
-        <div class="options">
-          <button
-            *ngFor="let option of question.options; let i = index"
-            (click)="checkAnswer(option)"
-            [disabled]="isAnswerSelected"
-          >
-            {{ option }}
-          </button>
-        </div>
-        <p *ngIf="isAnswerSelected && !isCorrect" class="error-message">
-          Dommage... essaie encore !
-        </p>
+<!-- Container principal -->
+<div class="future-vision-container">
+  <!-- Dialog Box pour le contexte - Utilise maintenant le DialogService -->
+  <div class="dialog-container" *ngIf="isDialogOpen">
+    <div class="d-flex justify-content-end">
+      <div class="detective-container">
+        <img class="img" src="img/detective.png" alt="detective">
       </div>
     </div>
-  
-    <!-- Boîte déverrouillée -->
-    <div class="unlocked-box" *ngIf="!boxLocked">
-      <div class="box-icon">🎁</div>
-      <p>Félicitations ! Vous avez déverrouillé vos attentes.</p>
-      <p class="expectation-message">{{ expectationMessage }}</p>
+    <div class="dialog-box">
+      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+        <i class="bi bi-x-circle fs-3"></i>
+      </button>
+      <div class="message px-5">
+        <div #typewriterText></div>
+        <span class="cursor" *ngIf="isTyping"></span>
+      </div>
     </div>
   </div>
+
+  <!-- Titre de la section avec statut de progression -->
+  <div class="section-header">
+    <h2 class="section-title">Projections Futures: Profil & Aspirations</h2>
+    <div class="projection-status">
+      <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
+      <span *ngIf="!isModuleCompleted" class="status-badge">En cours</span>
+      <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
+      <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
+    </div>
+  </div>
+
+  <!-- Terminal de prédiction -->
+  <div class="prediction-terminal">
+    <div class="terminal-header">
+      <div class="terminal-controls">
+        <span class="control red"></span>
+        <span class="control yellow"></span>
+        <span class="control green"></span>
+      </div>
+      <div class="terminal-title">SYSTÈME DE PROJECTION PROFESSIONNELLE v2.0</div>
+      <!-- Bouton pour afficher les notes -->
+      <button class="notes-button" (click)="toggleNotes()">
+        <i class="bi bi-journal-text"></i>
+        Notes
+      </button>
+    </div>
+    
+    <div class="terminal-content">
+      <div class="terminal-output" #terminalOutput>
+        <div *ngFor="let line of terminalLines" class="terminal-line" [class.active]="line.active">
+          <span class="prompt" *ngIf="line.type === 'input'">$</span>
+          <span class="command" *ngIf="line.type === 'input'">{{line.text}}</span>
+          <pre class="response" *ngIf="line.type === 'output'" [innerHTML]="line.text"></pre>
+        </div>
+        <div class="cursor-line" *ngIf="showCursor">
+          <span class="prompt">$</span>
+          <span class="current-input">{{currentInput}}</span>
+          <span class="cursor-blink"></span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="terminal-input-area">
+      <div class="suggestion-buttons">
+        <div class="suggestion-group">
+          <h4>Commandes disponibles:</h4>
+          <div class="buttons-row">
+            <button *ngFor="let cmd of availableCommands" 
+                    class="suggestion-btn" 
+                    [class.disabled]="isTyping || executingCommand"
+                    (click)="executeCommand(cmd)">
+              {{cmd}}
+            </button>
+          </div>
+        </div>
+        
+        <div class="suggestion-group" *ngIf="showTopicSuggestions">
+          <h4>Explorer un sujet:</h4>
+          <div class="buttons-row">
+            <button *ngFor="let topic of availableTopics" 
+                    class="topic-btn" 
+                    [class.disabled]="isTyping || executingCommand"
+                    (click)="exploreTopic(topic)">
+              {{topic}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Carte mentale des aspirations -->
+  <div class="aspirations-map" *ngIf="showAspirationsMap">
+    <div class="map-header">
+      <h3>Carte d'Aspirations Professionnelles</h3>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="priority high"></span>
+          <span>Priorité haute</span>
+        </div>
+        <div class="legend-item">
+          <span class="priority medium"></span>
+          <span>Priorité moyenne</span>
+        </div>
+        <div class="legend-item">
+          <span class="priority low"></span>
+          <span>Priorité standard</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mind-map">
+      <div class="map-center">
+        <div class="center-node">
+          <i class="bi bi-person-badge"></i>
+          <span>Aspirations</span>
+        </div>
+      </div>
+      
+      <div class="map-branches">
+        <!-- Branches principales -->
+        <div *ngFor="let branch of aspirationBranches; let i = index"
+             class="branch"
+             [class.revealed]="branch.revealed"
+             [style.--branch-angle]="getNodeAngle(i, aspirationBranches.length)">
+          
+          <div class="connector"></div>
+          
+          <div class="branch-node" [class]="'priority-' + branch.priority">
+            <i [class]="'bi ' + branch.icon"></i>
+            <span>{{branch.title}}</span>
+          </div>
+          
+          <!-- Sous-branches -->
+          <div *ngFor="let subBranch of branch.subBranches; let j = index"
+               class="sub-branch"
+               [class.revealed]="subBranch.revealed"
+               [style.--sub-branch-angle]="getSubNodeAngle(j, branch.subBranches.length)">
+            
+            <div class="sub-connector"></div>
+            
+            <div class="sub-branch-node" [class]="'priority-' + subBranch.priority">
+              <div class="node-content">
+                <i [class]="'bi ' + subBranch.icon"></i>
+                <span>{{subBranch.title}}</span>
+              </div>
+              <div class="node-details" *ngIf="subBranch.revealed">
+                <p>{{subBranch.description}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Projets futurs -->
+  <div class="future-projects" *ngIf="showFutureProjects">
+    <div class="projects-header">
+      <h3>Projets & Opportunités Futures</h3>
+      <div class="timeline-selector">
+        <button class="timeline-btn" [class.active]="selectedTimeline === 'short'" (click)="selectTimeline('short')">
+          Court terme
+        </button>
+        <button class="timeline-btn" [class.active]="selectedTimeline === 'mid'" (click)="selectTimeline('mid')">
+          Moyen terme
+        </button>
+        <button class="timeline-btn" [class.active]="selectedTimeline === 'long'" (click)="selectTimeline('long')">
+          Long terme
+        </button>
+      </div>
+    </div>
+    
+    <div class="projects-container">
+      <div class="project-card" *ngFor="let project of getProjectsByTimeline()"
+           [class.high-priority]="project.priority === 'high'"
+           [class.opportunity]="project.type === 'opportunity'">
+        <div class="project-header">
+          <div class="project-badge" [class]="project.type">
+            <i [class]="'bi ' + (project.type === 'project' ? 'bi-briefcase' : 'bi-lightning')"></i>
+          </div>
+          <div class="project-title-area">
+            <h4>{{project.title}}</h4>
+            <div class="project-meta">
+              <span class="project-type">{{project.type === 'project' ? 'Projet' : 'Opportunité'}}</span>
+              <span class="project-timeline">{{getTimelineLabel(project.timeline)}}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="project-content">
+          <p>{{project.description}}</p>
+          
+          <div class="project-tags">
+            <span class="tag" *ngFor="let tag of project.tags">{{tag}}</span>
+          </div>
+          
+          <div class="project-objectives" *ngIf="project.objectives && project.objectives.length > 0">
+            <h5>Objectifs:</h5>
+            <ul>
+              <li *ngFor="let objective of project.objectives">{{objective}}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Profil idéal -->
+  <div class="ideal-profile" *ngIf="showIdealProfile">
+    <div class="profile-header">
+      <h3>Profil d'Environnement Idéal</h3>
+      <div class="profile-meta">
+        Compatibilité avec les aspirations: 
+        <div class="compatibility-meter">
+          <div class="compatibility-bar" [style.width.%]="85"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="profile-categories">
+      <div class="profile-category" *ngFor="let category of idealEnvironment">
+        <div class="category-header">
+          <i [class]="'bi ' + category.icon"></i>
+          <h4>{{category.title}}</h4>
+        </div>
+        
+        <div class="category-items">
+          <div class="profile-item" *ngFor="let item of category.items">
+            <div class="item-icon">
+              <i [class]="'bi ' + item.icon"></i>
+            </div>
+            <div class="item-content">
+              <h5>{{item.title}}</h5>
+              <p>{{item.description}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message de confirmation de complétion du module -->
+  <div class="completion-message" *ngIf="isModuleCompleted">
+    <div class="alert alert-success">
+      <i class="bi bi-check-circle-fill"></i>
+      Module complété ! Toutes les projections futures ont été analysées avec succès.
+    </div>
+  </div>
+</div>

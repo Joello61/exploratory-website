@@ -1,19 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { gsap } from 'gsap';
-import { Router } from '@angular/router';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { NoteService } from '../../services/note.service';
+import { ProgressService } from '../../services/progress.service';
+import { TimeTrackerService } from '../../services/time-tracker.service';
+import { UserDataService } from '../../services/user-data.service';
 
-interface Skill {
+interface SkillCategory {
+  id: string;
   name: string;
   icon: string;
-  question: string;
-  answers: {
-    text: string;
-    correct: boolean;
-    hidden: boolean;
-    votes: number | undefined;
-  }[];
-  isUnlocked: boolean;
+}
+
+interface Skill {
+  id: string;
+  name: string;
+  category: string;
+  level: number;
+  description: string;
+  icon: string;
+  projects: string[];
+  discovered: boolean;
 }
 
 @Component({
@@ -21,440 +29,588 @@ interface Skill {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './competences.component.html',
-  styleUrls: ['./competences.component.css'],
+  styleUrls: ['./competences.component.css']
 })
-export class CompetencesComponent {
+export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('typewriterText') typewriterText!: ElementRef;
+
+  // Texte du dialogue d'introduction
+  private fullText: string = "Agent, nous avons besoin d'une analyse complète des compétences techniques de notre sujet. Utilisez notre laboratoire d'analyse pour scanner et identifier ses capacités. Chaque domaine de compétence doit être examiné minutieusement pour évaluer son niveau d'expertise.";
+  private subscriptions: Subscription = new Subscription();
+
+  // État du dialogue
+  isDialogOpen: boolean = true;
+  isTyping: boolean = false;
+
+  // Données de progression et de temps
+  elapsedTime: string = '00:00:00';
+  isModuleCompleted: boolean = false;
+  moduleProgressPercentage: number = 0;
+
+  // État du scan
+  isScanning: boolean = false;
+  scanProgress: number = 0;
+  scanningText: string = 'En attente de scan';
+  scannedSkillIndex: number = -1;
+
+  // Mode d'affichage
+  viewMode: 'graph' | 'list' = 'graph';
+  selectedCategory: string | null = null;
+
+  // Catégories de compétences
+  skillCategories: SkillCategory[] = [
+    { id: 'frontend', name: 'Développement Frontend', icon: 'bi-window' },
+    { id: 'backend', name: 'Développement Backend', icon: 'bi-server' },
+    { id: 'devops', name: 'DevOps & Cloud', icon: 'bi-cloud' },
+    { id: 'database', name: 'Base de données', icon: 'bi-database' },
+    { id: 'softskills', name: 'Soft Skills', icon: 'bi-people' }
+  ];
+
+  // Compétences
   skills: Skill[] = [
+    // Frontend
     {
+      id: 'angular',
       name: 'Angular',
-      icon: 'fab fa-angular',
-      question:
-        'Je suis un framework puissant utilisé pour concevoir des applications web modernes. Grâce à moi, les développeurs peuvent créer des interfaces dynamiques et performantes basées sur des composants. Mon logo est une lettre stylisée et je suis développé par Google. Qui suis-je ?',
-      answers: [
-        { text: 'Angular', correct: true, hidden: false, votes: 0 },
-        { text: 'React', correct: false, hidden: false, votes: 0 },
-        { text: 'Vue.js', correct: false, hidden: false, votes: 0 },
-        { text: 'Django', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      category: 'frontend',
+      level: 5,
+      description: 'Développement avancé d\'applications SPA avec Angular, utilisant RxJS, NgRx pour la gestion d\'état, et Angular Material pour les composants UI.',
+      icon: 'bi-code-slash',
+      projects: ['Plateforme e-commerce', 'Dashboard analytique', 'Application de gestion de projet'],
+      discovered: false
     },
     {
-      name: 'HTML/CSS',
-      icon: 'fab fa-html5',
-      question:
-        "Je suis le socle sur lequel repose tout site web. Grâce à moi, les développeurs structurent leurs pages et leur donnent une apparence agréable et harmonieuse. Mon premier rôle est de décrire le contenu (titres, paragraphes, images), tandis que mon compagnon s'occupe de l’esthétique. Qui sommes-nous ?",
-      answers: [
-        { text: 'Python', correct: false, hidden: false, votes: 0 },
-        { text: 'Java', correct: false, hidden: false, votes: 0 },
-        { text: 'HTML/CSS', correct: true, hidden: false, votes: 0 },
-        { text: 'Navigateur', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'react',
+      name: 'React',
+      category: 'frontend',
+      level: 4,
+      description: 'Création d\'interfaces utilisateur dynamiques avec React et Redux, en utilisant des hooks et des composants fonctionnels.',
+      icon: 'bi-code-square',
+      projects: ['Site vitrine interactif', 'Application de réservation'],
+      discovered: false
     },
     {
-      name: 'Node.js',
-      icon: 'fab fa-node-js',
-      question:
-        'Je suis un environnement d’exécution qui permet aux développeurs d’utiliser JavaScript côté serveur. Grâce à moi, on peut créer des applications rapides et évolutives, notamment des API et des services en temps réel. Je suis basé sur le moteur V8 de Google Chrome. Qui suis-je ?',
-      answers: [
-        { text: 'PHP', correct: false, hidden: false, votes: 0 },
-        { text: 'C#', correct: false, hidden: false, votes: 0 },
-        { text: 'Git', correct: false, hidden: false, votes: 0 },
-        { text: 'Node.js', correct: true, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'css',
+      name: 'CSS/SASS',
+      category: 'frontend',
+      level: 4,
+      description: 'Développement d\'interfaces responsives et animations avancées utilisant Flexbox, Grid, et animations CSS.',
+      icon: 'bi-brush',
+      projects: ['Refonte UI/UX', 'Thème personnalisé pour application SaaS'],
+      discovered: false
     },
     {
-      name: 'Python',
-      icon: 'fab fa-python',
-      question:
-        'Si tu veux faire de l’intelligence artificielle, de l’analyse de données ou de l’automatisation, tu ne peux pas me rater ! Je suis un langage simple et puissant, utilisé aussi bien par les débutants que par les experts en machine learning. On me reconnaît à mon logo en forme de serpent. Qui suis-je ?',
-      answers: [
-        { text: 'Python', correct: true, hidden: false, votes: 0 },
-        { text: 'C++', correct: false, hidden: false, votes: 0 },
-        { text: 'Jenkins', correct: false, hidden: false, votes: 0 },
-        { text: 'Flask', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
-    },
-    {
-      name: 'Git',
-      icon: 'fab fa-git-alt',
-      question:
-        'Travailler en équipe sur un projet informatique serait un chaos sans moi ! Je suis un outil de gestion de versions qui permet aux développeurs de suivre les modifications de leur code et de collaborer efficacement. Mon logo est une branche avec des connexions. Qui suis-je ?',
-      answers: [
-        { text: 'Rust', correct: false, hidden: false, votes: 0 },
-        { text: 'SQL', correct: false, hidden: false, votes: 0 },
-        { text: 'Git', correct: true, hidden: false, votes: 0 },
-        { text: 'Django', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
-    },
-    // Compétence supplémentaire 1 : TypeScript
-    {
+      id: 'typescript',
       name: 'TypeScript',
-      icon: 'fas fa-file-code',
-      question:
-        "Je suis un surensemble de JavaScript qui apporte le typage statique et des fonctionnalités avancées. Qui suis-je ?",
-      answers: [
-        { text: 'TypeScript', correct: true, hidden: false, votes: 0 },
-        { text: 'JavaScript', correct: false, hidden: false, votes: 0 },
-        { text: 'Python', correct: false, hidden: false, votes: 0 },
-        { text: 'C#', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      category: 'frontend',
+      level: 5,
+      description: 'Utilisation approfondie du typage et des fonctionnalités avancées de TypeScript pour des applications robustes et maintenables.',
+      icon: 'bi-braces',
+      projects: ['Framework interne', 'Librairie de composants réutilisables'],
+      discovered: false
     },
-    // Compétence supplémentaire 2 : RxJS
+    
+    // Backend
     {
-      name: 'RxJS',
-      icon: 'fas fa-sync-alt',
-      question:
-        "Je suis une librairie pour la programmation réactive, permettant de gérer des flux de données asynchrones dans Angular. Qui suis-je ?",
-      answers: [
-        { text: 'RxJS', correct: true, hidden: false, votes: 0 },
-        { text: 'Redux', correct: false, hidden: false, votes: 0 },
-        { text: 'Lodash', correct: false, hidden: false, votes: 0 },
-        { text: 'jQuery', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'nodejs',
+      name: 'Node.js',
+      category: 'backend',
+      level: 4,
+      description: 'Développement de serveurs et APIs RESTful avec Express.js et NestJS, incluant l\'authentification et l\'autorisation.',
+      icon: 'bi-hdd-network',
+      projects: ['API gateway', 'Microservices pour système de paiement'],
+      discovered: false
     },
-    // Compétence supplémentaire 3 : Sass/SCSS
     {
-      name: 'Sass/SCSS',
-      icon: 'fab fa-sass',
-      question:
-        "Je suis un préprocesseur CSS qui permet d'écrire des styles de manière plus efficace avec des variables, des mixins et une meilleure organisation. Qui suis-je ?",
-      answers: [
-        { text: 'Sass/SCSS', correct: true, hidden: false, votes: 0 },
-        { text: 'Less', correct: false, hidden: false, votes: 0 },
-        { text: 'Stylus', correct: false, hidden: false, votes: 0 },
-        { text: 'PostCSS', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'spring',
+      name: 'Spring Boot',
+      category: 'backend',
+      level: 3,
+      description: 'Création de services backend robustes avec Spring Boot, JPA/Hibernate et Spring Security.',
+      icon: 'bi-gear',
+      projects: ['Système de gestion d\'inventaire', 'API pour application mobile'],
+      discovered: false
     },
-    // Compétence supplémentaire 4 : Bootstrap
     {
-      name: 'Bootstrap',
-      icon: 'fab fa-bootstrap',
-      question:
-        "Je suis un framework CSS qui facilite la création d'interfaces web responsives et élégantes avec des composants préconçus. Qui suis-je ?",
-      answers: [
-        { text: 'Bootstrap', correct: true, hidden: false, votes: 0 },
-        { text: 'Foundation', correct: false, hidden: false, votes: 0 },
-        { text: 'Tailwind', correct: false, hidden: false, votes: 0 },
-        { text: 'Bulma', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'python',
+      name: 'Python',
+      category: 'backend',
+      level: 3,
+      description: 'Développement d\'outils d\'automatisation et scripts d\'analyse de données avec Python.',
+      icon: 'bi-filetype-py',
+      projects: ['Scripts ETL', 'Automatisation de déploiement'],
+      discovered: false
     },
-    // Compétence supplémentaire 5 : Docker
+    
+    // DevOps
     {
+      id: 'docker',
       name: 'Docker',
-      icon: 'fab fa-docker',
-      question:
-        "Je suis une plateforme de conteneurisation qui permet d'empaqueter des applications et leurs dépendances dans des conteneurs isolés. Qui suis-je ?",
-      answers: [
-        { text: 'Docker', correct: true, hidden: false, votes: 0 },
-        { text: 'Kubernetes', correct: false, hidden: false, votes: 0 },
-        { text: 'VirtualBox', correct: false, hidden: false, votes: 0 },
-        { text: 'VMware', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      category: 'devops',
+      level: 4,
+      description: 'Conteneurisation d\'applications et orchestration avec Docker et Docker Compose.',
+      icon: 'bi-box',
+      projects: ['Infrastructure de développement', 'Pipeline CI/CD'],
+      discovered: false
     },
-    // Compétence supplémentaire 6 : GraphQL
     {
-      name: 'GraphQL',
-      icon: 'fab fa-graphql',
-      question:
-        "Je suis un langage de requête pour les API qui permet de demander exactement les données nécessaires. Qui suis-je ?",
-      answers: [
-        { text: 'GraphQL', correct: true, hidden: false, votes: 0 },
-        { text: 'REST', correct: false, hidden: false, votes: 0 },
-        { text: 'SOAP', correct: false, hidden: false, votes: 0 },
-        { text: 'gRPC', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'kubernetes',
+      name: 'Kubernetes',
+      category: 'devops',
+      level: 3,
+      description: 'Déploiement et scaling d\'applications conteneurisées avec Kubernetes.',
+      icon: 'bi-diagram-3',
+      projects: ['Cluster de production', 'Système de déploiement blue/green'],
+      discovered: false
     },
-    // Compétence supplémentaire 7 : Firebase
     {
-      name: 'Firebase',
-      icon: 'fas fa-fire',
-      question:
-        "Je suis une plateforme de développement d'applications web et mobiles qui offre une base de données en temps réel, l'authentification et l'hébergement. Qui suis-je ?",
-      answers: [
-        { text: 'Firebase', correct: true, hidden: false, votes: 0 },
-        { text: 'Parse', correct: false, hidden: false, votes: 0 },
-        { text: 'AWS Amplify', correct: false, hidden: false, votes: 0 },
-        { text: 'Back4App', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'aws',
+      name: 'AWS',
+      category: 'devops',
+      level: 4,
+      description: 'Utilisation des services AWS pour l\'infrastructure cloud: EC2, S3, Lambda, CloudFormation.',
+      icon: 'bi-cloud-check',
+      projects: ['Architecture serverless', 'Système de stockage de données sécurisé'],
+      discovered: false
     },
-    // Compétence supplémentaire 8 : Jest
     {
-      name: 'Jest',
-      icon: 'fas fa-vial',
-      question:
-        "Je suis un framework de tests pour JavaScript, connu pour ma simplicité et mon intégration avec React et d'autres frameworks. Qui suis-je ?",
-      answers: [
-        { text: 'Jest', correct: true, hidden: false, votes: 0 },
-        { text: 'Mocha', correct: false, hidden: false, votes: 0 },
-        { text: 'Chai', correct: false, hidden: false, votes: 0 },
-        { text: 'Karma', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'cicd',
+      name: 'CI/CD',
+      category: 'devops',
+      level: 4,
+      description: 'Mise en place de workflows d\'intégration et déploiement continus avec Jenkins, GitLab CI, et GitHub Actions.',
+      icon: 'bi-arrow-repeat',
+      projects: ['Pipeline de déploiement automatisé', 'Tests automatisés'],
+      discovered: false
     },
-    // Compétence supplémentaire 9 : Tailwind CSS
+    
+    // Database
     {
-      name: 'Tailwind CSS',
-      icon: 'fab fa-tailwind-css',
-      question:
-        "Je suis un framework CSS utility-first permettant de créer des interfaces modernes et responsives rapidement. Qui suis-je ?",
-      answers: [
-        { text: 'Tailwind CSS', correct: true, hidden: false, votes: 0 },
-        { text: 'Bootstrap', correct: false, hidden: false, votes: 0 },
-        { text: 'Bulma', correct: false, hidden: false, votes: 0 },
-        { text: 'Foundation', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'sql',
+      name: 'SQL',
+      category: 'database',
+      level: 4,
+      description: 'Conception et optimisation de bases de données relationnelles avec PostgreSQL et MySQL.',
+      icon: 'bi-table',
+      projects: ['Modélisation de base de données e-commerce', 'Optimisation de requêtes complexes'],
+      discovered: false
     },
-    // Compétence supplémentaire 10 : Express.js
     {
-      name: 'Express.js',
-      icon: 'fas fa-server',
-      question:
-        "Je suis un framework minimaliste pour Node.js qui permet de gérer des routes et middlewares de manière simple et efficace. Qui suis-je ?",
-      answers: [
-        { text: 'Express.js', correct: true, hidden: false, votes: 0 },
-        { text: 'Koa', correct: false, hidden: false, votes: 0 },
-        { text: 'Nest.js', correct: false, hidden: false, votes: 0 },
-        { text: 'Hapi', correct: false, hidden: false, votes: 0 },
-      ],
-      isUnlocked: false,
+      id: 'mongodb',
+      name: 'MongoDB',
+      category: 'database',
+      level: 3,
+      description: 'Développement de solutions NoSQL avec MongoDB, incluant l\'agrégation et le sharding.',
+      icon: 'bi-file-earmark-binary',
+      projects: ['Système de logging', 'API de contenu dynamique'],
+      discovered: false
+    },
+    {
+      id: 'orm',
+      name: 'ORM / ODM',
+      category: 'database',
+      level: 4,
+      description: 'Utilisation de Mongoose, TypeORM et Sequelize pour l\'abstraction de bases de données.',
+      icon: 'bi-layers',
+      projects: ['Module d\'accès aux données', 'Couche d\'abstraction multi-DB'],
+      discovered: false
+    },
+    
+    // Soft Skills
+    {
+      id: 'teamwork',
+      name: 'Travail d\'équipe',
+      category: 'softskills',
+      level: 5,
+      description: 'Collaboration efficace au sein d\'équipes multidisciplinaires, partage de connaissances et mentorat.',
+      icon: 'bi-people-fill',
+      projects: ['Direction technique d\'une équipe de 6 développeurs', 'Programme de mentorat'],
+      discovered: false
+    },
+    {
+      id: 'communication',
+      name: 'Communication',
+      category: 'softskills',
+      level: 4,
+      description: 'Communication claire des concepts techniques aux parties prenantes non techniques et documentation approfondie.',
+      icon: 'bi-chat-dots',
+      projects: ['Présentation technique aux clients', 'Documentation technique détaillée'],
+      discovered: false
+    },
+    {
+      id: 'problemsolving',
+      name: 'Résolution de problèmes',
+      category: 'softskills',
+      level: 5,
+      description: 'Analyse de problèmes complexes et développement de solutions créatives et efficaces.',
+      icon: 'bi-puzzle',
+      projects: ['Débogage de système legacy', 'Optimisation de performance'],
+      discovered: false
+    },
+    {
+      id: 'agile',
+      name: 'Méthodologie Agile',
+      category: 'softskills',
+      level: 4,
+      description: 'Expérience avec Scrum et Kanban, facilitation de cérémonies agiles et planification de sprint.',
+      icon: 'bi-kanban',
+      projects: ['Transformation Agile', 'Facilitation de rétrospectives'],
+      discovered: false
     }
   ];
+
+  constructor(
+    private progressService: ProgressService,
+    private timeTrackerService: TimeTrackerService,
+    private userDataService: UserDataService,
+    private dialogService: DialogService,
+    private noteService: NoteService
+  ) {}
+
+  ngOnInit() {
+    // Vérifier si le module est disponible
+    if (!this.progressService.isModuleAvailable('personnalite')) {
+      console.warn('Ce module n\'est pas encore disponible');
+      // Logique de redirection à implémenter si nécessaire
+    }
+
+    // Par défaut, aucune compétence n'est découverte sauf si on a des données sauvegardées
+    this.skills = this.skills.map(skill => ({ ...skill, discovered: false }));
+
+    // S'abonner au temps écoulé
+    this.subscriptions.add(
+      this.timeTrackerService.elapsedTime$.subscribe(time => {
+        this.elapsedTime = time;
+      })
+    );
+
+    // Vérifier si le module est déjà complété
+    this.subscriptions.add(
+      this.progressService.moduleStatuses$.subscribe(statuses => {
+        this.isModuleCompleted = statuses.personnalite;
+        this.moduleProgressPercentage = this.progressService.getCompletionPercentage();
+        
+        // Si le module est déjà complété, on peut pré-charger les réponses utilisateur
+        if (this.isModuleCompleted || this.userDataService.getModuleResponses('personnalite').length > 0) {
+          this.loadSavedState();
+        }
+      })
+    );
+  }
+
+  ngAfterViewInit(): void {
+    // Utiliser le DialogService au lieu du typewriter manuel
+    setTimeout(() => {
+      this.showIntroDialog();
+    }, 500);
+  }
+
+  ngOnDestroy(): void {
+    // Se désabonner de tous les observables pour éviter les fuites mémoire
+    this.subscriptions.unsubscribe();
+  }
+
+  showIntroDialog(): void {
+    const message: DialogMessage = {
+      text: this.fullText,
+      character: 'detective',
+      imageUrl: 'img/detective.png'
+    };
+
+    this.dialogService.openDialog(message);
+    
+    // Démarrer l'effet de typewriter
+    this.dialogService.startTypewriter(this.fullText, () => {
+      // Callback une fois le typing terminé
+      setTimeout(() => {
+        this.dialogService.closeDialog();
+        this.isDialogOpen = false;
+      }, 3000);
+    });
+
+    // S'abonner au statut du typing
+    this.subscriptions.add(
+      this.dialogService.isTyping$.subscribe(isTyping => {
+        this.isTyping = isTyping;
+      })
+    );
+  }
+
+  closeDialogTypeWriter(): void {
+    this.dialogService.closeDialog();
+    this.isDialogOpen = false;
+  }
+
+  // Charger l'état sauvegardé précédemment
+  loadSavedState(): void {
+    const responses = this.userDataService.getModuleResponses('personnalite');
+    
+    if (responses.length > 0) {
+      // Charger les compétences découvertes
+      const discoveredSkillsResponse = responses.find(r => r.questionId === 'discovered_skills');
+      if (discoveredSkillsResponse && Array.isArray(discoveredSkillsResponse.response)) {
+        const discoveredIds = discoveredSkillsResponse.response as string[];
+        this.skills = this.skills.map(skill => ({
+          ...skill,
+          discovered: discoveredIds.includes(skill.id)
+        }));
+      }
+
+      // Charger la catégorie sélectionnée
+      const categoryResponse = responses.find(r => r.questionId === 'selected_category');
+      if (categoryResponse && typeof categoryResponse.response === 'string') {
+        this.selectedCategory = categoryResponse.response as string;
+      }
+
+      // Charger le mode d'affichage
+      const viewModeResponse = responses.find(r => r.questionId === 'view_mode');
+      if (viewModeResponse && (viewModeResponse.response === 'graph' || viewModeResponse.response === 'list')) {
+        this.viewMode = viewModeResponse.response as 'graph' | 'list';
+      }
+    }
+  }
+
+  // Sauvegarder l'état actuel
+  saveState(): void {
+    // Sauvegarder les compétences découvertes
+    const discoveredIds = this.skills
+      .filter(skill => skill.discovered)
+      .map(skill => skill.id);
+    
+    this.userDataService.saveResponse('personnalite', 'discovered_skills', discoveredIds);
+    
+    // Sauvegarder la catégorie sélectionnée
+    if (this.selectedCategory) {
+      this.userDataService.saveResponse('personnalite', 'selected_category', this.selectedCategory);
+    }
+    
+    // Sauvegarder le mode d'affichage
+    this.userDataService.saveResponse('personnalite', 'view_mode', this.viewMode);
+    
+    // Vérifier si le module peut être complété
+    this.checkModuleCompletion();
+  }
+
+  // Vérifier si les conditions de complétion du module sont remplies
+  checkModuleCompletion(): void {
+    // Par exemple, si un certain pourcentage des compétences sont découvertes
+    const discoveryThreshold = Math.ceil(this.skills.length * 0.7); // 70% des compétences
+    
+    if (this.getDiscoveredSkillsCount() >= discoveryThreshold && !this.isModuleCompleted) {
+      this.completeModule();
+    }
+  }
+
+  // Marquer le module comme complété
+  completeModule(): void {
+    this.progressService.completeModule('personnalite');
+    this.isModuleCompleted = true;
+    
+    // Ajouter une note automatique pour résumer ce qui a été fait
+    this.addCompletionNote();
+  }
+
+  // Ajouter une note récapitulative automatique
+  addCompletionNote(): void {
+    const discoveredCount = this.getDiscoveredSkillsCount();
+    const totalCount = this.getTotalSkillsCount();
+    
+    // Récupérer les compétences principales découvertes
+    const topSkills = this.getTopSkills(5)
+      .map(skill => `${skill.name} (${skill.level}/5)`)
+      .join(', ');
+    
+    const noteContent = `
+Module "Compétences" complété le ${new Date().toLocaleDateString()}.
+${discoveredCount}/${totalCount} compétences identifiées.
+Compétences clés: ${topSkills}.
+Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()}/5.
+    `;
+    
+    this.noteService.addNote(noteContent.trim());
+  }
+
+  // Ouvrir le panneau de notes
+  toggleNotes(): void {
+    this.noteService.toggleNotesVisibility();
+  }
+
+  // Sélection d'une catégorie
+  selectCategory(categoryId: string): void {
+    this.selectedCategory = categoryId;
+    
+    // Sauvegarder la sélection
+    this.userDataService.saveResponse('personnalite', 'selected_category', categoryId);
+    
+    // Animation pour le changement de catégorie
+    const container = document.querySelector('.skill-visualization');
+    if (container) {
+      container.classList.add('category-change');
+      setTimeout(() => {
+        container.classList.remove('category-change');
+      }, 500);
+    }
+  }
   
-
-
-  isModalOpen = false;
-  currentSkill: Skill | null = null;
-  countdown = 30;
-  initialCountdown = 30;
-  // Stocke la réponse sélectionnée
-  selectedAnswer: { text: string; correct: boolean } | null = null;
-  // Indicateurs pour la finalisation et l'évaluation
-  finalized: boolean = false;
-  finalAnswerCorrect: boolean = false;
-  jokersUsed: string[] = [];
-  showAudienceResults: boolean | undefined;
-  timerSubscription: any;
-
-  @ViewChild('modalContent', { static: false }) modalContent!: ElementRef;
-
-  constructor(private router: Router) {}
-
-  // Getter pour savoir si toutes les compétences sont débloquées
-  get allSkillsUnlocked(): boolean {
-    return this.skills.every(skill => skill.isUnlocked);
+  // Changement de mode d'affichage
+  switchViewMode(mode: 'graph' | 'list'): void {
+    this.viewMode = mode;
+    
+    // Sauvegarder le mode d'affichage
+    this.userDataService.saveResponse('personnalite', 'view_mode', mode);
   }
-
-  openModal(skill: Skill) {
-    if (skill.isUnlocked) return;
-    this.currentSkill = skill;
-    this.isModalOpen = true;
-    // Réinitialisation de l'état du modal
-    this.selectedAnswer = null;
-    this.finalized = false;
-    this.finalAnswerCorrect = false;
-    this.countdown = this.initialCountdown;
-    // Animation d'ouverture de la modale
-    setTimeout(() => {
-      gsap.fromTo(
-        this.modalContent.nativeElement,
-        { opacity: 0, scale: 0.8 },
-        { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' }
-      );
-    }, 0);
-    this.startCountdown();
-  }
-
-  closeModal() {
-    if (this.modalContent) {
-      gsap.to(this.modalContent.nativeElement, {
-        opacity: 0,
-        scale: 0.8,
-        duration: 0.5,
-        ease: 'power2.in',
-        onComplete: () => {
-          this.isModalOpen = false;
-          this.currentSkill = null;
-          this.resetModalState();
-        },
-      });
-    } else {
-      this.isModalOpen = false;
-      this.currentSkill = null;
-      this.resetModalState();
+  
+  // Démarrer un scan des compétences
+  startSkillScan(): void {
+    if (this.isScanning || !this.selectedCategory) return;
+    
+    this.isScanning = true;
+    this.scanProgress = 0;
+    this.scanningText = 'Scan en cours...';
+    
+    // Obtenir les compétences non découvertes pour la catégorie sélectionnée
+    const undiscoveredSkills = this.getSkillsByCategory(this.selectedCategory).filter(skill => !skill.discovered);
+    
+    if (undiscoveredSkills.length === 0) {
+      // Toutes les compétences sont déjà découvertes
+      this.scanningText = 'Scan terminé - Toutes les compétences identifiées';
+      this.isScanning = false;
+      return;
     }
-  }
-
-  resetModalState() {
-    if (this.timerSubscription) {
-      clearInterval(this.timerSubscription);
-      this.timerSubscription = null;
-    }
-    this.countdown = this.initialCountdown;
-    this.showAudienceResults = false;
-    this.selectedAnswer = null;
-    this.finalized = false;
-    this.finalAnswerCorrect = false;
-    if (this.currentSkill) {
-      this.currentSkill.answers.forEach(answer => (answer.hidden = false));
-    }
-  }
-
-  startCountdown() {
-    if (this.timerSubscription) {
-      clearInterval(this.timerSubscription);
-    }
-    this.timerSubscription = setInterval(() => {
-      if (this.countdown > 0) {
-        this.countdown--;
-      } else {
-        clearInterval(this.timerSubscription);
-        this.timerSubscription = null;
-        this.finalizeAnswer();
+    
+    // Choisir une compétence au hasard à découvrir
+    const randomIndex = Math.floor(Math.random() * undiscoveredSkills.length);
+    const skillToDiscover = undiscoveredSkills[randomIndex];
+    
+    // Index dans la liste complète des compétences de la catégorie
+    this.scannedSkillIndex = this.getSkillsByCategory(this.selectedCategory).findIndex(s => s.id === skillToDiscover.id);
+    
+    // Animation de scan
+    const scanInterval = setInterval(() => {
+      this.scanProgress += 2;
+      
+      if (this.scanProgress >= 100) {
+        clearInterval(scanInterval);
+        
+        // Révéler la compétence
+        this.revealSkill(skillToDiscover.id);
+        
+        // Réinitialiser l'état du scan
+        setTimeout(() => {
+          this.isScanning = false;
+          this.scanProgress = 0;
+          this.scannedSkillIndex = -1;
+          this.scanningText = `Scan terminé - ${skillToDiscover.name} identifié`;
+        }, 500);
       }
-    }, 1000);
+    }, 50);
   }
-
-  stopCountdown() {
-    if (this.timerSubscription) {
-      clearInterval(this.timerSubscription);
-      this.timerSubscription = null;
+  
+  // Révéler une compétence spécifique
+  revealSkill(skillId: string): void {
+    const skillIndex = this.skills.findIndex(s => s.id === skillId);
+    if (skillIndex >= 0) {
+      // Créer une nouvelle copie du tableau avec la compétence mise à jour
+      const updatedSkills = [...this.skills];
+      updatedSkills[skillIndex] = { ...updatedSkills[skillIndex], discovered: true };
+      this.skills = updatedSkills;
+      
+      // Sauvegarder l'état
+      this.saveState();
     }
   }
-
-  getProgressBarWidth() {
-    return (this.countdown / this.initialCountdown) * 100;
+  
+  // Obtenir le nom d'une catégorie par son ID
+  getCategoryName(categoryId: string): string {
+    const category = this.skillCategories.find(c => c.id === categoryId);
+    return category ? category.name : 'Catégorie inconnue';
   }
-
-  // Lorsqu'une réponse est cliquée, elle est sélectionnée (affichage en orange)
-  selectAnswer(answer: { text: string; correct: boolean }) {
-    this.selectedAnswer = answer;
+  
+  // Obtenir l'icône d'une catégorie par son ID
+  getCategoryIcon(categoryId: string): string {
+    const category = this.skillCategories.find(c => c.id === categoryId);
+    return category ? category.icon : 'bi-question';
   }
-
-  // Permet à l'utilisateur de valider immédiatement sa réponse
-  validateAnswer() {
-    this.stopCountdown();
-    this.finalizeAnswer();
+  
+  // Obtenir les compétences par catégorie
+  getSkillsByCategory(categoryId: string): Skill[] {
+    return this.skills.filter(skill => skill.category === categoryId);
   }
-
-  // Évalue la réponse sélectionnée et lance l'animation de type roulette
-  finalizeAnswer() {
-    this.finalized = true;
-    if (this.selectedAnswer && this.selectedAnswer.correct) {
-      this.finalAnswerCorrect = true;
-      this.playCorrectSound();
-      gsap.to(this.modalContent.nativeElement, { borderColor: "#28a745", duration: 0.5 });
-      if (this.currentSkill) {
-        this.currentSkill.isUnlocked = true;
-      }
-    } else {
-      this.finalAnswerCorrect = false;
-      this.playWrongSound();
-      gsap.to(this.modalContent.nativeElement, { borderColor: "#ff3333", duration: 0.5 });
-    }
-    // Après 3 secondes, fermer la modale
-    setTimeout(() => {
-      this.closeModal();
-    }, 1500);
+  
+  // Obtenir le pourcentage de complétion d'une catégorie
+  getCategoryCompletionPercentage(categoryId: string): number {
+    const categorySkills = this.getSkillsByCategory(categoryId);
+    if (categorySkills.length === 0) return 0;
+    
+    const discoveredCount = categorySkills.filter(skill => skill.discovered).length;
+    return Math.round((discoveredCount / categorySkills.length) * 100);
   }
-
-  // Gestion des jokers globaux
-  useJoker(type: string) {
-    if (!this.jokersUsed.includes(type)) {
-      this.jokersUsed.push(type);
-    }
-    switch (type) {
-      case '50-50':
-        this.useFiftyFifty();
-        break;
-      case 'audience':
-        this.useAudienceHelp();
-        break;
-      case 'pause':
-        this.pauseTimer();
-        break;
-      default:
-        console.log('Joker inconnu');
-    }
+  
+  // Obtenir le niveau moyen d'une catégorie (pour le graphique radar)
+  getCategoryAverageLevel(categoryId: string): number {
+    const discoveredSkills = this.getSkillsByCategory(categoryId).filter(skill => skill.discovered);
+    if (discoveredSkills.length === 0) return 0;
+    
+    const sum = discoveredSkills.reduce((total, skill) => total + skill.level, 0);
+    return sum / discoveredSkills.length;
   }
-
-  useFiftyFifty() {
-    if (!this.currentSkill || !this.currentSkill.answers) return;
-    let wrongAnswers = this.currentSkill.answers.filter(a => !a.correct);
-    if (wrongAnswers.length > 2) {
-      wrongAnswers = this.shuffleArray(wrongAnswers).slice(0, 2);
-    }
-    this.currentSkill.answers.forEach((answer, index) => {
-      if (wrongAnswers.includes(answer)) {
-        gsap.to(`.answers button[data-index="${index}"]`, {
-          opacity: 0,
-          duration: 0.3,
-          onComplete: () => {
-            answer.hidden = true;
-          },
-        });
-      }
-    });
+  
+  // Obtenir le niveau moyen des compétences techniques (hors soft skills)
+  getAverageTechnicalSkillLevel(): number {
+    const technicalSkills = this.skills.filter(
+      skill => skill.discovered && skill.category !== 'softskills'
+    );
+    
+    if (technicalSkills.length === 0) return 0;
+    
+    const sum = technicalSkills.reduce((total, skill) => total + skill.level, 0);
+    return parseFloat((sum / technicalSkills.length).toFixed(1));
   }
-
-  shuffleArray(array: any[]) {
-    return array.sort(() => Math.random() - 0.5);
+  
+  // Obtenir les compétences les plus fortes (pour l'affichage des compétences clés)
+  getTopSkills(limit: number = 6): Skill[] {
+    return this.skills
+      .filter(skill => skill.discovered)
+      .sort((a, b) => b.level - a.level)
+      .slice(0, limit);
   }
-
-  useAudienceHelp() {
-    if (!this.currentSkill || !this.currentSkill.answers) return;
-    let totalVotes = 100;
-    let correctAnswer = this.currentSkill.answers.find(a => a.correct);
-    let otherAnswers = this.currentSkill.answers.filter(a => !a.correct);
-    let correctVote = Math.floor(Math.random() * 40) + 50; // entre 50% et 90%
-    totalVotes -= correctVote;
-    let otherVotes = otherAnswers.map(() => Math.floor(totalVotes / otherAnswers.length));
-    this.currentSkill.answers.forEach(answer => {
-      if (answer.correct) {
-        answer.votes = correctVote;
-      } else {
-        answer.votes = otherVotes.pop();
-      }
-    });
-    this.showAudienceResults = true;
+  
+  // Obtenir le nombre total de compétences
+  getTotalSkillsCount(): number {
+    return this.skills.length;
   }
-
-  pauseTimer() {
-    this.stopCountdown();
-    setTimeout(() => {
-      this.startCountdown();
-    }, 5000);
+  
+  // Obtenir le nombre de compétences découvertes
+  getDiscoveredSkillsCount(): number {
+    return this.skills.filter(skill => skill.discovered).length;
   }
-
-  playCorrectSound() {
-    const audio = document.getElementById('correct-sound') as HTMLAudioElement;
-    if (audio) {
-      audio.volume = 0.7;
-      audio.play().catch(err => console.error("Audio playback error:", err));
+  
+  // Obtenir le pourcentage global de complétion
+  getOverallCompletionPercentage(): number {
+    return Math.round((this.getDiscoveredSkillsCount() / this.getTotalSkillsCount()) * 100);
+  }
+  
+  // Obtenir une description textuelle du niveau de compétence
+  getLevelDescription(level: number): string {
+    switch (level) {
+      case 1: return 'Notions de base';
+      case 2: return 'Compétent';
+      case 3: return 'Avancé';
+      case 4: return 'Expert';
+      case 5: return 'Maîtrise complète';
+      default: return 'Inconnu';
     }
   }
-
-  playWrongSound() {
-    const audio = document.getElementById('wrong-sound') as HTMLAudioElement;
-    if (audio) {
-      audio.volume = 0.7;
-      audio.play().catch(err => console.error("Audio playback error:", err));
-    }
+  
+  // Calculer l'angle pour positionner un nœud dans le graphique en étoile
+  getNodeAngle(index: number, total: number): number {
+    if (total <= 1) return 0;
+    return (index * (360 / total));
   }
-
-  goToNextSection() {
-    // Navigation vers la section suivante (ajustez la route selon vos besoins)
-    this.router.navigate(['/itineraire']);
+  
+  // Calculer la distance depuis le centre en fonction du niveau de compétence
+  getNodeDistance(level: number): number {
+    // Normaliser le niveau pour qu'il soit entre 0.3 (plus proche du centre) et 1.0 (plus loin du centre)
+    return 0.3 + ((level - 1) / 4) * 0.7;
   }
 }

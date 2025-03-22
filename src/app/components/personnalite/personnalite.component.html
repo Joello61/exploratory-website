@@ -1,65 +1,451 @@
-<div class="personality-container">
-    <!-- Titre et description -->
-    <div class="personality-header text-center">
-      <h1 class="title">🌟 Ma Personnalité</h1>
-      <p class="personality-description">
-        Découvrez qui je suis, mes passions, mes valeurs et ce qui m'inspire au quotidien.
-      </p>
+<!-- Container principal -->
+<div class="psycho-profile-container">
+  <!-- Dialog Box pour le contexte -->
+  <div class="dialog-container" *ngIf="isDialogOpen">
+    <div class="d-flex justify-content-end">
+      <div class="detective-container">
+        <img class="img" src="img/detective.png" alt="detective">
+      </div>
     </div>
-  
-    <!-- Sections thématiques -->
-    <div class="personality-sections">
-      <!-- Section Valeurs -->
-      <div class="section">
-        <h2>Mes Valeurs</h2>
-        <div class="cards">
-          <div class="card" *ngFor="let value of values">
-            <div class="card-icon">
-              <i [class]="value.icon"></i>
+    <div class="dialog-box">
+      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+        <i class="bi bi-x-circle fs-3"></i>
+      </button>
+      <div class="message px-5">
+        <div #typewriterText></div>
+        <span class="cursor" *ngIf="isTyping"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Titre de la section -->
+  <div class="section-header">
+    <h2 class="section-title">Profil psychologique: Analyse de personnalité</h2>
+    <div class="profile-status">Statut: <span class="status-badge">Confidentiel</span></div>
+  </div>
+
+  <!-- Dossier de profil psychologique -->
+  <div class="psych-folder">
+    <!-- Onglets du dossier -->
+    <div class="folder-tabs">
+      <div *ngFor="let tab of profileTabs" 
+           class="folder-tab" 
+           [class.active]="activeTab === tab.id"
+           (click)="setActiveTab(tab.id)">
+        <div class="tab-icon">
+          <i [class]="'bi ' + tab.icon"></i>
+        </div>
+        <div class="tab-label">{{tab.name}}</div>
+      </div>
+    </div>
+    
+    <!-- Contenu du dossier -->
+    <div class="folder-content">
+      <!-- Système de test de personnalité -->
+      <div class="personality-test" *ngIf="activeTab === 'test'">
+        <div class="test-header">
+          <h3>Évaluation comportementale interactive</h3>
+          <div class="test-status">
+            <div class="status-text">{{getTestStatusText()}}</div>
+            <div class="progress-container">
+              <div class="progress-bar" [style.width.%]="getTestCompletionPercentage()"></div>
             </div>
-            <h3>{{ value.title }}</h3>
-            <p>{{ value.description }}</p>
+          </div>
+        </div>
+        
+        <div class="test-container" *ngIf="!testCompleted">
+          <div class="scenario-box" *ngIf="currentScenario">
+            <div class="scenario-number">Scénario {{currentScenarioIndex + 1}}/{{scenarios.length}}</div>
+            <div class="scenario-title">{{currentScenario.title}}</div>
+            <div class="scenario-description">{{currentScenario.description}}</div>
+            
+            <div class="scenario-responses">
+              <div *ngFor="let response of currentScenario.responses; let i = index" 
+                   class="response-option"
+                   [class.selected]="selectedResponse === i"
+                   (click)="selectResponse(i)">
+                <div class="response-letter">{{getResponseLetter(i)}}</div>
+                <div class="response-text">{{response.text}}</div>
+              </div>
+            </div>
+            
+            <div class="scenario-navigation">
+              <button class="nav-btn" 
+                      [disabled]="currentScenarioIndex === 0"
+                      (click)="previousScenario()">
+                <i class="bi bi-arrow-left"></i>
+                Précédent
+              </button>
+              
+              <button class="nav-btn primary" 
+                      [disabled]="selectedResponse === null"
+                      (click)="nextScenario()">
+                {{currentScenarioIndex < scenarios.length - 1 ? 'Suivant' : 'Terminer'}}
+                <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="test-instructions" *ngIf="!currentScenario">
+            <div class="instructions-icon">
+              <i class="bi bi-clipboard-check"></i>
+            </div>
+            <h3>Test de personnalité interactif</h3>
+            <p>Pour révéler le profil psychologique du sujet, vous allez être confronté à différents scénarios comportementaux. Pour chaque scénario, choisissez la réponse qui vous semble correspondre le mieux à votre personnalité.</p>
+            <p>Vos réponses permettront de générer une analyse détaillée des traits de caractère du sujet.</p>
+            <button class="start-btn" (click)="startTest()">
+              Commencer l'évaluation
+              <i class="bi bi-arrow-right-circle"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="test-results" *ngIf="testCompleted">
+          <div class="results-header">
+            <h3>Analyse comportementale complétée</h3>
+            <button class="restart-btn" (click)="restartTest()">
+              <i class="bi bi-arrow-repeat"></i>
+              Recommencer le test
+            </button>
+          </div>
+          
+          <div class="results-overview">
+            <div class="personality-gauge">
+              <div class="chart-container">
+                <!-- Ici, on pourrait ajouter un graphique si besoin -->
+                <div class="placeholder-chart">
+                  <div class="chart-quadrants">
+                    <div class="quadrant q1"></div>
+                    <div class="quadrant q2"></div>
+                    <div class="quadrant q3"></div>
+                    <div class="quadrant q4"></div>
+                  </div>
+                  <div class="chart-center">
+                    <i class="bi bi-person"></i>
+                  </div>
+                  <div class="chart-markers">
+                    <div class="marker extroversion" [style.height.%]="(traitScores.extroversion / maxTraitScore) * 100"></div>
+                    <div class="marker agreeableness" [style.height.%]="(traitScores.agreeableness / maxTraitScore) * 100"></div>
+                    <div class="marker conscientiousness" [style.height.%]="(traitScores.conscientiousness / maxTraitScore) * 100"></div>
+                    <div class="marker openness" [style.height.%]="(traitScores.openness / maxTraitScore) * 100"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="traits-summary">
+                <div class="trait-item" *ngFor="let trait of getTraitsArray()">
+                  <div class="trait-name">
+                    <i [class]="'bi ' + getTraitIcon(trait.id)"></i>
+                    <span>{{trait.name}}</span>
+                  </div>
+                  <div class="trait-bar-container">
+                    <div class="trait-bar" [style.width.%]="(trait.score / maxTraitScore) * 100" [style.background]="getTraitColor(trait.id)"></div>
+                  </div>
+                  <div class="trait-score">{{trait.score}}/10</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="primary-traits">
+            <h4>Traits de personnalité dominants</h4>
+            <div class="dominant-traits">
+              <div *ngFor="let trait of getDominantTraits(2)" class="dominant-trait">
+                <div class="trait-header">
+                  <div class="trait-icon" [style.background]="getTraitColor(trait.id)">
+                    <i [class]="'bi ' + getTraitIcon(trait.id)"></i>
+                  </div>
+                  <h5>{{trait.name}}</h5>
+                </div>
+                <div class="trait-description">
+                  <p>{{getTraitDescription(trait.id)}}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-  
-      <!-- Section Passions -->
-      <div class="section">
-        <h2>Mes Passions</h2>
-        <div class="cards">
-          <div class="card" *ngFor="let passion of passions">
-            <div class="card-icon">
-              <i [class]="passion.icon"></i>
+      
+      <!-- Profil de personnalité -->
+      <div class="personality-profile" *ngIf="activeTab === 'profile'">
+        <div class="profile-locked" *ngIf="!testCompleted">
+          <div class="locked-icon">
+            <i class="bi bi-lock"></i>
+          </div>
+          <h3>Profil non accessible</h3>
+          <p>Vous devez d'abord compléter l'évaluation comportementale pour débloquer le profil de personnalité.</p>
+          <button class="take-test-btn" (click)="setActiveTab('test')">
+            Passer le test maintenant
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+        
+        <div class="profile-content" *ngIf="testCompleted">
+          <div class="profile-summary">
+            <div class="summary-header">
+              <h3>Résumé du profil psychologique</h3>
+              <div class="profile-date">Analyse générée le {{getCurrentDate()}}</div>
             </div>
-            <h3>{{ passion.title }}</h3>
-            <p>{{ passion.description }}</p>
+            
+            <div class="summary-content">
+              <p class="summary-text">{{getPersonalitySummary()}}</p>
+            </div>
+          </div>
+          
+          <div class="personality-details">
+            <div class="traits-grid">
+              <div *ngFor="let trait of personalityTraits" class="trait-card">
+                <div class="trait-card-header">
+                  <div class="trait-icon" [style.background]="getTraitColor(trait.id)">
+                    <i [class]="'bi ' + trait.icon"></i>
+                  </div>
+                  <div class="trait-title">
+                    <h4>{{trait.name}}</h4>
+                    <div class="trait-score-badge" [style.background]="getTraitColor(trait.id)">
+                      {{getTraitScore(trait.id)}}/10
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="trait-content">
+                  <p class="trait-description">{{trait.description}}</p>
+                  
+                  <div class="trait-aspects">
+                    <h5>Manifestations</h5>
+                    <ul class="aspects-list">
+                      <li *ngFor="let aspect of trait.manifestations">{{aspect}}</li>
+                    </ul>
+                  </div>
+                  
+                  <div class="trait-work-impact">
+                    <h5>Impact professionnel</h5>
+                    <p>{{trait.workImpact}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="personality-insights">
+            <div class="insights-header">
+              <h3>Points clés et observations</h3>
+            </div>
+            
+            <div class="insights-body">
+              <div class="insight-group">
+                <h4>
+                  <i class="bi bi-lightbulb"></i>
+                  Forces principales
+                </h4>
+                <ul class="insight-list">
+                  <li *ngFor="let strength of personalityStrengths">{{strength}}</li>
+                </ul>
+              </div>
+              
+              <div class="insight-group">
+                <h4>
+                  <i class="bi bi-arrow-up-circle"></i>
+                  Contributions en équipe
+                </h4>
+                <ul class="insight-list">
+                  <li *ngFor="let contribution of teamContributions">{{contribution}}</li>
+                </ul>
+              </div>
+              
+              <div class="insight-group">
+                <h4>
+                  <i class="bi bi-briefcase"></i>
+                  Environnement de travail optimal
+                </h4>
+                <ul class="insight-list">
+                  <li *ngFor="let environment of workEnvironment">{{environment}}</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-  
-      <!-- Section Centres d'intérêt -->
-      <div class="section">
-        <h2>Mes Centres d'Intérêt</h2>
-        <div class="cards">
-          <div class="card" *ngFor="let interest of interests">
-            <div class="card-icon">
-              <i [class]="interest.icon"></i>
+      
+      <!-- Communication & Style de travail -->
+      <div class="work-style" *ngIf="activeTab === 'style'">
+        <div class="style-locked" *ngIf="!testCompleted">
+          <div class="locked-icon">
+            <i class="bi bi-lock"></i>
+          </div>
+          <h3>Profil non accessible</h3>
+          <p>Vous devez d'abord compléter l'évaluation comportementale pour débloquer l'analyse du style de travail.</p>
+          <button class="take-test-btn" (click)="setActiveTab('test')">
+            Passer le test maintenant
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+        
+        <div class="style-content" *ngIf="testCompleted">
+          <div class="style-header">
+            <h3>Style de travail et communication</h3>
+          </div>
+          
+          <div class="style-sections">
+            <div class="style-section">
+              <div class="section-header">
+                <i class="bi bi-chat-dots"></i>
+                <h4>Mode de communication</h4>
+              </div>
+              
+              <div class="communication-style">
+                <div class="comm-diagram">
+                  <div class="comm-scale">
+                    <div class="scale-label left">Direct</div>
+                    <div class="scale-line">
+                      <div class="scale-marker" [style.left.%]="getCommunicationStyle().directness"></div>
+                    </div>
+                    <div class="scale-label right">Diplomate</div>
+                  </div>
+                  
+                  <div class="comm-scale">
+                    <div class="scale-label left">Factuel</div>
+                    <div class="scale-line">
+                      <div class="scale-marker" [style.left.%]="getCommunicationStyle().factual"></div>
+                    </div>
+                    <div class="scale-label right">Émotionnel</div>
+                  </div>
+                  
+                  <div class="comm-scale">
+                    <div class="scale-label left">Concis</div>
+                    <div class="scale-line">
+                      <div class="scale-marker" [style.left.%]="getCommunicationStyle().conciseness"></div>
+                    </div>
+                    <div class="scale-label right">Détaillé</div>
+                  </div>
+                </div>
+                
+                <div class="comm-summary">
+                  <p>{{getCommunicationSummary()}}</p>
+                </div>
+              </div>
             </div>
-            <h3>{{ interest.title }}</h3>
-            <p>{{ interest.description }}</p>
+            
+            <div class="style-section">
+              <div class="section-header">
+                <i class="bi bi-people"></i>
+                <h4>Collaboration & Dynamique d'équipe</h4>
+              </div>
+              
+              <div class="collaboration-style">
+                <div class="collab-grid">
+                  <div *ngFor="let aspect of collaborationAspects" class="collab-aspect">
+                    <div class="aspect-header">
+                      <i [class]="'bi ' + aspect.icon"></i>
+                      <h5>{{aspect.name}}</h5>
+                    </div>
+                    <p>{{aspect.description}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="style-section">
+              <div class="section-header">
+                <i class="bi bi-gear"></i>
+                <h4>Processus de travail</h4>
+              </div>
+              
+              <div class="work-process">
+                <div class="process-diagram">
+                  <div class="process-item" *ngFor="let process of workProcesses; let i = index">
+                    <div class="process-icon">
+                      <i [class]="'bi ' + process.icon"></i>
+                    </div>
+                    <div class="process-arrow" *ngIf="i < workProcesses.length - 1">
+                      <i class="bi bi-arrow-right"></i>
+                    </div>
+                    <div class="process-details">
+                      <h5>{{process.name}}</h5>
+                      <p>{{process.description}}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-  
-      <!-- Section Citations -->
-      <div class="section">
-        <h2>Citations Inspirantes</h2>
-        <div class="quotes">
-          <div class="quote" *ngFor="let quote of quotes">
-            <p>"{{ quote.text }}"</p>
-            <p class="author">- {{ quote.author }}</p>
+      
+      <!-- Motivations & Valeurs -->
+      <div class="motivations" *ngIf="activeTab === 'values'">
+        <div class="values-locked" *ngIf="!testCompleted">
+          <div class="locked-icon">
+            <i class="bi bi-lock"></i>
+          </div>
+          <h3>Profil non accessible</h3>
+          <p>Vous devez d'abord compléter l'évaluation comportementale pour débloquer l'analyse des motivations et valeurs.</p>
+          <button class="take-test-btn" (click)="setActiveTab('test')">
+            Passer le test maintenant
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+        
+        <div class="values-content" *ngIf="testCompleted">
+          <div class="values-header">
+            <h3>Motivations et valeurs professionnelles</h3>
+          </div>
+          
+          <div class="values-body">
+            <div class="values-card">
+              <div class="card-title">
+                <i class="bi bi-stars"></i>
+                <h4>Facteurs de motivation</h4>
+              </div>
+              
+              <div class="motivation-factors">
+                <div *ngFor="let factor of motivationFactors" class="motivation-factor">
+                  <div class="factor-icon">
+                    <i [class]="'bi ' + factor.icon"></i>
+                  </div>
+                  <div class="factor-content">
+                    <h5>{{factor.name}}</h5>
+                    <p>{{factor.description}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="values-card">
+              <div class="card-title">
+                <i class="bi bi-award"></i>
+                <h4>Valeurs professionnelles</h4>
+              </div>
+              
+              <div class="core-values">
+                <div class="values-cloud">
+                  <div *ngFor="let value of coreValues; let i = index" 
+                       class="value-tag"
+                       [style.font-size.px]="getValueFontSize(value.importance)"
+                       [style.--value-index]="i">
+                    {{value.name}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="values-insights">
+              <div class="insight-card">
+                <div class="insight-header">
+                  <i class="bi bi-check-circle"></i>
+                  <h4>Préférences professionnelles</h4>
+                </div>
+                
+                <div class="preferences-list">
+                  <div *ngFor="let pref of workPreferences" class="preference-item" [class.preferred]="pref.preferred">
+                    <i [class]="pref.preferred ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'"></i>
+                    <span>{{pref.text}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>

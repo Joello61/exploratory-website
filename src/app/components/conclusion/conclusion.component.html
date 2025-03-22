@@ -1,0 +1,297 @@
+<!-- Container principal -->
+<div class="conclusion-investigation-container">
+    <!-- Dialog Box pour le contexte -->
+    <div class="dialog-container" *ngIf="isDialogOpen">
+      <div class="d-flex justify-content-end">
+        <div class="detective-container">
+          <img class="img" src="img/detective.png" alt="detective">
+        </div>
+      </div>
+      <div class="dialog-box">
+        <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+          <i class="bi bi-x-circle fs-3"></i>
+        </button>
+        <div class="message px-5">
+          <div #typewriterText></div>
+          <span class="cursor" *ngIf="isTyping"></span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Titre de la section avec informations de progression -->
+    <div class="section-header">
+      <h2 class="section-title">Rapport d'enquête: Conclusions & Recommandations</h2>
+      <div class="investigation-status">
+        <span class="status-badge status-badge-complete">Enquête complétée</span>
+        <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
+        <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
+        
+        <!-- Bouton pour afficher les notes -->
+        <button class="notes-button" (click)="toggleNotes()">
+          <i class="bi bi-journal-text"></i>
+          Notes
+        </button>
+      </div>
+    </div>
+    
+    <!-- Dossier de conclusion -->
+    <div class="conclusion-room">
+      <div class="room-title">
+        <i class="bi bi-file-earmark-text"></i>
+        <h3>Dossier #2187 - Rapport final d'investigation</h3>
+      </div>
+      
+      <!-- Résumé de l'enquête -->
+      <div class="investigation-summary">
+        <div class="summary-header">
+          <div class="header-details">
+            <h4>Synthèse d'enquête</h4>
+            <div class="confidential-stamp">
+              <span>CONFIDENTIEL</span>
+            </div>
+          </div>
+          <div class="completion-indicator">
+            <span>Taux de complétion</span>
+            <div class="progress-track">
+              <div class="progress-fill" [style.width.%]="completionRate"></div>
+            </div>
+            <span class="completion-value">{{completionRate}}%</span>
+          </div>
+        </div>
+        
+        <div class="summary-content">
+          <div class="summary-visualization">
+            <div class="profile-image-container">
+              <div class="profile-header">
+                <i class="bi bi-person-badge"></i>
+                <h5>Profil du sujet</h5>
+              </div>
+              <div class="cv-preview">
+                <img [src]="cvImagePath" alt="CV du sujet" class="cv-image">
+                <div class="image-overlay">
+                  <button class="overlay-btn" (click)="toggleCvModal()">
+                    <i class="bi bi-zoom-in"></i> Examiner
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="profile-stats">
+              <div class="stats-header">
+                <i class="bi bi-graph-up"></i>
+                <h5>Indicateurs clés</h5>
+              </div>
+              <div class="stats-grid">
+                <div *ngFor="let stat of keyStats" class="stat-item" [class.highlight-stat]="stat.highlight">
+                  <div class="stat-icon">
+                    <i [class]="'bi ' + stat.icon"></i>
+                  </div>
+                  <div class="stat-value">{{stat.value}}</div>
+                  <div class="stat-label">{{stat.label}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="summary-text">
+            <p [innerHTML]="investigationSummary"></p>
+            <div class="keywords-container">
+              <div class="keywords-title">Attributs principaux identifiés:</div>
+              <div class="keyword-list">
+                <span *ngFor="let keyword of summaryKeywords" class="keyword-badge" [ngClass]="'keyword-' + keyword.category">
+                  {{keyword.text}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Section des éléments clés -->
+      <div class="key-findings">
+        <div class="findings-header">
+          <h4>
+            <i class="bi bi-lightbulb"></i>
+            Éléments déterminants
+          </h4>
+          <div class="view-controls">
+            <button class="control-btn" [class.active]="viewMode === 'grid'" (click)="setViewMode('grid')">
+              <i class="bi bi-grid"></i>
+            </button>
+            <button class="control-btn" [class.active]="viewMode === 'list'" (click)="setViewMode('list')">
+              <i class="bi bi-list"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="findings-grid" *ngIf="viewMode === 'grid'">
+          <div *ngFor="let finding of keyFindings" class="finding-card">
+            <div class="finding-header">
+              <div class="finding-icon">
+                <i [class]="'bi ' + finding.icon"></i>
+              </div>
+              <div class="finding-title">{{finding.title}}</div>
+            </div>
+            <div class="finding-content">
+              <p>{{finding.description}}</p>
+            </div>
+            <div class="finding-source">Source: {{finding.source}}</div>
+          </div>
+        </div>
+        
+        <div class="findings-list" *ngIf="viewMode === 'list'">
+          <div *ngFor="let finding of keyFindings" class="finding-list-item">
+            <div class="finding-list-icon">
+              <i [class]="'bi ' + finding.icon"></i>
+            </div>
+            <div class="finding-list-content">
+              <div class="finding-list-title">{{finding.title}}</div>
+              <p>{{finding.description}}</p>
+              <div class="finding-list-source">Source: {{finding.source}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Profil de compatibilité -->
+      <div class="compatibility-profile">
+        <div class="compatibility-header">
+          <h4>Profil de compatibilité</h4>
+        </div>
+        
+        <div class="compatibility-visualization">
+          <div class="radar-chart">
+            <div class="chart-container">
+              <!-- Chart placeholder -->
+              <div class="radar-placeholder">
+                <div *ngFor="let factor of compatibilityFactors; let i = index" 
+                     class="radar-axis" 
+                     [style.--axis-angle]="(i * 360 / compatibilityFactors.length) + 'deg'">
+                  <div class="axis-label">{{factor.name}}</div>
+                </div>
+                <div *ngFor="let level of [0.2, 0.4, 0.6, 0.8, 1]" 
+                     class="radar-level" 
+                     [style.--level-scale]="level">
+                </div>
+                <div class="radar-area">
+                  <div *ngFor="let factor of compatibilityFactors; let i = index" 
+                       class="area-point" 
+                       [style.--point-angle]="(i * 360 / compatibilityFactors.length) + 'deg'"
+                       [style.--point-distance]="factor.level / 10">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="compatibility-scores">
+            <div class="score-header">
+              <h5>Compatibilité par environnement</h5>
+            </div>
+            <div class="score-list">
+              <div *ngFor="let env of compatibilityEnvironments" class="score-item">
+                <div class="score-name">
+                  <i [class]="'bi ' + env.icon"></i>
+                  <span>{{env.name}}</span>
+                </div>
+                <div class="score-track">
+                  <div class="score-fill" [style.width.%]="env.score" [ngClass]="getScoreClass(env.score)"></div>
+                </div>
+                <div class="score-value" [ngClass]="getScoreClass(env.score)">{{env.score}}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recommandations -->
+      <div class="recommendations-section">
+        <div class="section-header">
+          <i class="bi bi-check2-circle"></i>
+          <h4>Recommandations stratégiques</h4>
+        </div>
+        
+        <div class="recommendations-content">
+          <div class="recommendations-intro">
+            <p>{{recommendationsIntro}}</p>
+          </div>
+          
+          <div class="recommendations-categories">
+            <div *ngFor="let category of recommendationCategories" class="recommendation-category">
+              <div class="category-header" (click)="toggleCategory(category)">
+                <div class="category-icon">
+                  <i [class]="'bi ' + category.icon"></i>
+                </div>
+                <div class="category-title">{{category.title}}</div>
+                <div class="category-toggle">
+                  <i [class]="category.expanded ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
+                </div>
+              </div>
+              
+              <div class="category-items" [class.expanded]="category.expanded">
+                <div *ngFor="let item of category.items" class="recommendation-item">
+                  <div class="item-marker">
+                    <i class="bi bi-check-circle-fill"></i>
+                  </div>
+                  <div class="item-content">{{item.content}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Appel à l'action -->
+      <div class="action-section">
+        <div class="action-content">
+          <h4>Prochaines étapes</h4>
+          <p>{{nextStepsText}}</p>
+          <div class="action-buttons">
+            <button class="action-btn primary-action" (click)="generateFullReport()">
+              <i class="bi bi-file-earmark-pdf"></i>
+              Générer le rapport complet
+            </button>
+            <button class="action-btn secondary-action" (click)="initiateFollowUp()">
+              <i class="bi bi-calendar-check"></i>
+              Planifier un suivi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal pour afficher le CV en grand -->
+    <div class="cv-modal" *ngIf="showCvModal">
+      <div class="modal-background" (click)="toggleCvModal()"></div>
+      <div class="modal-content">
+        <button class="modal-close" (click)="toggleCvModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="modal-header">
+          <h4>Curriculum Vitae - Analyse détaillée</h4>
+        </div>
+        <div class="modal-body">
+          <img [src]="cvImagePath" alt="CV du sujet" class="full-cv-image">
+          
+          <div class="cv-annotations" [class.hidden]="!showAnnotations">
+            <div *ngFor="let note of cvAnnotations" 
+                 class="cv-note" 
+                 [style.top.%]="note.position.top" 
+                 [style.left.%]="note.position.left">
+              <div class="note-marker">{{note.id}}</div>
+              <div class="note-content">
+                <div class="note-title">{{note.title}}</div>
+                <div class="note-text">{{note.text}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-action" (click)="toggleAnnotations()">
+            <i [class]="showAnnotations ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            {{showAnnotations ? 'Masquer les annotations' : 'Afficher les annotations'}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

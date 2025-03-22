@@ -1,54 +1,173 @@
-
-<div class="timeline-container">
-    <!-- En-tête de la timeline -->
-    <div class="timeline-header">
-      <h1 class="title">🚀 Mon Itinéraire</h1>
-      <p class="timeline-description">
-        Découvrez mon parcours, étape par étape. Chaque phase de mon aventure est un mystère à résoudre. Cliquez sur une étape pour en découvrir les secrets.
-      </p>
-    </div>
-  
-    <!-- Timeline principale -->
-    <div class="timeline">
-      <div class="timeline-item" 
-           *ngFor="let item of timelineItems; let i = index" 
-           [ngClass]="{'left': i % 2 === 0, 'right': i % 2 !== 0}"
-           (click)="openDetails(item)">
-        <div class="timeline-icon">
-          <!-- L'icône de la timeline est un cadenas tant que l'élément est verrouillé -->
-          <i [class]="item.locked ? 'fas fa-lock' : item.icon"></i>
-        </div>
-        <div class="timeline-content">
-          <h3>{{ item.title }}</h3>
-          <p class="timeline-date">{{ item.date }}</p>
-          <p class="timeline-description">{{ item.locked ? "Cliquez pour résoudre l'énigme et débloquer cette étape." : item.description }}</p>
-          <button class="details-btn" *ngIf="item.locked">Voir l'énigme</button>
-        </div>
+<!-- Container principal -->
+<div class="itineraire-container">
+  <!-- Dialog Box pour le contexte -->
+  <div class="dialog-container" *ngIf="isDialogOpen">
+    <div class="d-flex justify-content-end">
+      <div class="detective-container">
+        <img class="img" src="/img/detective.png" alt="detective">
       </div>
     </div>
-  
-    <!-- Modale pour le quiz ou les détails -->
-    <div class="modal" *ngIf="isModalOpen">
-      <div class="modal-content">
-        <span class="close-btn" (click)="closeModal()">✖</span>
-        <!-- Affichage du quiz si l'étape est verrouillée -->
-        <div *ngIf="showPuzzle && currentPuzzle">
-          <h2>Résolvez l'énigme pour débloquer cette étape</h2>
-          <p class="puzzle-question">{{ currentPuzzle.question }}</p>
-          <div class="puzzle-options">
-            <button *ngFor="let option of currentPuzzle.options" (click)="checkPuzzleAnswer(option)">
-              {{ option }}
-            </button>
-          </div>
-          <p class="puzzle-response">{{ puzzleResponseMessage }}</p>
+    <div class="dialog-box">
+      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+        <i class="bi bi-x-circle fs-3"></i>
+      </button>
+      <div class="message px-5">
+        <div #typewriterText></div>
+        <span class="cursor" *ngIf="isTyping"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- En-tête de la section -->
+  <div class="section-header">
+    <h2 class="section-title">Cartographie du parcours</h2>
+    <div class="investigation-status">
+      Données récupérées: <span class="status-badge">{{dataRecoveryPercentage}}%</span>
+    </div>
+  </div>
+
+  <!-- Carte des origines -->
+  <div class="map-section">
+    <div class="section-title-container">
+      <div class="section-icon">
+        <i class="bi bi-geo-alt"></i>
+      </div>
+      <h3 class="subsection-title">Origines géographiques</h3>
+    </div>
+    
+    <div class="map-container">
+      <div class="map-overlay"></div>
+      <div class="map-markers">
+        <!--<div class="map-marker" 
+             *ngFor="let location of originLocations" 
+             [style.top.%]="location.coordinates.lng" 
+             [style.left.%]="location.coordinates.lat"
+             (click)="selectLocation(location)">
+          <div class="marker-pulse"></div>
+          <div class="marker-point"></div>
+          <div class="marker-label">{{location.name}}</div>
+        </div>-->
+      </div>
+      
+      <!-- Information sur le lieu sélectionné -->
+      <div class="location-info" *ngIf="selectedLocation">
+        <div class="info-header">
+          <h4>{{selectedLocation.name}}</h4>
+          <button class="close-info" (click)="closeLocationInfo()">
+            <i class="bi bi-x"></i>
+          </button>
         </div>
-        <!-- Sinon, affichage des détails complets -->
-        <div *ngIf="!showPuzzle && selectedItem">
-          <h2>{{ selectedItem.title }}</h2>
-          <p class="modal-date">{{ selectedItem.date }}</p>
-          <p class="modal-description">{{ selectedItem.details }}</p>
+        <div class="info-content">
+          <div class="info-period">{{selectedLocation.period}}</div>
+          <p class="info-description">{{selectedLocation.description}}</p>
+          <div class="info-data">
+            <div class="data-item" *ngFor="let data of selectedLocation.data">
+              <div class="data-label">{{data.label}}:</div>
+              <div class="data-value">{{data.value}}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  
+
+  <!-- Timeline de formation -->
+  <div class="timeline-section">
+    <div class="section-title-container">
+      <div class="section-icon">
+        <i class="bi bi-mortarboard"></i>
+      </div>
+      <h3 class="subsection-title">Parcours de formation</h3>
+    </div>
+    
+    <div class="timeline-container">
+      <div class="timeline-line"></div>
+      
+      <div class="timeline-items">
+        <div class="timeline-item" 
+             *ngFor="let education of educationTimeline; let i = index" 
+             [class.timeline-right]="i % 2 === 1"
+             [class.discovered]="education.discovered"
+             (click)="toggleEducationDetails(education)">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-marker">{{education.years}}</div>
+            
+            <div class="timeline-header">
+              <h4 class="timeline-title">{{education.title}}</h4>
+              <div class="timeline-institution">{{education.institution}}</div>
+            </div>
+            
+            <div class="timeline-details" [class.expanded]="education.expanded">
+              <p class="timeline-description">{{education.description}}</p>
+              
+              <div class="timeline-skills" *ngIf="education.skills && education.skills.length > 0">
+                <h5>Compétences acquises:</h5>
+                <div class="skills-container">
+                  <span class="skill-badge" *ngFor="let skill of education.skills">{{skill}}</span>
+                </div>
+              </div>
+              
+              <div class="timeline-achievements" *ngIf="education.achievements && education.achievements.length > 0">
+                <h5>Réalisations notables:</h5>
+                <ul>
+                  <li *ngFor="let achievement of education.achievements">{{achievement}}</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div class="timeline-actions">
+              <button class="action-button" *ngIf="education.discovered" (click)="toggleEducationDetails(education, $event)">
+                <i class="bi" [ngClass]="education.expanded ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                {{education.expanded ? 'Réduire' : 'Détails'}}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques et indicateurs -->
+  <div class="stats-section">
+    <div class="section-title-container">
+      <div class="section-icon">
+        <i class="bi bi-bar-chart"></i>
+      </div>
+      <h3 class="subsection-title">Analyse du parcours</h3>
+    </div>
+    
+    <div class="stats-container">
+      <!-- Graphique d'évolution des compétences -->
+      <div class="stats-evolution">
+        <h4 class="stats-title">Évolution des compétences</h4>
+        <div class="evolution-chart">
+          <!-- Intégrer un graphique ici (utiliser Canvas ou une bibliothèque de graphiques) -->
+          <div class="chart-placeholder">
+            <!-- Barres verticales pour simuler un graphique -->
+            <div class="chart-bar" *ngFor="let skill of skillsEvolution; let i = index" 
+                [style.height.%]="skill.level" 
+                [style.left.%]="i * 10 + 10">
+              <div class="bar-label">{{skill.year}}</div>
+              <div class="bar-tooltip">{{skill.tooltip}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Indicateurs clés -->
+      <div class="stats-indicators">
+        <h4 class="stats-title">Indicateurs clés</h4>
+        <div class="indicators-grid">
+          <div class="indicator-item" *ngFor="let indicator of keyIndicators">
+            <div class="indicator-value">{{indicator.value}}</div>
+            <div class="indicator-label">{{indicator.label}}</div>
+            <div class="indicator-trend" [ngClass]="indicator.trend">
+              <i class="bi" [ngClass]="'bi-' + (indicator.trend === 'up' ? 'graph-up-arrow' : indicator.trend === 'down' ? 'graph-down-arrow' : 'dash')"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

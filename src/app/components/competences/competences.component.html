@@ -1,97 +1,230 @@
-<div class="skills-container">
-  <!-- Titre et description -->
-  <div class="skills-header text-center">
-    <h1 class="title">🔍 Découvrez mes compétences</h1>
-    <p class="skills-description">
-      Résolvez les énigmes pour débloquer mes compétences. Attention, le temps est limité !
-    </p>
-  </div>
-
-  <!-- Grille des compétences -->
-  <div class="skills-grid">
-    <div
-      class="skill-card"
-      *ngFor="let skill of skills; let i = index"
-      (click)="openModal(skill)"
-    >
-      <div class="skill-icon">
-        <i [class]="skill.isUnlocked ? skill.icon : 'fas fa-lock'"></i>
+<!-- Container principal -->
+<div class="lab-container">
+  <!-- Dialog Box pour le contexte -->
+  <div class="dialog-container" *ngIf="isDialogOpen">
+    <div class="d-flex justify-content-end">
+      <div class="detective-container">
+        <img class="img" src="img/detective.png" alt="detective">
       </div>
-      <h3 class="skill-name">
-        {{ skill.isUnlocked ? skill.name : 'Compétence ' + (i + 1) }}
-      </h3>
+    </div>
+    <div class="dialog-box">
+      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+        <i class="bi bi-x-circle fs-3"></i>
+      </button>
+      <div class="message px-5">
+        <div #typewriterText></div>
+        <span class="cursor" *ngIf="isTyping"></span>
+      </div>
     </div>
   </div>
 
-  <!-- Bouton pour passer à la section suivante -->
-  <div *ngIf="allSkillsUnlocked" class="next-section-button">
-    <button (click)="goToNextSection()">Passer à la section suivante</button>
+  <!-- Titre de la section avec informations de progression -->
+  <div class="section-header">
+    <h2 class="section-title">Laboratoire d'analyse: Profil de compétences</h2>
+    <div class="lab-status">
+      <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
+      <span *ngIf="!isModuleCompleted" class="status-badge">En analyse</span>
+      <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
+      <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
+      
+      <!-- Bouton pour afficher les notes -->
+      <button class="notes-button" (click)="toggleNotes()">
+        <i class="bi bi-journal-text"></i>
+        Notes
+      </button>
+    </div>
   </div>
 
-  <!-- Modale pour les énigmes -->
-  <div class="modal" *ngIf="isModalOpen">
-    <div class="modal-content" #modalContent>
-      <button class="close-button" (click)="closeModal()">
-        <i class="fas fa-xmark"></i>
-      </button>
-      <!-- Barre de progression du timer -->
-      <div class="timer-bar">
-        <div class="progress" [style.width.%]="getProgressBarWidth()"></div>
-      </div>
-      <div class="row">
-        <div class="col-md-8">
-          <h2>{{ currentSkill?.question }}</h2>
-          <div class="timer-text">Temps restant : {{ countdown }}s</div>
+  <!-- Interface du laboratoire -->
+  <div class="lab-interface">
+    <!-- Panneau d'outils et de contrôle -->
+    <div class="control-panel">
+      <div class="panel-header">
+        <h3>Outils d'analyse</h3>
+        <div class="scan-status">
+          <span class="scan-indicator" [class.active]="isScanning"></span>
+          <span class="scan-text">{{scanningText}}</span>
         </div>
-        <div class="col-md-4">
-          <div class="answers">
-            <ng-container *ngFor="let answer of currentSkill?.answers; let i = index">
-              <button
-                *ngIf="!answer.hidden"
-                (click)="selectAnswer(answer)"
-                [attr.data-index]="i"
-                [ngClass]="{
-                  'selected': selectedAnswer?.text === answer.text && !finalized,
-                  'final-correct': finalized && selectedAnswer?.text === answer.text && finalAnswerCorrect,
-                  'final-incorrect': finalized && selectedAnswer?.text === answer.text && !finalAnswerCorrect
-                }"
-              >
-                {{ answer.text }}
-              </button>
-            </ng-container>
-            <div *ngIf="showAudienceResults" class="audience-results">
-              <p *ngFor="let answer of currentSkill?.answers">
-                {{ answer.text }} : {{ answer.votes }}%
-              </p>
+      </div>
+      
+      <div class="tool-section">
+        <h4>Catégories de scan</h4>
+        <div class="category-buttons">
+          <button *ngFor="let category of skillCategories" 
+                  class="category-btn" 
+                  [class.active]="selectedCategory === category.id"
+                  (click)="selectCategory(category.id)">
+            <i [class]="'bi ' + category.icon"></i>
+            <span>{{category.name}}</span>
+            <span class="completion-indicator" 
+                  [style.width.%]="getCategoryCompletionPercentage(category.id)"></span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="scan-controls">
+        <button class="scan-btn" 
+                (click)="startSkillScan()" 
+                [disabled]="isScanning || isModuleCompleted">
+          <i class="bi bi-radar"></i>
+          <span>Scanner</span>
+        </button>
+        
+        <div class="scan-progress" *ngIf="isScanning">
+          <div class="progress-bar" [style.width.%]="scanProgress"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Visualisation des compétences -->
+    <div class="skill-visualization">
+      <div class="visualization-header">
+        <h3>{{selectedCategory ? getCategoryName(selectedCategory) : 'Sélectionnez une catégorie'}}</h3>
+        <div class="visualization-controls">
+          <button class="view-mode-btn" [class.active]="viewMode === 'graph'" (click)="switchViewMode('graph')">
+            <i class="bi bi-grid-3x3"></i>
+          </button>
+          <button class="view-mode-btn" [class.active]="viewMode === 'list'" (click)="switchViewMode('list')">
+            <i class="bi bi-list"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Vue graphique des compétences -->
+      <div class="skills-graph" *ngIf="viewMode === 'graph' && selectedCategory">
+        <div class="skill-node main-node">
+          <div class="node-content">
+            <i [class]="'bi ' + getCategoryIcon(selectedCategory)"></i>
+            <span>{{getCategoryName(selectedCategory)}}</span>
+          </div>
+        </div>
+        
+        <div class="skills-network">
+          <div *ngFor="let skill of getSkillsByCategory(selectedCategory); let i = index" 
+               class="skill-node" 
+               [class.revealed]="skill.discovered"
+               [class.scanning]="scannedSkillIndex === i && isScanning"
+               [style.--node-angle]="getNodeAngle(i, getSkillsByCategory(selectedCategory).length)"
+               [style.--node-distance]="getNodeDistance(skill.level)">
+            <div class="node-connector"></div>
+            <div class="node-content">
+              <div class="skill-icon">
+                <i [class]="'bi ' + (skill.discovered ? skill.icon : 'bi-question')"></i>
+              </div>
+              <span class="skill-name">{{skill.discovered ? skill.name : '???'}}</span>
+              <div *ngIf="skill.discovered" class="skill-level">
+                <div class="level-indicator">
+                  <span *ngFor="let _ of [].constructor(5); let j = index" 
+                        class="level-bar"
+                        [class.filled]="j < skill.level"></span>
+                </div>
+              </div>
             </div>
           </div>
-          <!-- Bouton de validation immédiate -->
-          <button class="validate-btn" (click)="validateAnswer()" [disabled]="!selectedAnswer || finalized">
-            C'est mon dernier mot
-          </button>
-          <div class="jokers">
-            <button (click)="useJoker('50-50')" [disabled]="jokersUsed.includes('50-50')">
-              50:50
-            </button>
-            <button (click)="useJoker('audience')" [disabled]="jokersUsed.includes('audience')">
-              👥 L'avis du public
-            </button>
-            <button (click)="useJoker('pause')" [disabled]="jokersUsed.includes('pause')">
-              ⏳ Pause chrono
-            </button>
+        </div>
+      </div>
+      
+      <!-- Vue liste des compétences -->
+      <div class="skills-list" *ngIf="viewMode === 'list' && selectedCategory">
+        <div *ngFor="let skill of getSkillsByCategory(selectedCategory); let i = index"
+             class="skill-list-item"
+             [class.revealed]="skill.discovered"
+             [class.scanning]="scannedSkillIndex === i && isScanning">
+          <div class="skill-list-header">
+            <div class="skill-icon">
+              <i [class]="'bi ' + (skill.discovered ? skill.icon : 'bi-question')"></i>
+            </div>
+            <div class="skill-info">
+              <h4 class="skill-name">{{skill.discovered ? skill.name : 'Compétence non identifiée'}}</h4>
+              <div *ngIf="skill.discovered" class="skill-level-text">
+                Niveau: {{skill.level}}/5 - {{getLevelDescription(skill.level)}}
+              </div>
+            </div>
+          </div>
+          <div *ngIf="skill.discovered" class="skill-details">
+            <p>{{skill.description}}</p>
+            <div class="skill-projects" *ngIf="skill.projects && skill.projects.length > 0">
+              <h5>Projets associés:</h5>
+              <ul>
+                <li *ngFor="let project of skill.projects">{{project}}</li>
+              </ul>
+            </div>
+          </div>
+          <div *ngIf="!skill.discovered" class="skill-locked">
+            <i class="bi bi-lock"></i>
+            <span>Données cryptées. Utilisez le scanner pour révéler cette compétence.</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Message quand aucune catégorie n'est sélectionnée -->
+      <div class="no-selection" *ngIf="!selectedCategory">
+        <i class="bi bi-arrow-left-circle"></i>
+        <p>Veuillez sélectionner une catégorie de compétences pour commencer l'analyse.</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Résumé des résultats -->
+  <div class="results-summary" *ngIf="getDiscoveredSkillsCount() > 0">
+    <div class="summary-header">
+      <h3>Résumé d'analyse</h3>
+      <div class="summary-progress">
+        <div class="progress-text">
+          {{getDiscoveredSkillsCount()}} / {{getTotalSkillsCount()}} compétences identifiées
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar" [style.width.%]="getOverallCompletionPercentage()"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="top-skills" *ngIf="getTopSkills().length > 0">
+      <h4>Compétences clés identifiées</h4>
+      <div class="top-skills-list">
+        <div *ngFor="let skill of getTopSkills()" class="top-skill-item">
+          <div class="skill-badge">
+            <i [class]="'bi ' + skill.icon"></i>
+          </div>
+          <div class="skill-info">
+            <span class="skill-name">{{skill.name}}</span>
+            <div class="skill-rating">
+              <span *ngFor="let _ of [].constructor(5); let j = index" 
+                    class="rating-star"
+                    [class.filled]="j < skill.level">★</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="skill-map" *ngIf="getDiscoveredSkillsCount() > 5">
+      <h4>Cartographie des compétences</h4>
+      <div class="radar-chart">
+        <!-- Ici, on pourrait ajouter un composant de chart radar si on avait une bibliothèque de graphiques -->
+        <div class="placeholder-chart">
+          <div class="chart-axis" *ngFor="let category of skillCategories; let i = index"
+               [style.--axis-angle]="i * (360 / skillCategories.length)">
+            <div class="axis-label">{{category.name}}</div>
+          </div>
+          <div class="chart-web" *ngFor="let level of [0.2, 0.4, 0.6, 0.8, 1]">
+            <div class="web-level" [style.--web-scale]="level"></div>
+          </div>
+          <div class="chart-area">
+            <div class="area-point" *ngFor="let category of skillCategories; let i = index"
+                 [style.--point-angle]="i * (360 / skillCategories.length)"
+                 [style.--point-distance]="getCategoryAverageLevel(category.id) / 5"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Sons pour les réponses -->
-  <audio id="correct-sound">
-    <source src="assets/sounds/correct.mp3" type="audio/mpeg" />
-    Your browser does not support the audio element.
-  </audio>
-  <audio id="wrong-sound">
-    <source src="assets/sounds/wrong.mp3" type="audio/mpeg" />
-    Your browser does not support the audio element.
-  </audio>
+  <!-- Message de confirmation de complétion du module -->
+  <div class="completion-message" *ngIf="isModuleCompleted">
+    <div class="alert alert-success">
+      <i class="bi bi-check-circle-fill"></i>
+      Module complété ! Analyse des compétences terminée avec succès.
+    </div>
+  </div>
 </div>

@@ -1,39 +1,235 @@
-<div class="accueil-container">
-  <!-- Conteneur pour l'effet machine à écrire -->
-  <div id="typewriter-text-container">
-    <div id="typewriter-text" #typewriterText></div>
+<!-- Container principal -->
+<div class="home-container">
+  <!-- Effet de brouillard pour créer de l'atmosphère -->
+  <div class="fog-container">
+    <div class="fog fog-1"></div>
+    <div class="fog fog-2"></div>
   </div>
 
-  <!-- Animation de chargement -->
-  <div class="loader">
-    <div class="scanner"></div>
+  <!-- Élément d'effet de lumière suivant la souris -->
+  <div class="light-effect"></div>
+
+  <!-- Animation de fond dynamique -->
+  <div class="background-animation"></div>
+
+  <!-- Écran d'authentification -->
+  <div class="auth-screen" *ngIf="showAuthScreen">
+    <div class="auth-container glass-effect">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <div class="auth-logo-glow"></div>
+          <h1 class="auth-title">
+            <span class="auth-title-line1">DÉPARTEMENT</span>
+            <span class="auth-title-line2">D'INVESTIGATION</span>
+          </h1>
+        </div>
+      </div>
+      
+      <div class="auth-body">
+        <div class="auth-message">
+          <p>ACCÈS RESTREINT</p>
+          <p>Veuillez vous authentifier pour accéder au système d'investigation.</p>
+        </div>
+        
+        <div class="auth-form">
+          <div class="form-group">
+            <label for="auth-id">ID Agent</label>
+            <input type="text" id="auth-id" [(ngModel)]="agentId" 
+                  class="auth-input" placeholder="Entrez votre ID d'agent">
+          </div>
+          
+          <div class="form-group">
+            <label for="auth-code">Code d'accès</label>
+            <input type="password" id="auth-code" [(ngModel)]="accessCode" 
+                  class="auth-input" placeholder="Entrez votre code d'accès">
+          </div>
+          
+          <div class="auth-scanner">
+            <div class="scanner-line" *ngIf="isScanning"></div>
+            <div class="scanner-text">{{scannerText}}</div>
+          </div>
+          
+          <button class="auth-btn" (click)="authenticate()" [disabled]="isAuthenticating">
+            <span *ngIf="!isAuthenticating">AUTHENTIFIER</span>
+            <div *ngIf="isAuthenticating" class="auth-loader"></div>
+          </button>
+        </div>
+      </div>
+      
+      <div class="auth-footer">
+        <div class="security-level">
+          <span class="level-indicator"></span>
+          <span class="level-text">NIVEAU DE SÉCURITÉ: ALPHA</span>
+        </div>
+        <div class="encrypted-message">Communication chiffrée - Protocole Quantum</div>
+      </div>
+    </div>
   </div>
 
-  <!-- Contenu principal (invisible au départ, révélé après l'animation) -->
-  <div class="content" style="opacity: 0;">
-    <h1 class="title neon-effect">Enquête Mystère</h1>
-    <p class="mission">
-      <span class="highlight">Votre objectif ?</span> Découvrir les secrets cachés dans un parcours professionnel et personnel exceptionnel.
-      <strong>Mais attention...</strong> chaque révélation comporte son propre défi.
-      <em>"Dans chaque mystère, il y a un moment clé. Êtes-vous prêt à le découvrir ?"</em>
-    </p>
-    <!-- Bouton interactif pour démarrer l'enquête -->
-    <div class="btn-container">
-      <button (click)="commencerEnquete()" class="start-btn">
-        <i class="fas fa-search"></i> Commencer l'enquête
+  <!-- Section de contenu principal (après authentification) -->
+  <div class="main-content" *ngIf="showMainContent">
+    <div class="welcome-header glass-effect">
+      <h1 class="welcome-title">BIENVENUE, AGENT {{agentId}}</h1>
+      <p class="welcome-subtitle">SYSTÈME D'INVESTIGATION MYSTERY-LINK v2.0</p>
+      
+      <!-- Indicateur de progression -->
+      <div class="progress-indicator">
+        <div class="progress-text">
+          <span>Progression globale: {{moduleProgressPercentage}}%</span>
+          <span class="elapsed-time">Temps écoulé: {{elapsedTime}}</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" [style.width.%]="moduleProgressPercentage"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mission-brief glass-effect">
+      <div class="brief-header">
+        <div class="brief-icon">
+          <i class="bi bi-file-earmark-text"></i>
+        </div>
+        <h2 class="brief-title">BRIEFING DE MISSION</h2>
+      </div>
+      
+      <div class="brief-content">
+        <p>Votre mission, si vous l'acceptez, est de conduire une <strong>enquête approfondie</strong> sur le profil mystère qui vous a été assigné.</p>
+        
+        <p>Les données ont été fragmentées en plusieurs modules sécurisés afin de préserver l'intégrité de l'investigation. Vous devrez analyser chaque aspect méthodiquement pour reconstituer l'ensemble du profil.</p>
+        
+        <p class="brief-highlight">« La vérité se cache souvent dans les détails que l'on néglige. Soyez méticuleux, agent. »</p>
+        
+        <ul class="brief-objectives">
+          <li><i class="bi bi-check-circle"></i> Décoder le parcours et l'expérience</li>
+          <li><i class="bi bi-check-circle"></i> Analyser les motivations et centres d'intérêt</li>
+          <li><i class="bi bi-check-circle"></i> Établir un profil de compatibilité</li>
+          <li><i class="bi bi-check-circle"></i> Formuler des conclusions stratégiques</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="action-panel">
+      <button class="action-btn primary-action" (click)="startInvestigation()">
+        <i class="bi bi-folder-check"></i>
+        <span>ACCÉDER AU DOSSIER</span>
       </button>
+
+      <button class="action-btn secondary-action" (click)="showSystemModal = true">
+        <i class="bi bi-terminal"></i>
+        <span>INFOS SYSTÈME</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal d'information système -->
+  <div class="system-modal" *ngIf="showSystemModal">
+    <div class="modal-backdrop" (click)="closeModal()"></div>
+    <div class="modal-content glass-effect">
+      <div class="modal-header">
+        <h3 class="modal-title">INFORMATIONS SYSTÈME</h3>
+        <button class="modal-close" (click)="closeModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="system-info">
+          <div class="info-group">
+            <div class="info-label">Version système:</div>
+            <div class="info-value">InvestiSystem v2.5.7</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Niveau d'accréditation:</div>
+            <div class="info-value">Niveau 3 - Confidentiel</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Dernière mise à jour:</div>
+            <div class="info-value">{{currentDate | date:'dd/MM/yyyy HH:mm'}}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Statut du serveur:</div>
+            <div class="info-value">
+              <span class="status-indicator online"></span> En ligne
+            </div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Connexion sécurisée:</div>
+            <div class="info-value">
+              <span class="status-indicator secure"></span> Active
+            </div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Temps d'enquête:</div>
+            <div class="info-value">{{elapsedTime}}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Progression:</div>
+            <div class="info-value">{{moduleProgressPercentage}}%</div>
+          </div>
+        </div>
+        
+        <div class="system-modules">
+          <h4 class="modules-title">Modules système actifs</h4>
+          <ul class="modules-list">
+            <li class="module-item">
+              <i class="bi bi-shield-check"></i>
+              <span class="module-name">Cryptage quantique</span>
+              <span class="module-status">Opérationnel</span>
+            </li>
+            <li class="module-item">
+              <i class="bi bi-database-check"></i>
+              <span class="module-name">Base de données sécurisée</span>
+              <span class="module-status">Opérationnel</span>
+            </li>
+            <li class="module-item">
+              <i class="bi bi-cpu"></i>
+              <span class="module-name">Moteur d'analyse IA</span>
+              <span class="module-status">Opérationnel</span>
+            </li>
+            <li class="module-item">
+              <i class="bi bi-eye"></i>
+              <span class="module-name">Système de surveillance</span>
+              <span class="module-status">Actif</span>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Section de gestion de données -->
+        <div class="data-management">
+          <h4 class="data-title">Gestion des données</h4>
+          <div class="data-actions">
+            <button class="data-btn export-btn" (click)="exportData()">
+              <i class="bi bi-download"></i>
+              Exporter les données
+            </button>
+            
+            <div class="import-container">
+              <label for="import-data" class="data-btn import-btn">
+                <i class="bi bi-upload"></i>
+                Importer des données
+              </label>
+              <input type="file" id="import-data" accept=".json" 
+                     style="display: none;" (change)="importData($event)">
+            </div>
+            
+            <button class="data-btn reset-btn" (click)="resetProgress()">
+              <i class="bi bi-trash"></i>
+              Réinitialiser la progression
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="system-warning">
+          <i class="bi bi-exclamation-triangle"></i>
+          <span>Toutes les activités sont enregistrées conformément au protocole de sécurité</span>
+        </div>
+        <button class="modal-btn" (click)="closeModal()">COMPRIS</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Élément d'effet de lumière suivant la souris -->
-<div class="light-effect"></div>
-
-<!-- Animation de fond dynamique -->
-<div class="background-animation"></div>
-
 <!-- Lecture du son d'ambiance en boucle -->
 <audio id="ambiance-sound" loop>
-  <source src="assets/sounds/ambiance.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
+  <source src="/audio/song.mp3" type="audio/mpeg" />
 </audio>
