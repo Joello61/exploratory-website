@@ -57,11 +57,13 @@ export class MotivationSocioProComponent implements OnInit, AfterViewInit, OnDes
 
   // Texte du dialogue d'introduction
   private fullText: string = "Agent, nous entrons dans une phase critique de notre enquête. Nous devons maintenant analyser les motivations socio-professionnelles du sujet. Examinez les indices recueillis et établissez les connexions entre eux pour identifier les facteurs qui guident ses choix de carrière et ses aspirations. Cette analyse nous permettra de comprendre ce qui l'anime vraiment.";
-  private subscriptions: Subscription = new Subscription();
+  
+  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;
   isTyping: boolean = false;
+  dialogMessage: DialogMessage | null = null;
 
   // Données de progression et de temps
   elapsedTime: string = '00:00:00';
@@ -288,18 +290,18 @@ export class MotivationSocioProComponent implements OnInit, AfterViewInit, OnDes
     // Vérifier si le module est disponible
     if (!this.progressService.isModuleAvailable('motivations')) {
       console.warn('Ce module n\'est pas encore disponible');
-      return;
     }
 
+
     // S'abonner au temps écoulé
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.timeTrackerService.elapsedTime$.subscribe(time => {
         this.elapsedTime = time;
       })
     );
 
     // Vérifier si le module est déjà complété
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.progressService.moduleStatuses$.subscribe(statuses => {
         this.isModuleCompleted = statuses.motivations;
         this.moduleProgressPercentage = this.progressService.getCompletionPercentage();
@@ -308,6 +310,18 @@ export class MotivationSocioProComponent implements OnInit, AfterViewInit, OnDes
         if (this.isModuleCompleted) {
           this.loadSavedState();
         }
+      })
+    );
+
+    this.subscriptions.push(
+      this.dialogService.isDialogOpen$.subscribe(isOpen => {
+        this.isDialogOpen = isOpen;
+      }),
+      this.dialogService.isTyping$.subscribe(isTyping => {
+        this.isTyping = isTyping;
+      }),
+      this.dialogService.currentMessage$.subscribe(message => {
+        this.dialogMessage = message;
       })
     );
   }
@@ -329,39 +343,22 @@ export class MotivationSocioProComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnDestroy(): void {
-    // Se désabonner de tous les observables pour éviter les fuites mémoire
-    this.subscriptions.unsubscribe();
+    // Nettoyer les souscriptions pour éviter les fuites de mémoire
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   showIntroDialog(): void {
-    const message: DialogMessage = {
-      text: this.fullText,
-      character: 'detective',
-      imageUrl: 'img/detective.png'
+    const dialogMessage: DialogMessage = {
+      text: "", // Commencer avec un texte vide pour l'effet de machine à écrire
+      character: 'detective'
     };
-
-    this.dialogService.openDialog(message);
-    
-    // Démarrer l'effet de typewriter
-    this.dialogService.startTypewriter(this.fullText, () => {
-      // Callback une fois le typing terminé
-      setTimeout(() => {
-        this.dialogService.closeDialog();
-        this.isDialogOpen = false;
-      }, 3000);
-    });
-
-    // S'abonner au statut du typing
-    this.subscriptions.add(
-      this.dialogService.isTyping$.subscribe(isTyping => {
-        this.isTyping = isTyping;
-      })
-    );
+    this.dialogService.openDialog(dialogMessage);
+    this.dialogService.startTypewriter(this.fullText);
   }
 
+  // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
-    this.isDialogOpen = false;
   }
 
   // Charger l'état sauvegardé précédemment

@@ -1,12 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, OnDestroy, ViewChild, AfterViewInit, Renderer2 } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { AppStateService } from '../../services/app-state.service';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
-import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
 
 interface Scenario {
@@ -90,6 +88,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   // État du dialogue
   isDialogOpen: boolean = false;
   isTyping: boolean = false;
+  dialogMessage: DialogMessage | null = null;
 
   // État de progression du module
   moduleAvailable: boolean = false;
@@ -433,16 +432,17 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private progressService: ProgressService,
-    private timeTracker: TimeTrackerService,
     private userDataService: UserDataService,
-    private dialogService: DialogService,
-    private noteService: NoteService,
-    private appStateService: AppStateService
+    public dialogService: DialogService, // Rendu public pour les templates
+    public noteService: NoteService,
   ) {}
 
   ngOnInit(): void {
     // Vérifier si le module est disponible
-    this.moduleAvailable = this.progressService.isModuleAvailable(this.MODULE_ID);
+    if (!this.progressService.isModuleAvailable('personnalite')) {
+      console.warn('Ce module n\'est pas encore disponible');
+      // Logique de redirection à implémenter si nécessaire
+    }
 
     // Vérifier si le test a déjà été complété (charger depuis userDataService)
     this.loadUserProgress();
@@ -454,6 +454,9 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
       this.dialogService.isTyping$.subscribe(isTyping => {
         this.isTyping = isTyping;
+      }),
+      this.dialogService.currentMessage$.subscribe(message => {
+        this.dialogMessage = message;
       })
     );
   }
@@ -517,7 +520,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   // Afficher le dialogue d'introduction
   showIntroDialog(): void {
     const dialogMessage: DialogMessage = {
-      text: this.fullText,
+      text: "", // Commencer avec un texte vide pour l'effet de machine à écrire
       character: 'detective'
     };
     this.dialogService.openDialog(dialogMessage);

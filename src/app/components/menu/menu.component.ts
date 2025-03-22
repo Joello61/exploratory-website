@@ -19,11 +19,12 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Texte du dialogue d'introduction
   private fullText: string = "Bienvenue, agent. Vous êtes maintenant connecté au système central d'investigation. Cette enquête vise à établir un profil complet du sujet à travers différents modules d'analyse. Parcourez chaque section pour collecter les données nécessaires et débloquer le rapport final. Votre perspicacité sera essentielle pour formuler des conclusions pertinentes.";
-  private subscriptions: Subscription = new Subscription();
+  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;
   isTyping: boolean = false;
+  dialogMessage: DialogMessage | null = null;
 
   // Ordre des modules pour déterminer la progression
   moduleOrder = [
@@ -44,6 +45,7 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     experience: false,
     attentes: false,
     personnalite: false,
+    competences: false,
     centres: false,
     motivations: false,
     conclusion: false
@@ -72,7 +74,7 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     // S'abonner aux statuts des modules
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.progressService.moduleStatuses$.subscribe(statuses => {
         this.moduleStatuses = statuses;
         // Calculer les statistiques basées sur les statuts
@@ -81,23 +83,35 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     // S'abonner au temps écoulé
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.timeTrackerService.elapsedTime$.subscribe(time => {
         this.timeSpent = time;
       })
     );
 
     // S'abonner aux notes
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.noteService.notes$.subscribe(notes => {
         this.notes = notes;
       })
     );
 
     // S'abonner à la visibilité des notes
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.noteService.isNotesVisible$.subscribe(visible => {
         this.showNotes = visible;
+      })
+    );
+
+    this.subscriptions.push(
+      this.dialogService.isDialogOpen$.subscribe(isOpen => {
+        this.isDialogOpen = isOpen;
+      }),
+      this.dialogService.isTyping$.subscribe(isTyping => {
+        this.isTyping = isTyping;
+      }),
+      this.dialogService.currentMessage$.subscribe(message => {
+        this.dialogMessage = message;
       })
     );
   }
@@ -110,39 +124,22 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Se désabonner de tous les observables pour éviter les fuites mémoire
-    this.subscriptions.unsubscribe();
+    // Nettoyer les souscriptions pour éviter les fuites de mémoire
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   showIntroDialog(): void {
-    const message: DialogMessage = {
-      text: this.fullText,
-      character: 'detective',
-      imageUrl: '/img/detective.png'
+    const dialogMessage: DialogMessage = {
+      text: "", // Commencer avec un texte vide pour l'effet de machine à écrire
+      character: 'detective'
     };
-
-    this.dialogService.openDialog(message);
-    
-    // Démarrer l'effet de typewriter
-    this.dialogService.startTypewriter(this.fullText, () => {
-      // Callback une fois le typing terminé
-      setTimeout(() => {
-        this.dialogService.closeDialog();
-        this.isDialogOpen = false;
-      }, 5000);
-    });
-
-    // S'abonner au statut du typing
-    this.subscriptions.add(
-      this.dialogService.isTyping$.subscribe(isTyping => {
-        this.isTyping = isTyping;
-      })
-    );
+    this.dialogService.openDialog(dialogMessage);
+    this.dialogService.startTypewriter(this.fullText);
   }
 
+  // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
-    this.isDialogOpen = false;
   }
 
   // Obtenir l'index d'un module (pour l'affichage)

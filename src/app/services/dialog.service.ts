@@ -11,7 +11,6 @@ export interface DialogMessage {
   providedIn: 'root'
 })
 export class DialogService {
-
   private isDialogOpenSubject = new BehaviorSubject<boolean>(false);
   private currentMessageSubject = new BehaviorSubject<DialogMessage | null>(null);
   private isTypingSubject = new BehaviorSubject<boolean>(false);
@@ -22,6 +21,7 @@ export class DialogService {
 
   // Vitesse de l'effet machine à écrire
   private typingSpeed: number = 50;
+  private typewriterTimeouts: number[] = [];
   
   constructor() {}
 
@@ -34,19 +34,35 @@ export class DialogService {
   }
 
   /**
-   * Ferme le dialogue
+   * Ferme le dialogue et nettoie les timeouts
    */
   closeDialog(): void {
     this.isDialogOpenSubject.next(false);
+    
+    // Nettoyer tous les timeouts en cours
+    this.clearTypewriterTimeouts();
+    
     setTimeout(() => {
       this.currentMessageSubject.next(null);
+      this.isTypingSubject.next(false);
     }, 300); // Petit délai pour l'animation de fermeture
+  }
+
+  /**
+   * Nettoie les timeouts de l'effet machine à écrire
+   */
+  private clearTypewriterTimeouts(): void {
+    this.typewriterTimeouts.forEach(timeoutId => window.clearTimeout(timeoutId));
+    this.typewriterTimeouts = [];
   }
 
   /**
    * Démarre l'effet machine à écrire
    */
   startTypewriter(text: string, callback?: () => void): void {
+    // Nettoyer les timeouts précédents
+    this.clearTypewriterTimeouts();
+    
     let currentIndex = 0;
     const fullText = text;
     
@@ -73,9 +89,12 @@ export class DialogService {
           ? this.typingSpeed * 3 
           : this.typingSpeed + Math.random() * 40 - 20;
         
-        setTimeout(typeNextChar, delay);
+        // Stocker l'ID du timeout pour pouvoir le nettoyer si nécessaire
+        const timeoutId = window.setTimeout(typeNextChar, delay);
+        this.typewriterTimeouts.push(timeoutId);
       } else {
         this.isTypingSubject.next(false);
+        this.typewriterTimeouts = []; // Réinitialiser la liste des timeouts
         if (callback) callback();
       }
     };
@@ -90,7 +109,8 @@ export class DialogService {
     }
     
     // Commencer l'effet
-    setTimeout(typeNextChar, 100);
+    const initialTimeoutId = window.setTimeout(typeNextChar, 100);
+    this.typewriterTimeouts.push(initialTimeoutId);
   }
 
   /**
@@ -99,5 +119,4 @@ export class DialogService {
   setTypingSpeed(speed: number): void {
     this.typingSpeed = speed;
   }
-
 }

@@ -7,6 +7,7 @@ export interface ModuleStatus {
   experience: boolean;
   attentes: boolean;
   personnalite: boolean;
+  competences: boolean
   centres: boolean;
   motivations: boolean;
   conclusion: boolean;
@@ -35,6 +36,7 @@ export class ProgressService {
     experience: false,
     attentes: false,
     personnalite: false,
+    competences: false,
     centres: false,
     motivations: false,
     conclusion: false
@@ -132,6 +134,7 @@ export class ProgressService {
       experience: false,
       attentes: false,
       personnalite: false,
+      competences: false,
       centres: false,
       motivations: false,
       conclusion: false

@@ -36,11 +36,12 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Texte du dialogue d'introduction
   private fullText: string = "Agent, nous avons besoin d'une analyse complète des compétences techniques de notre sujet. Utilisez notre laboratoire d'analyse pour scanner et identifier ses capacités. Chaque domaine de compétence doit être examiné minutieusement pour évaluer son niveau d'expertise.";
-  private subscriptions: Subscription = new Subscription();
+  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;
   isTyping: boolean = false;
+  dialogMessage: DialogMessage | null = null;
 
   // Données de progression et de temps
   elapsedTime: string = '00:00:00';
@@ -269,7 +270,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     // Vérifier si le module est disponible
-    if (!this.progressService.isModuleAvailable('personnalite')) {
+    if (!this.progressService.isModuleAvailable('competences')) {
       console.warn('Ce module n\'est pas encore disponible');
       // Logique de redirection à implémenter si nécessaire
     }
@@ -278,14 +279,14 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.skills = this.skills.map(skill => ({ ...skill, discovered: false }));
 
     // S'abonner au temps écoulé
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.timeTrackerService.elapsedTime$.subscribe(time => {
         this.elapsedTime = time;
       })
     );
 
     // Vérifier si le module est déjà complété
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.progressService.moduleStatuses$.subscribe(statuses => {
         this.isModuleCompleted = statuses.personnalite;
         this.moduleProgressPercentage = this.progressService.getCompletionPercentage();
@@ -294,6 +295,18 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.isModuleCompleted || this.userDataService.getModuleResponses('personnalite').length > 0) {
           this.loadSavedState();
         }
+      })
+    );
+
+    this.subscriptions.push(
+      this.dialogService.isDialogOpen$.subscribe(isOpen => {
+        this.isDialogOpen = isOpen;
+      }),
+      this.dialogService.isTyping$.subscribe(isTyping => {
+        this.isTyping = isTyping;
+      }),
+      this.dialogService.currentMessage$.subscribe(message => {
+        this.dialogMessage = message;
       })
     );
   }
@@ -306,39 +319,22 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Se désabonner de tous les observables pour éviter les fuites mémoire
-    this.subscriptions.unsubscribe();
+    // Nettoyer les souscriptions pour éviter les fuites de mémoire
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   showIntroDialog(): void {
-    const message: DialogMessage = {
-      text: this.fullText,
-      character: 'detective',
-      imageUrl: 'img/detective.png'
+    const dialogMessage: DialogMessage = {
+      text: "", // Commencer avec un texte vide pour l'effet de machine à écrire
+      character: 'detective'
     };
-
-    this.dialogService.openDialog(message);
-    
-    // Démarrer l'effet de typewriter
-    this.dialogService.startTypewriter(this.fullText, () => {
-      // Callback une fois le typing terminé
-      setTimeout(() => {
-        this.dialogService.closeDialog();
-        this.isDialogOpen = false;
-      }, 3000);
-    });
-
-    // S'abonner au statut du typing
-    this.subscriptions.add(
-      this.dialogService.isTyping$.subscribe(isTyping => {
-        this.isTyping = isTyping;
-      })
-    );
+    this.dialogService.openDialog(dialogMessage);
+    this.dialogService.startTypewriter(this.fullText);
   }
 
+  // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
-    this.isDialogOpen = false;
   }
 
   // Charger l'état sauvegardé précédemment

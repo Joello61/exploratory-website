@@ -12,12 +12,13 @@
         <i class="bi bi-x-circle fs-3"></i>
       </button>
       <div class="message px-5">
-        <div #typewriterText></div>
+        <!-- Utilisation du message directement depuis le service -->
+        <div>{{ dialogMessage?.text }}</div>
         <span class="cursor" *ngIf="isTyping"></span>
       </div>
     </div>
   </div>
-
+  
   <!-- Titre de la section avec statut de progression -->
   <div class="section-header">
     <h2 class="section-title">Projections Futures: Profil & Aspirations</h2>

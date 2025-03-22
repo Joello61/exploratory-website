@@ -65,11 +65,12 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Texte du dialogue d'introduction
   private fullText: string = "Agent, nous avons besoin d'une projection des intentions futures du sujet. Utilisez le terminal prédictif pour accéder à ses aspirations professionnelles, projets et environnement idéal. Ces informations sont cruciales pour comprendre sa trajectoire de carrière.";
-  private subscriptions: Subscription = new Subscription();
+  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;
   isTyping: boolean = false;
+  dialogMessage: DialogMessage | null = null;
 
   // Terminal
   terminalLines: TerminalLine[] = [];
@@ -437,6 +438,12 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+
+    if (!this.progressService.isModuleAvailable('attentes')) {
+      console.warn('Ce module n\'est pas encore disponible');
+      // Logique de redirection à implémenter si nécessaire
+    }
+
     // Initialiser le terminal avec un message de bienvenue
     this.terminalLines = [
       {
@@ -457,14 +464,14 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
     ];
 
     // S'abonner au temps écoulé
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.timeTrackerService.elapsedTime$.subscribe(time => {
         this.elapsedTime = time;
       })
     );
 
     // Vérifier si le module est déjà complété
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.progressService.moduleStatuses$.subscribe(statuses => {
         this.isModuleCompleted = statuses.attentes;
         this.moduleProgressPercentage = this.progressService.getCompletionPercentage();
@@ -473,6 +480,18 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.isModuleCompleted) {
           this.loadUserResponses();
         }
+      })
+    );
+
+    this.subscriptions.push(
+      this.dialogService.isDialogOpen$.subscribe(isOpen => {
+        this.isDialogOpen = isOpen;
+      }),
+      this.dialogService.isTyping$.subscribe(isTyping => {
+        this.isTyping = isTyping;
+      }),
+      this.dialogService.currentMessage$.subscribe(message => {
+        this.dialogMessage = message;
       })
     );
 
@@ -492,39 +511,22 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Se désabonner de tous les observables
-    this.subscriptions.unsubscribe();
+    // Nettoyer les souscriptions pour éviter les fuites de mémoire
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   showIntroDialog(): void {
-    const message: DialogMessage = {
-      text: this.fullText,
-      character: 'detective',
-      imageUrl: 'img/detective.png'
+    const dialogMessage: DialogMessage = {
+      text: "", // Commencer avec un texte vide pour l'effet de machine à écrire
+      character: 'detective'
     };
-
-    this.dialogService.openDialog(message);
-    
-    // Démarrer l'effet de typewriter
-    this.dialogService.startTypewriter(this.fullText, () => {
-      // Callback une fois le typing terminé
-      setTimeout(() => {
-        this.dialogService.closeDialog();
-        this.isDialogOpen = false;
-      }, 3000);
-    });
-
-    // S'abonner au statut du typing
-    this.subscriptions.add(
-      this.dialogService.isTyping$.subscribe(isTyping => {
-        this.isTyping = isTyping;
-      })
-    );
+    this.dialogService.openDialog(dialogMessage);
+    this.dialogService.startTypewriter(this.fullText);
   }
 
+  // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
-    this.isDialogOpen = false;
   }
 
   // Enregistrer les réponses utilisateur

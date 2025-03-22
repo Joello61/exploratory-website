@@ -55,7 +55,7 @@ export class CentresInteretComponent implements OnInit, AfterViewInit, OnDestroy
 
   // Texte du dialogue d'introduction
   private fullText: string = "Agent, pour compléter le profil de notre sujet, nous devons analyser ses centres d'intérêt personnels. Ces activités hors travail peuvent révéler des aspects clés de sa personnalité, ses motivations et ses compétences transversales. Recueillez des indices et explorez chaque domaine en profondeur.";
-  private subscriptions: Subscription = new Subscription();
+  private subscriptions: Subscription[] = [];
 
   // Données de progression et de temps
   elapsedTime: string = '00:00:00';
@@ -65,6 +65,7 @@ export class CentresInteretComponent implements OnInit, AfterViewInit, OnDestroy
   // État du dialogue
   isDialogOpen: boolean = true;
   isTyping: boolean = false;
+  dialogMessage: DialogMessage | null = null;
 
   // État de la photo polaroid
   isPhotoFlipped: boolean = false;
@@ -394,14 +395,14 @@ export class CentresInteretComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     // S'abonner au temps écoulé
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.timeTrackerService.elapsedTime$.subscribe(time => {
         this.elapsedTime = time;
       })
     );
 
     // Vérifier si le module est déjà complété
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.progressService.moduleStatuses$.subscribe(statuses => {
         this.isModuleCompleted = statuses.centres;
         this.moduleProgressPercentage = this.progressService.getCompletionPercentage();
@@ -410,6 +411,18 @@ export class CentresInteretComponent implements OnInit, AfterViewInit, OnDestroy
         if (this.isModuleCompleted) {
           this.loadSavedState();
         }
+      })
+    );
+
+    this.subscriptions.push(
+      this.dialogService.isDialogOpen$.subscribe(isOpen => {
+        this.isDialogOpen = isOpen;
+      }),
+      this.dialogService.isTyping$.subscribe(isTyping => {
+        this.isTyping = isTyping;
+      }),
+      this.dialogService.currentMessage$.subscribe(message => {
+        this.dialogMessage = message;
       })
     );
   }
@@ -422,39 +435,22 @@ export class CentresInteretComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngOnDestroy(): void {
-    // Se désabonner de tous les observables pour éviter les fuites mémoire
-    this.subscriptions.unsubscribe();
+    // Nettoyer les souscriptions pour éviter les fuites de mémoire
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   showIntroDialog(): void {
-    const message: DialogMessage = {
-      text: this.fullText,
-      character: 'detective',
-      imageUrl: 'img/detective.png'
+    const dialogMessage: DialogMessage = {
+      text: "", // Commencer avec un texte vide pour l'effet de machine à écrire
+      character: 'detective'
     };
-
-    this.dialogService.openDialog(message);
-    
-    // Démarrer l'effet de typewriter
-    this.dialogService.startTypewriter(this.fullText, () => {
-      // Callback une fois le typing terminé
-      setTimeout(() => {
-        this.dialogService.closeDialog();
-        this.isDialogOpen = false;
-      }, 3000);
-    });
-
-    // S'abonner au statut du typing
-    this.subscriptions.add(
-      this.dialogService.isTyping$.subscribe(isTyping => {
-        this.isTyping = isTyping;
-      })
-    );
+    this.dialogService.openDialog(dialogMessage);
+    this.dialogService.startTypewriter(this.fullText);
   }
 
+  // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
-    this.isDialogOpen = false;
   }
 
   // Charger l'état sauvegardé précédemment

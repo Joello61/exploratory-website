@@ -64,11 +64,12 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Texte du dialogue d'introduction
   private fullText: string = "Agent, cette section détaille l'itinéraire personnel et éducatif du sujet. Examinez attentivement ces informations pour comprendre son parcours. Certaines données sont encore cryptées et nécessitent une découverte progressive. Collectez tous les éléments pour obtenir une vision complète de sa formation et de ses origines.";
-  private subscriptions: Subscription = new Subscription();
+  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;
   isTyping: boolean = false;
+  dialogMessage: DialogMessage | null = null;
 
   // Données de progression et temps
   elapsedTime: string = '00:00:00';
@@ -217,20 +218,17 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
     // Vérifier si le module est disponible
     if (!this.progressService.isModuleAvailable('itineraire')) {
       console.warn('Ce module n\'est pas encore disponible');
-      // Rediriger vers la page d'accueil
-      this.router.navigate(['/']);
-      return;
     }
 
     // S'abonner au temps écoulé
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.timeTrackerService.elapsedTime$.subscribe(time => {
         this.elapsedTime = time;
       })
     );
 
     // Vérifier si le module est déjà complété
-    this.subscriptions.add(
+    this.subscriptions.push(
       this.progressService.moduleStatuses$.subscribe(statuses => {
         this.isModuleCompleted = statuses.itineraire;
         this.moduleProgressPercentage = this.progressService.getCompletionPercentage();
@@ -243,6 +241,18 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       })
     );
+
+    this.subscriptions.push(
+      this.dialogService.isDialogOpen$.subscribe(isOpen => {
+        this.isDialogOpen = isOpen;
+      }),
+      this.dialogService.isTyping$.subscribe(isTyping => {
+        this.isTyping = isTyping;
+      }),
+      this.dialogService.currentMessage$.subscribe(message => {
+        this.dialogMessage = message;
+      })
+    );
   }
 
   ngAfterViewInit(): void {
@@ -253,39 +263,22 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Se désabonner de tous les observables pour éviter les fuites mémoire
-    this.subscriptions.unsubscribe();
+    // Nettoyer les souscriptions pour éviter les fuites de mémoire
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  showIntroDialog(): void {
-    const message: DialogMessage = {
-      text: this.fullText,
-      character: 'detective',
-      imageUrl: '/img/detective.png'
+showIntroDialog(): void {
+    const dialogMessage: DialogMessage = {
+      text: "", // Commencer avec un texte vide pour l'effet de machine à écrire
+      character: 'detective'
     };
-
-    this.dialogService.openDialog(message);
-    
-    // Démarrer l'effet de typewriter
-    this.dialogService.startTypewriter(this.fullText, () => {
-      // Callback une fois le typing terminé
-      setTimeout(() => {
-        this.dialogService.closeDialog();
-        this.isDialogOpen = false;
-      }, 5000);
-    });
-
-    // S'abonner au statut du typing
-    this.subscriptions.add(
-      this.dialogService.isTyping$.subscribe(isTyping => {
-        this.isTyping = isTyping;
-      })
-    );
+    this.dialogService.openDialog(dialogMessage);
+    this.dialogService.startTypewriter(this.fullText);
   }
 
+  // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
-    this.isDialogOpen = false;
   }
 
   // Initialiser les données
