@@ -13,8 +13,7 @@
       </button>
       <div class="message px-5">
         <!-- Utilisation du message directement depuis le service -->
-        <div>{{ dialogMessage?.text }}</div>
-        <span class="cursor" *ngIf="isTyping"></span>
+        <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
       </div>
     </div>
   </div>

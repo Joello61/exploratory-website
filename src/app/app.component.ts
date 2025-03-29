@@ -29,6 +29,13 @@ export class AppComponent implements OnInit, OnDestroy {
   completionPercentage: number = 0;
   elapsedTime: string = '00:00:00';
   isFirstVisit: boolean = true;
+
+    // État des notes
+    showNotes: boolean = false;
+    notes: Array<{ content: string, timestamp: number }> = [];
+    
+    // Date actuelle pour les notes
+    currentDate: Date = new Date();
   
   // Subscriptions pour gérer la mémoire
   private subscriptions: Subscription[] = [];
@@ -61,6 +68,21 @@ export class AppComponent implements OnInit, OnDestroy {
         modal?.classList.remove('show'); // Fermer la modale
       });
     }
+
+     // S'abonner aux notes
+     this.subscriptions.push(
+      this.noteService.notes$.subscribe(notes => {
+        this.notes = notes;
+      })
+    );
+
+    // S'abonner à la visibilité des notes
+    this.subscriptions.push(
+      this.noteService.isNotesVisible$.subscribe(visible => {
+        this.showNotes = visible;
+      })
+    );
+
     
     // S'abonner aux services pour obtenir l'état de l'application
     this.subscriptions.push(
@@ -136,11 +158,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.requestAnimationId = requestAnimationFrame(animate);
   }
   
-  // Ouvrir le panneau de notes
-  toggleNotes(): void {
-    this.noteService.toggleNotesVisibility();
-  }
-  
   // Réinitialiser l'application (avec confirmation)
   resetApplication(): void {
     if (confirm('Êtes-vous sûr de vouloir réinitialiser toute votre progression? Cette action est irréversible.')) {
@@ -190,4 +207,19 @@ export class AppComponent implements OnInit, OnDestroy {
     
     reader.readAsText(file);
   }
+
+    // Afficher/masquer les notes
+    toggleNotes(): void {
+      this.noteService.toggleNotesVisibility();
+    }
+  
+    // Ajouter une note (pour le bouton d'ajout)
+    addNote(content: string): void {
+      this.noteService.addNote(content);
+    }
+  
+    // Supprimer une note
+    deleteNote(id: string): void {
+      this.noteService.deleteNote(id);
+    }
 }

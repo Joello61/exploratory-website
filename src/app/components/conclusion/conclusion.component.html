@@ -13,13 +13,12 @@
         </button>
         <div class="message px-5">
           <!-- Utilisation du message directement depuis le service -->
-          <div>{{ dialogMessage?.text }}</div>
-          <span class="cursor" *ngIf="isTyping"></span>
+          <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
         </div>
       </div>
     </div>
     <!-- Titre de la section avec informations de progression -->
-    <div class="section-header">
+    <div class="conclusion-section-header">
       <h2 class="section-title">Rapport d'enquête: Conclusions & Recommandations</h2>
       <div class="investigation-status">
         <span class="status-badge status-badge-complete">Enquête complétée</span>
@@ -206,7 +205,7 @@
       
       <!-- Recommandations -->
       <div class="recommendations-section">
-        <div class="section-header">
+        <div class="recommendations-inner-header">
           <i class="bi bi-check2-circle"></i>
           <h4>Recommandations stratégiques</h4>
         </div>

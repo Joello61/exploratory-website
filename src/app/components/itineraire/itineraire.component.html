@@ -13,11 +13,11 @@
       </button>
       <div class="message px-5">
         <!-- Utilisation du message directement depuis le service -->
-        <div>{{ dialogMessage?.text }}</div>
-        <span class="cursor" *ngIf="isTyping"></span>
+        <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
       </div>
     </div>
   </div>
+
   <!-- En-tête de la section -->
   <div class="section-header">
     <h2 class="section-title">Cartographie du parcours</h2>
@@ -167,6 +167,100 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+  <!-- Ajouter ce code à la fin du HTML, juste avant la fermeture de la div .itineraire-container -->
+
+  <!-- Bouton Continuer -->
+  <div class="continue-section">
+    <button class="primary-action action-btn" (click)="openQuizModal()">
+      <i class="bi bi-arrow-right-circle"></i>
+      Continuer
+    </button>
+  </div>
+
+  <!-- Modal Quiz -->
+  <div class="modal-overlay" *ngIf="isQuizModalOpen" (click)="closeQuizModal()">
+    <div class="quiz-modal" (click)="$event.stopPropagation()">
+      <div class="quiz-header">
+        <h3>Vérification des connaissances</h3>
+        <button class="close-modal" (click)="closeQuizModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      
+      <div class="quiz-content">
+        <div class="quiz-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="(currentQuestionIndex / quizQuestions.length) * 100"></div>
+          </div>
+          <div class="progress-text">Question {{currentQuestionIndex + 1}}/{{quizQuestions.length}}</div>
+        </div>
+        
+        <div class="quiz-question" *ngIf="currentQuestion">
+          <h4>{{currentQuestion.text}}</h4>
+          
+          <div class="question-options">
+            <div class="option" 
+                 *ngFor="let option of currentQuestion.options; let i = index"
+                 [class.selected]="selectedOption === i"
+                 (click)="selectOption(i)">
+              <div class="option-marker">{{['A', 'B', 'C', 'D'][i]}}</div>
+              <div class="option-text">{{option}}</div>
+            </div>
+          </div>
+          
+          <div class="quiz-feedback" *ngIf="showFeedback">
+            <div class="feedback-message" [class.correct]="isAnswerCorrect" [class.incorrect]="!isAnswerCorrect">
+              <i class="bi" [ngClass]="isAnswerCorrect ? 'bi-check-circle' : 'bi-x-circle'"></i>
+              <span>{{feedbackMessage}}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="quiz-results" *ngIf="quizCompleted">
+          <h4>Résultats</h4>
+          
+          <div class="results-score">
+            <div class="score-circle">
+              <div class="score-value">{{correctAnswersCount}}/{{quizQuestions.length}}</div>
+            </div>
+            <div class="score-label">Réponses correctes</div>
+          </div>
+          
+          <div class="results-message">
+            <p *ngIf="quizPassed">Félicitations ! Vous avez bien compris les informations du dossier.</p>
+            <p *ngIf="!quizPassed">Vous devriez revoir certaines informations du dossier.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quiz-footer">
+        <button class="secondary-action action-btn" 
+                *ngIf="!quizCompleted && !showFeedback" 
+                [disabled]="selectedOption === null"
+                (click)="submitAnswer()">
+          Vérifier
+        </button>
+        
+        <button class="secondary-action action-btn" 
+                *ngIf="showFeedback && !quizCompleted" 
+                (click)="nextQuestion()">
+          Question suivante
+        </button>
+        
+        <button class="primary-action action-btn" 
+                *ngIf="quizCompleted && quizPassed" 
+                (click)="navigateToNextPage()">
+          Continuer l'enquête
+        </button>
+        
+        <button class="secondary-action action-btn" 
+                *ngIf="quizCompleted && !quizPassed" 
+                (click)="restartQuiz()">
+          Réessayer
+        </button>
       </div>
     </div>
   </div>

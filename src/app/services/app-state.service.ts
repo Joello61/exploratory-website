@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { NoteService } from './note.service';
 import { ProgressService } from './progress.service';
 import { TimeTrackerService } from './time-tracker.service';
 import { UserDataService } from './user-data.service';
@@ -17,7 +16,6 @@ export class AppStateService {
     private progressService: ProgressService,
     private timeTrackerService: TimeTrackerService,
     private userDataService: UserDataService,
-    private noteService: NoteService
   ) {
     this.checkFirstVisit();
   }

@@ -13,8 +13,7 @@
       </button>
       <div class="message px-5">
         <!-- Utilisation du message directement depuis le service -->
-        <div>{{ dialogMessage?.text }}</div>
-        <span class="cursor" *ngIf="isTyping"></span>
+        <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
       </div>
     </div>
   </div>
@@ -81,51 +80,14 @@
       <div class="visualization-header">
         <h3>{{selectedCategory ? getCategoryName(selectedCategory) : 'Sélectionnez une catégorie'}}</h3>
         <div class="visualization-controls">
-          <button class="view-mode-btn" [class.active]="viewMode === 'graph'" (click)="switchViewMode('graph')">
-            <i class="bi bi-grid-3x3"></i>
-          </button>
-          <button class="view-mode-btn" [class.active]="viewMode === 'list'" (click)="switchViewMode('list')">
+          <button class="view-mode-btn active">
             <i class="bi bi-list"></i>
           </button>
         </div>
       </div>
       
-      <!-- Vue graphique des compétences -->
-      <div class="skills-graph" *ngIf="viewMode === 'graph' && selectedCategory">
-        <div class="skill-node main-node">
-          <div class="node-content">
-            <i [class]="'bi ' + getCategoryIcon(selectedCategory)"></i>
-            <span>{{getCategoryName(selectedCategory)}}</span>
-          </div>
-        </div>
-        
-        <div class="skills-network">
-          <div *ngFor="let skill of getSkillsByCategory(selectedCategory); let i = index" 
-               class="skill-node" 
-               [class.revealed]="skill.discovered"
-               [class.scanning]="scannedSkillIndex === i && isScanning"
-               [style.--node-angle]="getNodeAngle(i, getSkillsByCategory(selectedCategory).length)"
-               [style.--node-distance]="getNodeDistance(skill.level)">
-            <div class="node-connector"></div>
-            <div class="node-content">
-              <div class="skill-icon">
-                <i [class]="'bi ' + (skill.discovered ? skill.icon : 'bi-question')"></i>
-              </div>
-              <span class="skill-name">{{skill.discovered ? skill.name : '???'}}</span>
-              <div *ngIf="skill.discovered" class="skill-level">
-                <div class="level-indicator">
-                  <span *ngFor="let _ of [].constructor(5); let j = index" 
-                        class="level-bar"
-                        [class.filled]="j < skill.level"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
       <!-- Vue liste des compétences -->
-      <div class="skills-list" *ngIf="viewMode === 'list' && selectedCategory">
+      <div class="skills-list" *ngIf=" selectedCategory">
         <div *ngFor="let skill of getSkillsByCategory(selectedCategory); let i = index"
              class="skill-list-item"
              [class.revealed]="skill.discovered"

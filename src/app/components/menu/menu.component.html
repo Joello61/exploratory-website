@@ -13,8 +13,7 @@
         </button>
         <div class="message px-5">
           <!-- Utilisation du message directement depuis le service -->
-          <div>{{ dialogMessage?.text }}</div>
-          <span class="cursor" *ngIf="isTyping"></span>
+          <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
         </div>
       </div>
     </div>
@@ -251,34 +250,4 @@
         <div class="stat-label">Modules terminés</div>
       </div>
     </div>
-  
-    <!-- Notes de l'enquêteur -->
-    <div class="investigator-notes" *ngIf="showNotes">
-      <div class="notes-header">
-        <h3><i class="bi bi-journal-text"></i> Notes de l'enquêteur</h3>
-        <button class="close-notes" (click)="toggleNotes()">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
-      <div class="notes-content">
-        <!-- Notes récupérées depuis le NoteService -->
-        <div *ngIf="notes.length === 0" class="no-notes">
-          <p>Aucune note pour le moment. Complétez des modules pour générer des notes automatiques.</p>
-        </div>
-        
-        <div *ngFor="let note of notes" class="note-item">
-          <div class="note-text">{{note.content}}</div>
-          <div class="note-date">{{note.timestamp | date:'dd/MM/yyyy HH:mm'}}</div>
-        </div>
-      </div>
-    </div>
-  
-    <!-- Bouton pour afficher/masquer les notes -->
-    <button class="toggle-notes-btn" (click)="toggleNotes()">
-      <i
-        class="bi"
-        [ngClass]="showNotes ? 'bi-chevron-down' : 'bi-journal-text'"
-      ></i>
-      <span *ngIf="!showNotes">Notes</span>
-    </button>
   </div>

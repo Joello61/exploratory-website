@@ -13,8 +13,7 @@
         </button>
         <div class="message px-5">
           <!-- Utilisation du message directement depuis le service -->
-          <div>{{ dialogMessage?.text }}</div>
-          <span class="cursor" *ngIf="isTyping"></span>
+          <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
         </div>
       </div>
     </div>
@@ -141,4 +140,181 @@
         Module complété ! L'analyse des expériences professionnelles a été réalisée avec succès.
       </div>
     </div>
+
+    <!-- Ajouter ce code juste avant la fermeture de la div .case-file-container -->
+
+<!-- Bouton Continuer (visible uniquement quand tous les dossiers sont déclassifiés) -->
+<div class="continue-section" *ngIf="areAllFilesCompleted()">
+  <button class="primary-action action-btn" (click)="openQuizModal()">
+    <i class="bi bi-arrow-right-circle"></i>
+    Continuer l'enquête
+  </button>
+</div>
+
+<!-- Modal Quiz -->
+<div class="modal-overlay" *ngIf="isQuizModalOpen" (click)="closeQuizModal()">
+  <div class="quiz-modal" (click)="$event.stopPropagation()">
+    <div class="quiz-header">
+      <h3>Vérification de l'enquête professionnelle</h3>
+      <button class="close-modal" (click)="closeQuizModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    
+    <div class="quiz-content">
+      <!-- Type de quiz: matching -->
+      <div *ngIf="quizType === 'matching' && !quizCompleted">
+        <div class="quiz-instructions">
+          <p>Associez chaque compétence avec l'expérience professionnelle correspondante:</p>
+        </div>
+
+        <div class="matching-container">
+          <div class="skills-column">
+            <div class="skill-item" 
+                *ngFor="let skill of matchingSkills; let i = index"
+                [class.selected]="selectedSkillIndex === i"
+                [class.matched]="skillMatched[i]"
+                (click)="selectSkill(i)">
+              <div class="skill-item-inner">{{skill}}</div>
+            </div>
+          </div>
+          
+          <div class="jobs-column">
+            <div class="job-item" 
+                *ngFor="let job of matchingJobs; let i = index"
+                [class.selected]="selectedJobMatchIndex === i"
+                [class.matched]="jobMatched[i]"
+                [class.incorrect]="incorrectMatch === i"
+                (click)="selectJobMatch(i)">
+              <div class="job-item-inner">
+                <span class="job-title-match">{{job.title}}</span>
+                <span class="job-company-match">{{job.company}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="matching-progress">
+          <div class="progress-text">{{getCorrectMatchesCount()}} / {{matchingSkills.length}} associations correctes</div>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="(getCorrectMatchesCount() / matchingSkills.length) * 100"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Type de quiz: chronology -->
+      <div *ngIf="quizType === 'chronology' && !quizCompleted">
+        <div class="quiz-instructions">
+          <p>Remettez les expériences professionnelles dans l'ordre chronologique:</p>
+        </div>
+
+        <div class="chronology-container" cdkDropList (cdkDropListDropped)="dropJob($event)">
+          <div class="job-chronology-item" 
+               *ngFor="let job of chronologyJobs; let i = index"
+               [class.correct-position]="isJobInCorrectPosition(i)"
+               cdkDrag
+               [cdkDragDisabled]="chronologyChecked">
+            <div class="job-chronology-inner">
+              <div class="job-number">{{i + 1}}</div>
+              <div class="job-info">
+                <div class="job-title-chrono">{{job.title}}</div>
+                <div class="job-company-chrono">{{job.company}}</div>
+              </div>
+              <div class="drag-handle">
+                <i class="bi bi-grip-vertical"></i>
+              </div>
+            </div>
+            <!-- Élément de prévisualisation personnalisé pendant le drag -->
+            <div class="custom-drag-preview" *cdkDragPreview>
+              <div class="job-chronology-inner">
+                <div class="job-number">{{i + 1}}</div>
+                <div class="job-info">
+                  <div class="job-title-chrono">{{job.title}}</div>
+                  <div class="job-company-chrono">{{job.company}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="check-order-container" *ngIf="!chronologyChecked">
+          <button class="secondary-action action-btn" (click)="checkChronologyOrder()">
+            Vérifier l'ordre
+          </button>
+        </div>
+        
+        <div class="chronology-feedback" *ngIf="chronologyChecked">
+          <div class="feedback-message" [class.correct]="isChronologyCorrect" [class.incorrect]="!isChronologyCorrect">
+            <i class="bi" [ngClass]="isChronologyCorrect ? 'bi-check-circle' : 'bi-x-circle'"></i>
+            <span>{{isChronologyCorrect ? 'Ordre chronologique correct !' : 'L\'ordre n\'est pas correct. Réessayez.'}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Résultats du quiz -->
+      <div class="quiz-results" *ngIf="quizCompleted">
+        <h4>Analyse des résultats</h4>
+        
+        <div class="results-score">
+          <div class="score-circle">
+            <div class="score-value">{{quizScore}}%</div>
+          </div>
+          <div class="score-label">Score final</div>
+        </div>
+        
+        <div class="results-message">
+          <p *ngIf="quizPassed">Félicitations ! Vous avez bien compris le parcours professionnel du sujet.</p>
+          <p *ngIf="!quizPassed">Vous devriez revoir certains éléments du dossier professionnel.</p>
+        </div>
+        
+        <div class="results-details">
+          <div class="detail-item" *ngIf="quizType === 'matching'">
+            <span class="detail-label">Associations correctes:</span>
+            <span class="detail-value">{{getCorrectMatchesCount()}} / {{matchingSkills.length}}</span>
+          </div>
+          <div class="detail-item" *ngIf="quizType === 'chronology'">
+            <span class="detail-label">Ordre chronologique:</span>
+            <span class="detail-value">{{isChronologyCorrect ? 'Correct' : 'Incorrect'}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="quiz-footer">
+      <!-- Boutons pour le quiz de matching -->
+      <button *ngIf="quizType === 'matching' && selectedSkillIndex !== null && selectedJobMatchIndex !== null && !skillMatched[selectedSkillIndex] && !jobMatched[selectedJobMatchIndex]"
+              class="secondary-action action-btn"
+              (click)="checkMatch()">
+        Vérifier l'association
+      </button>
+      
+      <!-- Boutons pour le quiz de chronologie après vérification -->
+      <button *ngIf="quizType === 'chronology' && chronologyChecked && !isChronologyCorrect"
+              class="secondary-action action-btn"
+              (click)="resetChronology()">
+        Réessayer
+      </button>
+      
+      <!-- Bouton pour passer au quiz suivant -->
+      <button *ngIf="(quizType === 'matching' && allSkillsMatched()) || (quizType === 'chronology' && isChronologyCorrect)"
+              class="primary-action action-btn"
+              (click)="goToNextQuiz()">
+        {{quizIndex < quizTypes.length - 1 ? 'Quiz suivant' : 'Voir les résultats'}}
+      </button>
+      
+      <!-- Boutons pour les résultats -->
+      <button *ngIf="quizCompleted && quizPassed"
+              class="primary-action action-btn"
+              (click)="navigateToNextPage()">
+        Continuer l'enquête
+      </button>
+      
+      <button *ngIf="quizCompleted && !quizPassed"
+              class="secondary-action action-btn"
+              (click)="restartQuiz()">
+        Réessayer
+      </button>
+    </div>
+  </div>
+</div>
   </div>

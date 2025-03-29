@@ -1,5 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, Renderer2, OnDestroy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 import { ProgressService } from '../../services/progress.service';
@@ -52,10 +55,37 @@ interface EnvironmentItem {
   icon: string;
 }
 
+// Ajouter ces interfaces
+interface PrioritizationItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  correctRank: number;
+}
+
+interface Scenario {
+  title: string;
+  description: string;
+  options: string[];
+  correctOption: number;
+  feedback: {
+    correct: string;
+    incorrect: string;
+  };
+}
+
+interface CompatibilityItem {
+  title: string;
+  description: string;
+  icon: string;
+  correctRating: number;
+}
+
 @Component({
   selector: 'app-attentes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './attentes.component.html',
   styleUrls: ['./attentes.component.css']
 })
@@ -429,7 +459,148 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   ];
 
+  // Ajouter ces propriétés à la classe AttentesComponent
+isQuizModalOpen: boolean = false;
+quizCompleted: boolean = false;
+quizPassed: boolean = false;
+quizScore: number = 0;
+
+// Types de quiz
+quizTypes: string[] = ['prioritization', 'scenarios', 'compatibility'];
+quizType: string = 'prioritization';
+quizIndex: number = 0;
+
+// Données pour le quiz de priorisation
+prioritizationItems: PrioritizationItem[] = [
+  {
+    id: 'expertise',
+    title: 'Expertise Technique',
+    description: 'Développer des compétences approfondies en architecture et technologies modernes',
+    icon: 'bi-code-slash',
+    correctRank: 0
+  },
+  {
+    id: 'leadership',
+    title: 'Leadership Technique',
+    description: 'Diriger des équipes et influencer les décisions techniques stratégiques',
+    icon: 'bi-people',
+    correctRank: 1
+  },
+  {
+    id: 'innovation',
+    title: 'Innovation',
+    description: 'Créer et implémenter des solutions novatrices à impact significatif',
+    icon: 'bi-lightbulb',
+    correctRank: 2
+  },
+  {
+    id: 'impact',
+    title: 'Projets d\'Impact',
+    description: 'Travailler sur des projets à forte visibilité et à impact mesurable',
+    icon: 'bi-bullseye',
+    correctRank: 3
+  },
+  {
+    id: 'growth',
+    title: 'Développement Personnel',
+    description: 'Équilibrer compétences techniques et soft skills pour une progression de carrière optimale',
+    icon: 'bi-graph-up',
+    correctRank: 4
+  }
+];
+prioritizationCompleted: boolean = false;
+
+// Données pour le quiz de scénarios
+scenarios: Scenario[] = [
+  {
+    title: 'Opportunité de projet',
+    description: 'Le sujet a le choix entre diriger un projet technique complexe avec une équipe junior ou rejoindre un projet établi en tant qu\'expert technique. Quelle option préférerait-il?',
+    options: [
+      'Diriger le projet complexe avec l\'équipe junior',
+      'Rejoindre le projet établi en tant qu\'expert',
+      'Proposer une solution alternative',
+      'Refuser les deux options'
+    ],
+    correctOption: 0,
+    feedback: {
+      correct: 'Correct! Le profil du sujet montre une forte aspiration vers le leadership technique combiné à l\'attrait pour les défis complexes.',
+      incorrect: 'Le profil du sujet révèle une préférence pour le leadership et les défis, ce qui le pousserait à choisir de diriger le projet complexe.'
+    }
+  },
+  {
+    title: 'Évolution technologique',
+    description: 'Une nouvelle technologie émerge dans le domaine du sujet. Quelle serait sa réaction la plus probable?',
+    options: [
+      'Attendre que la technologie fasse ses preuves avant de l\'explorer',
+      'L\'adopter immédiatement dans tous ses projets',
+      'Mener un projet pilote pour évaluer son potentiel',
+      'Ignorer cette technologie si elle ne s\'aligne pas avec sa spécialisation actuelle'
+    ],
+    correctOption: 2,
+    feedback: {
+      correct: 'Exact! Le profil du sujet indique un équilibre entre innovation et pragmatisme, favorisant une approche d\'évaluation contrôlée.',
+      incorrect: 'Le profil du sujet suggère qu\'il serait enthousiaste face à l\'innovation mais conserverait une approche méthodique via un projet pilote.'
+    }
+  },
+  {
+    title: 'Culture d\'entreprise',
+    description: 'Parmi ces environnements professionnels, lequel correspondrait le mieux aux aspirations du sujet?',
+    options: [
+      'Une grande entreprise stable avec des processus bien établis',
+      'Une startup innovante travaillant sur des technologies de rupture',
+      'Une entreprise de taille moyenne axée sur l\'excellence technique',
+      'Une organisation à but non lucratif avec une mission sociale forte'
+    ],
+    correctOption: 2,
+    feedback: {
+      correct: 'Correct! Le profil environnemental idéal du sujet met l\'accent sur l\'excellence technique combinée à des pratiques structurées.',
+      incorrect: 'L\'environnement idéal du sujet privilégie la qualité technique et les processus structurés sans les contraintes d\'une grande organisation.'
+    }
+  }
+];
+currentScenarioIndex: number = 0;
+selectedScenarioOption: number | null = null;
+scenarioAnswered: boolean = false;
+scenarioScores: boolean[] = [];
+
+// Données pour le quiz de compatibilité
+compatibilityItems: CompatibilityItem[] = [
+  {
+    title: 'Travail en autonomie',
+    description: 'Capacité à travailler de manière indépendante avec peu de supervision',
+    icon: 'bi-person-check',
+    correctRating: 8
+  },
+  {
+    title: 'Environnement collaboratif',
+    description: 'Préférence pour le travail en équipe et la collaboration pluridisciplinaire',
+    icon: 'bi-people',
+    correctRating: 9
+  },
+  {
+    title: 'Innovation continue',
+    description: 'Capacité à s\'adapter rapidement aux changements et à l\'évolution technologique',
+    icon: 'bi-lightning',
+    correctRating: 9
+  },
+  {
+    title: 'Stabilité et prévisibilité',
+    description: 'Préférence pour un environnement de travail structuré et des processus établis',
+    icon: 'bi-building',
+    correctRating: 6
+  },
+  {
+    title: 'Challenges techniques',
+    description: 'Affinité pour les problèmes complexes et les défis techniques',
+    icon: 'bi-puzzle',
+    correctRating: 10
+  }
+];
+compatibilityRatings: number[] = [5, 5, 5, 5, 5];
+compatibilityCompleted: boolean = false;
+
   constructor(
+    private router: Router,
     private progressService: ProgressService,
     private timeTrackerService: TimeTrackerService,
     private userDataService: UserDataService,
@@ -909,4 +1080,202 @@ technologies, équipe, management, croissance, équilibre
     // Répartir les sous-branches sur un arc de 120 degrés (-60 à +60)
     return -60 + (index * (120 / (total - 1)));
   }
+
+  // Fonction pour vérifier si l'utilisateur peut accéder au quiz
+canAccessQuiz(): boolean {
+  // L'utilisateur peut accéder au quiz s'il a révélé au moins 2 sections sur 3
+  let sectionsRevealed = 0;
+  if (this.showAspirationsMap) sectionsRevealed++;
+  if (this.showFutureProjects) sectionsRevealed++;
+  if (this.showIdealProfile) sectionsRevealed++;
+  
+  return sectionsRevealed >= 2;
+}
+
+// Fonctions pour le quiz modal
+openQuizModal(): void {
+  // Réinitialiser le quiz
+  this.quizCompleted = false;
+  this.quizPassed = false;
+  this.quizIndex = 0;
+  this.quizType = this.quizTypes[0];
+  this.quizScore = 0;
+  
+  // Initialiser les données du quiz
+  this.initPrioritizationQuiz();
+  this.initScenariosQuiz();
+  this.initCompatibilityQuiz();
+  
+  // Ouvrir la modal
+  this.isQuizModalOpen = true;
+}
+
+closeQuizModal(): void {
+  this.isQuizModalOpen = false;
+}
+
+// Initialiser le quiz de priorisation
+initPrioritizationQuiz(): void {
+  // Mélanger les items de priorisation
+  this.shuffleArray(this.prioritizationItems);
+  this.prioritizationCompleted = false;
+}
+
+// Initialiser le quiz de scénarios
+initScenariosQuiz(): void {
+  this.currentScenarioIndex = 0;
+  this.selectedScenarioOption = null;
+  this.scenarioAnswered = false;
+  this.scenarioScores = [];
+}
+
+// Initialiser le quiz de compatibilité
+initCompatibilityQuiz(): void {
+  // Réinitialiser les notations à 5 (milieu)
+  this.compatibilityRatings = this.compatibilityItems.map(() => 5);
+  this.compatibilityCompleted = false;
+}
+
+// Fonction pour mélanger un tableau
+shuffleArray(array: any[]): void {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+// Gérer le drop dans le quiz de priorisation
+dropPriority(event: CdkDragDrop<any[]>): void {
+  if (this.prioritizationCompleted) return;
+  
+  moveItemInArray(this.prioritizationItems, event.previousIndex, event.currentIndex);
+}
+
+// Valider la priorisation
+validatePrioritization(): void {
+  this.prioritizationCompleted = true;
+  
+  // Sauvegarder l'ordre de priorisation
+  this.saveUserResponse('prioritization_order', this.prioritizationItems.map(item => item.id));
+}
+
+// Sélectionner une option de scénario
+selectScenarioOption(index: number): void {
+  if (this.scenarioAnswered) return;
+  this.selectedScenarioOption = index;
+}
+
+// Valider la réponse au scénario
+validateScenarioAnswer(): void {
+  if (this.selectedScenarioOption === null) return;
+  
+  this.scenarioAnswered = true;
+  
+  // Vérifier si la réponse est correcte
+  const isCorrect = this.selectedScenarioOption === this.currentScenario.correctOption;
+  this.scenarioScores.push(isCorrect);
+  
+  // Sauvegarder la réponse
+  this.saveUserResponse(`scenario_${this.currentScenarioIndex}`, {
+    selected: this.selectedScenarioOption,
+    correct: isCorrect
+  });
+}
+
+// Passer au scénario suivant
+goToNextScenario(): void {
+  if (this.currentScenarioIndex < this.scenarios.length - 1) {
+    this.currentScenarioIndex++;
+    this.selectedScenarioOption = null;
+    this.scenarioAnswered = false;
+  } else {
+    // Fin des scénarios, passer au quiz suivant
+    this.goToNextQuiz();
+  }
+}
+
+// Valider l'évaluation de compatibilité
+validateCompatibility(): void {
+  this.compatibilityCompleted = true;
+  
+  // Sauvegarder les notations
+  this.saveUserResponse('compatibility_ratings', this.compatibilityRatings);
+}
+
+// Passer au quiz suivant
+goToNextQuiz(): void {
+  if (this.quizIndex < this.quizTypes.length - 1) {
+    this.quizIndex++;
+    this.quizType = this.quizTypes[this.quizIndex];
+  } else {
+    // Terminer le quiz
+    this.completeQuiz();
+  }
+}
+
+// Récupérer le scénario actuel
+get currentScenario(): Scenario {
+  return this.scenarios[this.currentScenarioIndex];
+}
+
+// Calcul du score du quiz
+completeQuiz(): void {
+  this.quizCompleted = true;
+  
+  // Calculer le score de priorisation (40% du score total)
+  let prioritizationScore = 0;
+  this.prioritizationItems.forEach((item, index) => {
+    // Plus l'item est proche de sa position correcte, plus le score est élevé
+    const distance = Math.abs(index - item.correctRank);
+    if (distance === 0) prioritizationScore += 1; // Position parfaite
+    else if (distance === 1) prioritizationScore += 0.5; // Une position d'écart
+  });
+  const normalizedPrioritizationScore = (prioritizationScore / this.prioritizationItems.length) * 40;
+  
+  // Calculer le score des scénarios (40% du score total)
+  const scenarioScore = (this.scenarioScores.filter(s => s).length / this.scenarios.length) * 40;
+  
+  // Calculer le score de compatibilité (20% du score total)
+  let compatibilityScore = 0;
+  this.compatibilityItems.forEach((item, index) => {
+    const difference = Math.abs(this.compatibilityRatings[index] - item.correctRating);
+    if (difference <= 1) compatibilityScore += 1; // Très proche
+    else if (difference <= 2) compatibilityScore += 0.75; // Assez proche
+    else if (difference <= 3) compatibilityScore += 0.5; // Différence modérée
+    else compatibilityScore += 0.25; // Différence importante
+  });
+  const normalizedCompatibilityScore = (compatibilityScore / this.compatibilityItems.length) * 20;
+  
+  // Score final
+  this.quizScore = Math.round(normalizedPrioritizationScore + scenarioScore + normalizedCompatibilityScore);
+  
+  // Quiz réussi si score >= 70%
+  this.quizPassed = this.quizScore >= 70;
+  
+  // Sauvegarder le score
+  this.saveUserResponse('quiz_score', this.quizScore);
+  
+  // Si le quiz est réussi, compléter le module
+  if (this.quizPassed && !this.isModuleCompleted) {
+    this.completeModule();
+  }
+}
+
+// Recommencer le quiz
+restartQuiz(): void {
+  this.quizIndex = 0;
+  this.quizType = this.quizTypes[0];
+  this.quizCompleted = false;
+  
+  // Réinitialiser les quiz
+  this.initPrioritizationQuiz();
+  this.initScenariosQuiz();
+  this.initCompatibilityQuiz();
+}
+
+// Naviguer vers la page suivante
+navigateToNextPage(): void {
+  this.closeQuizModal();
+  this.router.navigate(['/personnalite']);
+}
 }

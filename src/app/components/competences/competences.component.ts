@@ -55,7 +55,6 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
   scannedSkillIndex: number = -1;
 
   // Mode d'affichage
-  viewMode: 'graph' | 'list' = 'graph';
   selectedCategory: string | null = null;
 
   // Catégories de compétences
@@ -357,12 +356,6 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       if (categoryResponse && typeof categoryResponse.response === 'string') {
         this.selectedCategory = categoryResponse.response as string;
       }
-
-      // Charger le mode d'affichage
-      const viewModeResponse = responses.find(r => r.questionId === 'view_mode');
-      if (viewModeResponse && (viewModeResponse.response === 'graph' || viewModeResponse.response === 'list')) {
-        this.viewMode = viewModeResponse.response as 'graph' | 'list';
-      }
     }
   }
 
@@ -379,9 +372,6 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.selectedCategory) {
       this.userDataService.saveResponse('personnalite', 'selected_category', this.selectedCategory);
     }
-    
-    // Sauvegarder le mode d'affichage
-    this.userDataService.saveResponse('personnalite', 'view_mode', this.viewMode);
     
     // Vérifier si le module peut être complété
     this.checkModuleCompletion();
@@ -446,14 +436,6 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
         container.classList.remove('category-change');
       }, 500);
     }
-  }
-  
-  // Changement de mode d'affichage
-  switchViewMode(mode: 'graph' | 'list'): void {
-    this.viewMode = mode;
-    
-    // Sauvegarder le mode d'affichage
-    this.userDataService.saveResponse('personnalite', 'view_mode', mode);
   }
   
   // Démarrer un scan des compétences

@@ -13,8 +13,7 @@
       </button>
       <div class="message px-5">
         <!-- Utilisation du message directement depuis le service -->
-        <div>{{ dialogMessage?.text }}</div>
-        <span class="cursor" *ngIf="isTyping"></span>
+        <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
       </div>
     </div>
   </div>
@@ -62,8 +61,8 @@
         <div *ngFor="let evidence of evidenceItems; let i = index" 
              class="evidence-pin" 
              [class.discovered]="evidence.discovered"
-             [style.--pin-angle]="(i * 360 / evidenceItems.length) + 'deg'"
-             [style.--pin-distance]="'120px'"
+             [style.--pin-angle]="(i * (360 / evidenceItems.length)) + 'deg'"
+             [style.--pin-distance]="getPinDistance(i) + 'px'"
              (click)="discoverEvidence(i)">
           <div class="pin-connector" [class.active]="evidence.discovered"></div>
           <div class="pin-content">
@@ -243,4 +242,115 @@
       Module complété ! L'enquête sur les centres d'intérêt du sujet a été menée avec succès.
     </div>
   </div>
+
+  <!-- Ajouter le bouton "Continuer" après le message de complétion du module -->
+<div class="completion-message" *ngIf="isModuleCompleted">
+  <div class="alert alert-success">
+    <i class="bi bi-check-circle-fill"></i>
+    Module complété ! L'enquête sur les centres d'intérêt du sujet a été menée avec succès.
+  </div>
+</div>
+
+<!-- Ajouter le bouton continuer -->
+<div class="continue-module-section" *ngIf="getDiscoveredCount() >= (evidenceItems.length * 0.75) || isModuleCompleted">
+  <button class="continue-module-btn" (click)="startQuiz()">
+    <i class="bi bi-arrow-right-circle me-2"></i>
+    Continuer vers le module suivant
+  </button>
+</div>
+
+<!-- Modal du Quiz -->
+<div class="quiz-modal-overlay" *ngIf="showQuizModal">
+  <div class="quiz-modal">
+    <div class="quiz-modal-header">
+      <h3>
+        <i class="bi bi-clipboard-check me-2"></i>
+        Évaluation finale: Centres d'intérêt
+      </h3>
+      <button class="quiz-close-btn" (click)="closeQuizModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    
+    <div class="quiz-modal-body" *ngIf="quizStarted && !quizPassed && currentQuizQuestion < quizQuestions.length">
+      <div class="quiz-progress">
+        <div class="quiz-progress-text">Question {{currentQuizQuestion + 1}}/{{quizQuestions.length}}</div>
+        <div class="quiz-progress-bar-container">
+          <div class="quiz-progress-bar" [style.width.%]="((currentQuizQuestion + 1) / quizQuestions.length) * 100"></div>
+        </div>
+      </div>
+      
+      <div class="quiz-question">
+        <p>{{quizQuestions[currentQuizQuestion].question}}</p>
+      </div>
+      
+      <div class="quiz-options">
+        <div *ngFor="let option of quizQuestions[currentQuizQuestion].options; let i = index"
+             class="quiz-option"
+             [class.selected]="selectedAnswer === i"
+             (click)="selectQuizAnswer(i)">
+          <div class="option-marker">{{getResponseLetter(i)}}</div>
+          <div class="option-text">{{option}}</div>
+        </div>
+      </div>
+      
+      <button class="quiz-submit-btn" [disabled]="selectedAnswer === null" (click)="submitQuizAnswer()">
+        <i class="bi bi-check-circle me-2"></i>
+        Valider ma réponse
+      </button>
+    </div>
+    
+    <div class="quiz-modal-body quiz-results" *ngIf="quizStarted && (quizPassed || currentQuizQuestion >= quizQuestions.length)">
+      <div class="quiz-result-icon" [class.success]="quizPassed" [class.failure]="!quizPassed">
+        <i [class]="quizPassed ? 'bi bi-trophy' : 'bi bi-x-circle'"></i>
+      </div>
+      
+      <h4 class="quiz-result-title">
+        {{quizPassed ? 'Félicitations !' : 'Évaluation non validée'}}
+      </h4>
+      
+      <p class="quiz-result-message">
+        {{quizPassed ? 
+          'Vous avez correctement analysé les centres d\'intérêt du sujet. Vous êtes maintenant prêt à passer au module suivant.' : 
+          'Votre compréhension des centres d\'intérêt du sujet nécessite un approfondissement. Continuez à explorer les indices et réessayez.'}}
+      </p>
+      
+      <div class="quiz-score">
+        <div class="score-label">Votre score:</div>
+        <div class="score-value">{{quizScore}}/{{quizQuestions.length}}</div>
+      </div>
+      
+      <button class="quiz-close-btn-large" (click)="closeQuizModal()">
+        <i class="bi bi-arrow-left-circle me-2"></i>
+        Retourner à l'investigation
+      </button>
+      
+      <button class="quiz-continue-btn" *ngIf="quizPassed" (click)="continueToNextModule()">
+        <i class="bi bi-arrow-right-circle me-2"></i>
+        Continuer au module suivant
+      </button>
+    </div>
+    
+    <div class="quiz-modal-body quiz-intro" *ngIf="quizStarted === false">
+      <div class="quiz-intro-icon">
+        <i class="bi bi-clipboard-check"></i>
+      </div>
+      
+      <h4 class="quiz-intro-title">Évaluation de votre analyse</h4>
+      
+      <p class="quiz-intro-text">
+        Vous allez répondre à {{quizQuestions.length}} questions portant sur les centres d'intérêt que vous avez découverts à travers votre investigation. Cette évaluation permettra de valider votre compréhension du profil personnel du sujet.
+      </p>
+      
+      <p class="quiz-intro-instructions">
+        Pour réussir l'évaluation, vous devrez obtenir au moins {{getPassScore()}}/{{quizQuestions.length}} réponses correctes.
+      </p>
+      
+      <button class="quiz-start-btn" (click)="quizStarted = true">
+        <i class="bi bi-play-circle me-2"></i>
+        Commencer l'évaluation
+      </button>
+    </div>
+  </div>
+</div>
 </div>

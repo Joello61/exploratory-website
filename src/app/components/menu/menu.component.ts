@@ -3,7 +3,6 @@ import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy } fr
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
-import { NoteService } from '../../services/note.service';
 import { ModuleStatus, ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 
@@ -57,19 +56,13 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
   modulesCompleted: number = 0;
   totalModules: number = 7; // Nombre total de modules (sans compter home)
 
-  // État des notes
-  showNotes: boolean = false;
-  notes: Array<{ content: string, timestamp: number }> = [];
-  
-  // Date actuelle pour les notes
-  currentDate: Date = new Date();
+
 
   constructor(
     private router: Router,
     private progressService: ProgressService,
     private timeTrackerService: TimeTrackerService,
     private dialogService: DialogService,
-    private noteService: NoteService
   ) {}
 
   ngOnInit() {
@@ -86,20 +79,6 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.push(
       this.timeTrackerService.elapsedTime$.subscribe(time => {
         this.timeSpent = time;
-      })
-    );
-
-    // S'abonner aux notes
-    this.subscriptions.push(
-      this.noteService.notes$.subscribe(notes => {
-        this.notes = notes;
-      })
-    );
-
-    // S'abonner à la visibilité des notes
-    this.subscriptions.push(
-      this.noteService.isNotesVisible$.subscribe(visible => {
-        this.showNotes = visible;
       })
     );
 
@@ -197,18 +176,5 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     this.completionPercentage = this.progressService.getCompletionPercentage();
   }
 
-  // Afficher/masquer les notes
-  toggleNotes(): void {
-    this.noteService.toggleNotesVisibility();
-  }
 
-  // Ajouter une note (pour le bouton d'ajout)
-  addNote(content: string): void {
-    this.noteService.addNote(content);
-  }
-
-  // Supprimer une note
-  deleteNote(id: string): void {
-    this.noteService.deleteNote(id);
-  }
 }
