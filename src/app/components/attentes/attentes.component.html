@@ -90,69 +90,69 @@
   </div>
   
   <!-- Carte mentale des aspirations -->
-  <div class="aspirations-map" *ngIf="showAspirationsMap">
-    <div class="map-header">
-      <h3>Carte d'Aspirations Professionnelles</h3>
-      <div class="legend">
-        <div class="legend-item">
-          <span class="priority high"></span>
-          <span>Priorité haute</span>
-        </div>
-        <div class="legend-item">
-          <span class="priority medium"></span>
-          <span>Priorité moyenne</span>
-        </div>
-        <div class="legend-item">
-          <span class="priority low"></span>
-          <span>Priorité standard</span>
-        </div>
+<div class="aspirations-map" *ngIf="showAspirations">
+  <div class="map-header">
+    <h3>Carte d'Aspirations Professionnelles</h3>
+    <div class="legend">
+      <div class="legend-item">
+        <span class="priority high"></span>
+        <span>Priorité haute</span>
+      </div>
+      <div class="legend-item">
+        <span class="priority medium"></span>
+        <span>Priorité moyenne</span>
+      </div>
+      <div class="legend-item">
+        <span class="priority low"></span>
+        <span>Priorité standard</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mind-map">
+    <div class="map-center">
+      <div class="center-node">
+        <i class="bi bi-person-badge"></i>
+        <span>Aspirations</span>
       </div>
     </div>
     
-    <div class="mind-map">
-      <div class="map-center">
-        <div class="center-node">
-          <i class="bi bi-person-badge"></i>
-          <span>Aspirations</span>
+    <div class="map-branches">
+      <!-- Branches principales -->
+      <div *ngFor="let branch of aspirationBranches; let i = index"
+           class="branch"
+           [class.revealed]="branch.revealed"
+           [style.--branch-angle]="getNodeAngle(i, aspirationBranches.length)">
+        
+        <div class="connector"></div>
+        
+        <div class="branch-node" [class]="'priority-' + branch.priority">
+          <i [class]="'bi ' + branch.icon"></i>
+          <span>{{branch.title}}</span>
         </div>
-      </div>
-      
-      <div class="map-branches">
-        <!-- Branches principales -->
-        <div *ngFor="let branch of aspirationBranches; let i = index"
-             class="branch"
-             [class.revealed]="branch.revealed"
-             [style.--branch-angle]="getNodeAngle(i, aspirationBranches.length)">
+        
+        <!-- Sous-branches -->
+        <div *ngFor="let subBranch of branch.subBranches; let j = index"
+             class="sub-branch"
+             [class.revealed]="subBranch.revealed"
+             [style.--sub-branch-angle]="getSubNodeAngle(j, branch.subBranches.length)">
           
-          <div class="connector"></div>
+          <div class="sub-connector"></div>
           
-          <div class="branch-node" [class]="'priority-' + branch.priority">
-            <i [class]="'bi ' + branch.icon"></i>
-            <span>{{branch.title}}</span>
-          </div>
-          
-          <!-- Sous-branches -->
-          <div *ngFor="let subBranch of branch.subBranches; let j = index"
-               class="sub-branch"
-               [class.revealed]="subBranch.revealed"
-               [style.--sub-branch-angle]="getSubNodeAngle(j, branch.subBranches.length)">
-            
-            <div class="sub-connector"></div>
-            
-            <div class="sub-branch-node" [class]="'priority-' + subBranch.priority">
-              <div class="node-content">
-                <i [class]="'bi ' + subBranch.icon"></i>
-                <span>{{subBranch.title}}</span>
-              </div>
-              <div class="node-details" *ngIf="subBranch.revealed">
-                <p>{{subBranch.description}}</p>
-              </div>
+          <div class="sub-branch-node" [class]="'priority-' + subBranch.priority">
+            <div class="node-content">
+              <i [class]="'bi ' + subBranch.icon"></i>
+              <span>{{subBranch.title}}</span>
+            </div>
+            <div class="node-details" *ngIf="subBranch.revealed">
+              <p>{{subBranch.description}}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
   
   <!-- Projets futurs -->
   <div class="future-projects" *ngIf="showFutureProjects">
@@ -247,8 +247,6 @@
       Module complété ! Toutes les projections futures ont été analysées avec succès.
     </div>
   </div>
-
-  <!-- Ajouter ce code juste avant la fermeture de la div .future-vision-container -->
 
 <!-- Bouton Continuer -->
 <div class="continue-section" *ngIf="canAccessQuiz()">

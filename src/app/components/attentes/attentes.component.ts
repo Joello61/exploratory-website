@@ -108,6 +108,7 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
   showCursor: boolean = true;
   executingCommand: boolean = false;
   showTopicSuggestions: boolean = false;
+  showAspirations: boolean = false;
 
   // Commandes disponibles
   availableCommands: string[] = [
@@ -871,6 +872,7 @@ Carte des aspirations professionnelles générée.
       active: true
     });
     
+    this.showAspirations = true
     // Montrer la carte des aspirations
     setTimeout(() => {
       this.showAspirationsMap = true;
@@ -1068,17 +1070,19 @@ technologies, équipe, management, croissance, équilibre
   }
   
   // Calculer l'angle pour positionner un nœud dans la carte mentale
-  getNodeAngle(index: number, total: number): number {
-    if (total <= 1) return 0;
-    // Distribuer les branches sur 360 degrés
-    return (index * (360 / total));
+  getNodeAngle(index: number, total: number): string {
+    if (total <= 1) return '0deg';
+    // Distribuer les branches sur 360 degrés, mais commencer depuis le haut (270°)
+    const angleDegrees = 270 + (index * (360 / total));
+    return `${angleDegrees}deg`;
   }
   
   // Calculer l'angle pour positionner une sous-branche
-  getSubNodeAngle(index: number, total: number): number {
-    if (total <= 1) return 0;
+  getSubNodeAngle(index: number, total: number): string {
+    if (total <= 1) return '0deg';
     // Répartir les sous-branches sur un arc de 120 degrés (-60 à +60)
-    return -60 + (index * (120 / (total - 1)));
+    const angleDegrees = -60 + (index * (120 / (total - 1)));
+    return `${angleDegrees}deg`;
   }
 
   // Fonction pour vérifier si l'utilisateur peut accéder au quiz
