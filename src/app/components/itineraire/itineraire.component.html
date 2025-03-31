@@ -4,16 +4,22 @@
   <div class="dialog-container" *ngIf="isDialogOpen">
     <div class="d-flex justify-content-end">
       <div class="detective-container">
-        <img class="img" src="img/detective.png" alt="detective">
+        <img class="img" src="img/detective.png" alt="detective" />
       </div>
     </div>
     <div class="dialog-box">
-      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+      <button
+        (click)="closeDialogTypeWriter()"
+        type="button"
+        class="close-button"
+      >
         <i class="bi bi-x-circle fs-3"></i>
       </button>
       <div class="message px-5">
         <!-- Utilisation du message directement depuis le service -->
-        <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
+        <div>
+          {{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -22,7 +28,8 @@
   <div class="section-header">
     <h2 class="section-title">Cartographie du parcours</h2>
     <div class="investigation-status">
-      Données récupérées: <span class="status-badge">{{dataRecoveryPercentage}}%</span>
+      Données récupérées:
+      <span class="status-badge">{{ dataRecoveryPercentage }}%</span>
     </div>
   </div>
 
@@ -34,39 +41,15 @@
       </div>
       <h3 class="subsection-title">Origines géographiques</h3>
     </div>
-    
+
     <div class="map-container">
-      <div class="map-overlay"></div>
-      <div class="map-markers">
-        <!--<div class="map-marker" 
-             *ngFor="let location of originLocations" 
-             [style.top.%]="location.coordinates.lng" 
-             [style.left.%]="location.coordinates.lat"
-             (click)="selectLocation(location)">
-          <div class="marker-pulse"></div>
-          <div class="marker-point"></div>
-          <div class="marker-label">{{location.name}}</div>
-        </div>-->
-      </div>
-      
-      <!-- Information sur le lieu sélectionné -->
-      <div class="location-info" *ngIf="selectedLocation">
-        <div class="info-header">
-          <h4>{{selectedLocation.name}}</h4>
-          <button class="close-info" (click)="closeLocationInfo()">
-            <i class="bi bi-x"></i>
-          </button>
-        </div>
-        <div class="info-content">
-          <div class="info-period">{{selectedLocation.period}}</div>
-          <p class="info-description">{{selectedLocation.description}}</p>
-          <div class="info-data">
-            <div class="data-item" *ngFor="let data of selectedLocation.data">
-              <div class="data-label">{{data.label}}:</div>
-              <div class="data-value">{{data.value}}</div>
-            </div>
-          </div>
-        </div>
+      <div class="map-overlay">
+        <div style="height: 100%;"
+          class="map"
+          leaflet
+          [leafletOptions]="options"
+          (leafletMapReady)="onMapReady($event)"
+        ></div>
       </div>
     </div>
   </div>
@@ -79,47 +62,74 @@
       </div>
       <h3 class="subsection-title">Parcours de formation</h3>
     </div>
-    
+
     <div class="timeline-container">
       <div class="timeline-line"></div>
-      
+
       <div class="timeline-items">
-        <div class="timeline-item" 
-             *ngFor="let education of educationTimeline; let i = index" 
-             [class.timeline-right]="i % 2 === 1"
-             [class.discovered]="education.discovered"
-             (click)="toggleEducationDetails(education)">
+        <div
+          class="timeline-item"
+          *ngFor="let education of educationTimeline; let i = index"
+          [class.timeline-right]="i % 2 === 1"
+          [class.discovered]="education.discovered"
+          (click)="toggleEducationDetails(education)"
+        >
           <div class="timeline-dot"></div>
           <div class="timeline-content">
-            <div class="timeline-marker">{{education.years}}</div>
-            
+            <div class="timeline-marker">{{ education.years }}</div>
+
             <div class="timeline-header">
-              <h4 class="timeline-title">{{education.title}}</h4>
-              <div class="timeline-institution">{{education.institution}}</div>
+              <h4 class="timeline-title">{{ education.title }}</h4>
+              <div class="timeline-institution">
+                {{ education.institution }}
+              </div>
             </div>
-            
+
             <div class="timeline-details" [class.expanded]="education.expanded">
-              <p class="timeline-description">{{education.description}}</p>
-              
-              <div class="timeline-skills" *ngIf="education.skills && education.skills.length > 0">
+              <p class="timeline-description">{{ education.description }}</p>
+
+              <div
+                class="timeline-skills"
+                *ngIf="education.skills && education.skills.length > 0"
+              >
                 <h5>Compétences acquises:</h5>
                 <div class="skills-container">
-                  <span class="skill-badge" *ngFor="let skill of education.skills">{{skill}}</span>
+                  <span
+                    class="skill-badge"
+                    *ngFor="let skill of education.skills"
+                    >{{ skill }}</span
+                  >
                 </div>
               </div>
-              
-              <div class="timeline-achievements" *ngIf="education.achievements && education.achievements.length > 0">
+
+              <div
+                class="timeline-achievements"
+                *ngIf="
+                  education.achievements && education.achievements.length > 0
+                "
+              >
                 <h5>Réalisations notables:</h5>
                 <ul>
-                  <li *ngFor="let achievement of education.achievements">{{achievement}}</li>
+                  <li *ngFor="let achievement of education.achievements">
+                    {{ achievement }}
+                  </li>
                 </ul>
               </div>
             </div>
-            
+
             <div class="timeline-actions">
-              <button class="action-button" *ngIf="education.discovered" (click)="toggleEducationDetails(education, $event)">
-                <i class="bi" [ngClass]="education.expanded ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                {{education.expanded ? 'Réduire' : 'Détails'}}
+              <button
+                class="action-button"
+                *ngIf="education.discovered"
+                (click)="toggleEducationDetails(education, $event)"
+              >
+                <i
+                  class="bi"
+                  [ngClass]="
+                    education.expanded ? 'bi-chevron-up' : 'bi-chevron-down'
+                  "
+                ></i>
+                {{ education.expanded ? "Réduire" : "Détails" }}
               </button>
             </div>
           </div>
@@ -136,7 +146,7 @@
       </div>
       <h3 class="subsection-title">Analyse du parcours</h3>
     </div>
-    
+
     <div class="stats-container">
       <!-- Graphique d'évolution des compétences -->
       <div class="stats-evolution">
@@ -145,25 +155,38 @@
           <!-- Intégrer un graphique ici (utiliser Canvas ou une bibliothèque de graphiques) -->
           <div class="chart-placeholder">
             <!-- Barres verticales pour simuler un graphique -->
-            <div class="chart-bar" *ngFor="let skill of skillsEvolution; let i = index" 
-                [style.height.%]="skill.level" 
-                [style.left.%]="i * 10 + 10">
-              <div class="bar-label">{{skill.year}}</div>
-              <div class="bar-tooltip">{{skill.tooltip}}</div>
+            <div
+              class="chart-bar"
+              *ngFor="let skill of skillsEvolution; let i = index"
+              [style.height.%]="skill.level"
+              [style.left.%]="i * 10 + 10"
+            >
+              <div class="bar-label">{{ skill.year }}</div>
+              <div class="bar-tooltip">{{ skill.tooltip }}</div>
             </div>
           </div>
         </div>
       </div>
-      
+
       <!-- Indicateurs clés -->
       <div class="stats-indicators">
         <h4 class="stats-title">Indicateurs clés</h4>
         <div class="indicators-grid">
           <div class="indicator-item" *ngFor="let indicator of keyIndicators">
-            <div class="indicator-value">{{indicator.value}}</div>
-            <div class="indicator-label">{{indicator.label}}</div>
+            <div class="indicator-value">{{ indicator.value }}</div>
+            <div class="indicator-label">{{ indicator.label }}</div>
             <div class="indicator-trend" [ngClass]="indicator.trend">
-              <i class="bi" [ngClass]="'bi-' + (indicator.trend === 'up' ? 'graph-up-arrow' : indicator.trend === 'down' ? 'graph-down-arrow' : 'dash')"></i>
+              <i
+                class="bi"
+                [ngClass]="
+                  'bi-' +
+                  (indicator.trend === 'up'
+                    ? 'graph-up-arrow'
+                    : indicator.trend === 'down'
+                    ? 'graph-down-arrow'
+                    : 'dash')
+                "
+              ></i>
             </div>
           </div>
         </div>
@@ -189,76 +212,107 @@
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
-      
+
       <div class="quiz-content">
         <div class="quiz-progress">
           <div class="progress-bar">
-            <div class="progress-fill" [style.width.%]="(currentQuestionIndex / quizQuestions.length) * 100"></div>
+            <div
+              class="progress-fill"
+              [style.width.%]="
+                (currentQuestionIndex / quizQuestions.length) * 100
+              "
+            ></div>
           </div>
-          <div class="progress-text">Question {{currentQuestionIndex + 1}}/{{quizQuestions.length}}</div>
+          <div class="progress-text">
+            Question {{ currentQuestionIndex + 1 }}/{{ quizQuestions.length }}
+          </div>
         </div>
-        
+
         <div class="quiz-question" *ngIf="currentQuestion">
-          <h4>{{currentQuestion.text}}</h4>
-          
+          <h4>{{ currentQuestion.text }}</h4>
+
           <div class="question-options">
-            <div class="option" 
-                 *ngFor="let option of currentQuestion.options; let i = index"
-                 [class.selected]="selectedOption === i"
-                 (click)="selectOption(i)">
-              <div class="option-marker">{{['A', 'B', 'C', 'D'][i]}}</div>
-              <div class="option-text">{{option}}</div>
+            <div
+              class="option"
+              *ngFor="let option of currentQuestion.options; let i = index"
+              [class.selected]="selectedOption === i"
+              (click)="selectOption(i)"
+            >
+              <div class="option-marker">{{ ["A", "B", "C", "D"][i] }}</div>
+              <div class="option-text">{{ option }}</div>
             </div>
           </div>
-          
+
           <div class="quiz-feedback" *ngIf="showFeedback">
-            <div class="feedback-message" [class.correct]="isAnswerCorrect" [class.incorrect]="!isAnswerCorrect">
-              <i class="bi" [ngClass]="isAnswerCorrect ? 'bi-check-circle' : 'bi-x-circle'"></i>
-              <span>{{feedbackMessage}}</span>
+            <div
+              class="feedback-message"
+              [class.correct]="isAnswerCorrect"
+              [class.incorrect]="!isAnswerCorrect"
+            >
+              <i
+                class="bi"
+                [ngClass]="isAnswerCorrect ? 'bi-check-circle' : 'bi-x-circle'"
+              ></i>
+              <span>{{ feedbackMessage }}</span>
             </div>
           </div>
         </div>
-        
+
         <div class="quiz-results" *ngIf="quizCompleted">
           <h4>Résultats</h4>
-          
+
           <div class="results-score">
             <div class="score-circle">
-              <div class="score-value">{{correctAnswersCount}}/{{quizQuestions.length}}</div>
+              <div class="score-value">
+                {{ correctAnswersCount }}/{{ quizQuestions.length }}
+              </div>
             </div>
             <div class="score-label">Réponses correctes</div>
           </div>
-          
+
           <div class="results-message">
-            <p *ngIf="quizPassed">Félicitations ! Vous avez bien compris les informations du dossier.</p>
-            <p *ngIf="!quizPassed">Vous devriez revoir certaines informations du dossier.</p>
+            <p *ngIf="quizPassed">
+              Félicitations ! Vous avez bien compris les informations du
+              dossier.
+            </p>
+            <p *ngIf="!quizPassed">
+              Vous devriez revoir certaines informations du dossier.
+            </p>
           </div>
         </div>
       </div>
-      
+
       <div class="quiz-footer">
-        <button class="secondary-action action-btn" 
-                *ngIf="!quizCompleted && !showFeedback" 
-                [disabled]="selectedOption === null"
-                (click)="submitAnswer()">
+        <button
+          class="secondary-action action-btn"
+          *ngIf="!quizCompleted && !showFeedback"
+          [disabled]="selectedOption === null"
+          (click)="submitAnswer()"
+        >
           Vérifier
         </button>
-        
-        <button class="secondary-action action-btn" 
-                *ngIf="showFeedback && !quizCompleted" 
-                (click)="nextQuestion()">
+
+        <button
+          class="secondary-action action-btn"
+          *ngIf="showFeedback && !quizCompleted"
+          (click)="nextQuestion()"
+        >
           Question suivante
         </button>
-        
-        <button class="primary-action action-btn" 
-                *ngIf="quizCompleted && quizPassed" 
-                (click)="navigateToNextPage()">
+
+        <button
+          class="primary-action action-btn"
+          *ngIf="quizCompleted && quizPassed"
+          (click)="navigateToNextPage()"
+        >
           Continuer l'enquête
         </button>
-        
-        <button class="secondary-action action-btn" 
-                *ngIf="quizCompleted && !quizPassed" 
-                (click)="restartQuiz()">
+
+        <button
+          class="secondary-action action-btn"
+          *ngIf="quizCompleted && !quizPassed"
+          (click)="restartQuiz()"
+        >
           Réessayer
         </button>
       </div>

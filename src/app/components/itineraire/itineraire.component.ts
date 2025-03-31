@@ -14,6 +14,8 @@ import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
 import { Router } from '@angular/router';
+import { LeafletModule } from '@bluehalo/ngx-leaflet';
+import { latLng, tileLayer, Map, marker, Marker, Popup, icon } from 'leaflet';
 
 // Interfaces pour les données
 interface LocationData {
@@ -72,7 +74,7 @@ interface QuizQuestion {
 @Component({
   selector: 'app-itineraire',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LeafletModule],
   templateUrl: './itineraire.component.html',
   styleUrls: ['./itineraire.component.css'],
 })
@@ -346,6 +348,19 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   quizCompleted: boolean = false;
   quizPassed: boolean = false;
 
+  map!: Map;
+  markers: Marker[] = [];
+
+  options = {
+    layers: [
+      tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&amp;copy; OpenStreetMap contributors'
+      })
+    ],
+    zoom: 5,
+    center: latLng([48.8566, 2.3522])
+  };
+
   constructor(
     private progressService: ProgressService,
     private router: Router,
@@ -395,6 +410,24 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dialogMessage = message;
       })
     );
+
+    // Créer les marqueurs à partir des localisations
+  this.originLocations.forEach(loc => {
+    const m = marker([loc.coordinates.lat, loc.coordinates.lng], {
+      title: loc.name,
+      icon: icon({
+        iconUrl: 'leaflet/marker-icon.png', // par défaut Leaflet, ou personnalise ici
+        shadowUrl: 'leaflet/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      })
+    });
+
+    m.bindPopup(`<b>${loc.name}</b><br>${loc.period}<br>${loc.description}`);
+    this.markers.push(m);
+  });
   }
 
   ngAfterViewInit(): void {
@@ -409,13 +442,23 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
+  onMapReady(map: Map) {
+    this.map = map;
+    this.markers.forEach(m => m.addTo(this.map));
+  }
+  
+
   showIntroDialog(): void {
     const dialogMessage: DialogMessage = {
       text: '', // Commencer avec un texte vide pour l'effet de machine à écrire
       character: 'detective',
     };
     this.dialogService.openDialog(dialogMessage);
-    this.dialogService.startTypewriter(this.fullText);
+    this.dialogService.startTypewriter(this.fullText, () => {
+      setTimeout(() => {
+        this.dialogService.closeDialog()
+      }, 3000);
+    });
   }
 
   // Fermer le dialogue
