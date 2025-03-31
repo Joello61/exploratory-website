@@ -24,14 +24,7 @@
     <div class="investigation-status">
       <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
       <span *ngIf="!isModuleCompleted" class="status-badge">Analyses requises</span>
-      <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
       <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
-      
-      <!-- Bouton pour afficher les notes -->
-      <button class="notes-button" (click)="toggleNotes()">
-        <i class="bi bi-journal-text"></i>
-        Notes
-      </button>
     </div>
   </div>
   

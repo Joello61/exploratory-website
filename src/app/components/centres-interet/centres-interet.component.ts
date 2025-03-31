@@ -74,7 +74,6 @@ export class CentresInteretComponent
   private subscriptions: Subscription[] = [];
 
   // Données de progression et de temps
-  elapsedTime: string = '00:00:00';
   isModuleCompleted: boolean = false;
   moduleProgressPercentage: number = 0;
 
@@ -134,7 +133,7 @@ export class CentresInteretComponent
     {
       id: 'evidence-cooking',
       name: 'Ustensiles de cuisine spécialisés',
-      icon: 'bi-knife',
+      icon: 'bi-egg-fried',
       description:
         "Un ensemble d'ustensiles de cuisine de qualité professionnelle et des ingrédients rares ont été découverts, suggérant une passion pour la gastronomie et la cuisine expérimentale.",
       discovered: false,
@@ -528,7 +527,6 @@ export class CentresInteretComponent
 
   constructor(
     private progressService: ProgressService,
-    private timeTrackerService: TimeTrackerService,
     private userDataService: UserDataService,
     private dialogService: DialogService,
     private noteService: NoteService
@@ -540,13 +538,6 @@ export class CentresInteretComponent
       console.warn("Ce module n'est pas encore disponible");
       // Logique de redirection à implémenter si nécessaire
     }
-
-    // S'abonner au temps écoulé
-    this.subscriptions.push(
-      this.timeTrackerService.elapsedTime$.subscribe((time) => {
-        this.elapsedTime = time;
-      })
-    );
 
     // Vérifier si le module est déjà complété
     this.subscriptions.push(
@@ -593,7 +584,11 @@ export class CentresInteretComponent
       character: 'detective',
     };
     this.dialogService.openDialog(dialogMessage);
-    this.dialogService.startTypewriter(this.fullText);
+    this.dialogService.startTypewriter(this.fullText, () => {
+      setTimeout(() => {
+        this.dialogService.closeDialog()
+      }, 3000);
+    });
   }
 
   // Fermer le dialogue

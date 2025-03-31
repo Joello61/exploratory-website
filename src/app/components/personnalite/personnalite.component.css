@@ -192,8 +192,6 @@
 .folder-content {
   padding: 30px;
   flex: 1;
-  overflow-y: auto;
-  max-height: 75vh;
 }
 
 /* Adapter la scrollbar au style global */

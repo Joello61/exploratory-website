@@ -353,7 +353,11 @@ export class MotivationSocioProComponent implements OnInit, AfterViewInit, OnDes
       character: 'detective'
     };
     this.dialogService.openDialog(dialogMessage);
-    this.dialogService.startTypewriter(this.fullText);
+    this.dialogService.startTypewriter(this.fullText, () => {
+      setTimeout(() => {
+        this.dialogService.closeDialog()
+      }, 3000);
+    });
   }
 
   // Fermer le dialogue

@@ -693,7 +693,11 @@ compatibilityCompleted: boolean = false;
       character: 'detective'
     };
     this.dialogService.openDialog(dialogMessage);
-    this.dialogService.startTypewriter(this.fullText);
+    this.dialogService.startTypewriter(this.fullText, () => {
+      setTimeout(() => {
+        this.dialogService.closeDialog()
+      }, 3000);
+    });
   }
 
   // Fermer le dialogue

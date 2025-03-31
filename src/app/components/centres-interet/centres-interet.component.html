@@ -20,17 +20,10 @@
   <!-- Titre de la section avec informations de progression -->
   <div class="section-header">
     <h2 class="section-title">Investigation personnelle: Centres d'intérêt</h2>
-    <div class="investigation-status">
+    <div class="investigation-status">Statut : 
       <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
       <span *ngIf="!isModuleCompleted" class="status-badge">En analyse</span>
-      <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
       <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
-      
-      <!-- Bouton pour afficher les notes -->
-      <button class="notes-button" (click)="toggleNotes()">
-        <i class="bi bi-journal-text"></i>
-        Notes
-      </button>
     </div>
   </div>
 

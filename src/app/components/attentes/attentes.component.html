@@ -21,10 +21,9 @@
   <!-- Titre de la section avec statut de progression -->
   <div class="section-header">
     <h2 class="section-title">Projections Futures: Profil & Aspirations</h2>
-    <div class="projection-status">
+    <div class="projection-status"> Statut : 
       <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
       <span *ngIf="!isModuleCompleted" class="status-badge">En cours</span>
-      <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
       <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
     </div>
   </div>
@@ -39,10 +38,6 @@
       </div>
       <div class="terminal-title">SYSTÈME DE PROJECTION PROFESSIONNELLE v2.0</div>
       <!-- Bouton pour afficher les notes -->
-      <button class="notes-button" (click)="toggleNotes()">
-        <i class="bi bi-journal-text"></i>
-        Notes
-      </button>
     </div>
     
     <div class="terminal-content">

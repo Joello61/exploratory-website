@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { AppStateService } from '../../services/app-state.service';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
@@ -79,7 +78,6 @@ export class ConclusionComponent implements OnInit, AfterViewInit, OnDestroy {
   dialogMessage: DialogMessage | null = null;
 
   // Données de progression et de temps
-  elapsedTime: string = '00:00:00';
   totalElapsedSeconds: number = 0;
   moduleProgressPercentage: number = 100; // La conclusion est toujours à 100%
 
@@ -264,15 +262,6 @@ export class ConclusionComponent implements OnInit, AfterViewInit, OnDestroy {
       // Logique de redirection à implémenter si nécessaire
     }
 
-    // S'abonner au temps écoulé
-    this.subscriptions.push(
-      this.timeTrackerService.elapsedTime$.subscribe(time => {
-        this.elapsedTime = time;
-        // Mettre à jour le temps d'enquête dans les statistiques clés
-        this.updateTimeInStats(time);
-      })
-    );
-
     // Récupérer le temps écoulé en secondes
     this.totalElapsedSeconds = this.timeTrackerService.getElapsedSeconds();
 
@@ -328,7 +317,11 @@ export class ConclusionComponent implements OnInit, AfterViewInit, OnDestroy {
       character: 'detective'
     };
     this.dialogService.openDialog(dialogMessage);
-    this.dialogService.startTypewriter(this.fullText);
+    this.dialogService.startTypewriter(this.fullText, () => {
+      setTimeout(() => {
+        this.dialogService.closeDialog()
+      }, 3000);
+    });
   }
 
   // Fermer le dialogue
@@ -469,7 +462,6 @@ Environnement recommandé: ${this.compatibilityEnvironments[0].name} (${this.com
     // des différents modules pour générer un rapport complet
     return {
       timestamp: new Date().toISOString(),
-      elapsedTime: this.elapsedTime,
       completionRate: this.completionRate,
       findings: this.keyFindings,
       recommendations: this.recommendationCategories,

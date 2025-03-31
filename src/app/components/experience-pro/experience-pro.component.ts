@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
-import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
@@ -19,6 +18,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { Router } from '@angular/router';
+import { NoteService } from '../../services/note.service';
 
 interface JobClue {
   title: string;
@@ -62,7 +62,6 @@ export class ExperienceProComponent
   dialogMessage: DialogMessage | null = null;
 
   // Données de progression et de temps
-  elapsedTime: string = '00:00:00';
   isModuleCompleted: boolean = false;
   moduleProgressPercentage: number = 0;
 
@@ -330,7 +329,6 @@ export class ExperienceProComponent
 
   constructor(
     private progressService: ProgressService,
-    private timeTrackerService: TimeTrackerService,
     private router: Router,
     private userDataService: UserDataService,
     private dialogService: DialogService,
@@ -343,13 +341,6 @@ export class ExperienceProComponent
       console.warn("Ce module n'est pas encore disponible");
       // Logique de redirection à implémenter si nécessaire
     }
-
-    // S'abonner au temps écoulé
-    this.subscriptions.push(
-      this.timeTrackerService.elapsedTime$.subscribe((time) => {
-        this.elapsedTime = time;
-      })
-    );
 
     // Vérifier si le module est déjà complété
     this.subscriptions.push(
@@ -408,7 +399,11 @@ export class ExperienceProComponent
       character: 'detective',
     };
     this.dialogService.openDialog(dialogMessage);
-    this.dialogService.startTypewriter(this.fullText);
+    this.dialogService.startTypewriter(this.fullText, () => {
+      setTimeout(() => {
+        this.dialogService.closeDialog()
+      }, 3000);
+    });
   }
 
   // Fermer le dialogue
@@ -568,11 +563,6 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
     return this.jobs
       .filter((_, index) => this.jobCompletionStatus[index] === 100)
       .map((job) => job.achievement);
-  }
-
-  // Ouvrir le panneau de notes
-  toggleNotes(): void {
-    this.noteService.toggleNotesVisibility();
   }
 
   initializeExperienceData(): void {

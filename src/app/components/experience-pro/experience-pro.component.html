@@ -20,17 +20,10 @@
     <!-- Titre de la section avec informations de progression -->
     <div class="section-header">
       <h2 class="section-title">Dossier d'enquête: Expérience professionnelle</h2>
-      <div class="case-status">
+      <div class="case-status">Statut :
         <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
         <span *ngIf="!isModuleCompleted" class="status-badge">En cours</span>
-        <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
         <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
-        
-        <!-- Bouton pour afficher les notes -->
-        <button class="notes-button" (click)="toggleNotes()">
-          <i class="bi bi-journal-text"></i>
-          Notes
-        </button>
       </div>
     </div>
   

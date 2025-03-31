@@ -11,7 +11,6 @@ import { Subscription } from 'rxjs';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
-import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
 import { Router } from '@angular/router';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
@@ -93,9 +92,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   dialogMessage: DialogMessage | null = null;
 
   // Données de progression et temps
-  elapsedTime: string = '00:00:00';
   isModuleCompleted: boolean = false;
-  moduleProgressPercentage: number = 0;
 
   // Statistiques
   dataRecoveryPercentage: number = 35;
@@ -339,6 +336,8 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
 
+  statut: string = ""
+
   currentQuestionIndex: number = 0;
   selectedOption: number | null = null;
   showFeedback: boolean = false;
@@ -364,7 +363,6 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private progressService: ProgressService,
     private router: Router,
-    private timeTrackerService: TimeTrackerService,
     private userDataService: UserDataService,
     private dialogService: DialogService,
     private noteService: NoteService
@@ -376,25 +374,18 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       console.warn("Ce module n'est pas encore disponible");
     }
 
-    // S'abonner au temps écoulé
-    this.subscriptions.push(
-      this.timeTrackerService.elapsedTime$.subscribe((time) => {
-        this.elapsedTime = time;
-      })
-    );
-
     // Vérifier si le module est déjà complété
     this.subscriptions.push(
       this.progressService.moduleStatuses$.subscribe((statuses) => {
         this.isModuleCompleted = statuses.itineraire;
-        this.moduleProgressPercentage =
-          this.progressService.getCompletionPercentage();
 
         // Si le module est déjà complété, on peut pré-charger les réponses utilisateur
         if (this.isModuleCompleted) {
           this.loadSavedState();
+          this.statut = "TERMINÉ"
         } else {
           this.initializeData();
+          this.statut = "EN COURS"
         }
       })
     );

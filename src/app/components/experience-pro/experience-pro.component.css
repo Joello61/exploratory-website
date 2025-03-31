@@ -134,27 +134,6 @@
   font-size: 0.9rem;
 }
 
-.notes-button {
-  background: rgba(0, 191, 255, 0.2);
-  border: 1px solid rgba(0, 191, 255, 0.3);
-  color: #a0d8ff;
-  border-radius: 5px;
-  padding: 5px 10px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.notes-button:hover {
-  background: rgba(0, 191, 255, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 0 10px rgba(0, 191, 255, 0.2);
-  color: #00bfff;
-}
-
 /* Classeur de dossiers */
 .case-folder {
   background: rgba(26, 26, 46, 0.7);
@@ -655,10 +634,6 @@
   .case-status {
     flex-direction: column;
     align-items: flex-start;
-  }
-  
-  .notes-button {
-    align-self: flex-start;
   }
 }
 
