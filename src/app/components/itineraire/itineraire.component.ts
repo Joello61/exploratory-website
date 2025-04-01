@@ -101,42 +101,57 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   originLocations: Location[] = [
     {
       id: 'loc1',
-      name: 'Paris',
-      period: '2010 - Présent',
+      name: 'Toulouse',
+      period: '2024 - Présent',
       description:
-        'Lieu de résidence principal où se déroule la majorité de la carrière professionnelle.',
-      coordinates: { lat: 48.8566, lng: 2.3522 }, // Coordonnées réelles de Paris
+        'Lieu de résidence actuel et ville d\'études pour le Master Informatique à l\'Université de Toulouse Jean Jaurès.',
+      coordinates: { lat: 43.6047, lng: 1.4442 }, // Coordonnées réelles de Toulouse
       data: [
-        { label: 'Influence', value: 'Haute' },
-        { label: 'Réseau professionnel', value: 'Étendu' },
-        { label: "Secteur d'activité", value: 'Technologie' },
+        { label: 'Influence', value: 'Actuelle' },
+        { label: 'Formation', value: 'Master Informatique' },
+        { label: "Secteur d'activité", value: 'Développement Fullstack' },
       ],
       discovered: false,
     },
     {
       id: 'loc2',
-      name: 'Montpellier',
-      period: '2005 - 2010',
+      name: 'Marseille',
+      period: '2024 - Présent',
       description:
-        'Lieu des études supérieures et des premières expériences professionnelles.',
-      coordinates: { lat: 43.6112, lng: 3.8767 }, // Coordonnées réelles de Montpellier
+        'Lieu de l\'alternance chez Arthur Ngaku (ANG Tech), où se déroule l\'expérience professionnelle actuelle en développement Fullstack.',
+      coordinates: { lat: 43.2965, lng: 5.3698 }, // Coordonnées réelles de Marseille
       data: [
-        { label: 'Influence', value: 'Moyenne' },
-        { label: 'Formation principale', value: 'Ingénierie' },
-        { label: 'Connexions', value: 'Académiques' },
+        { label: 'Influence', value: 'Professionnelle' },
+        { label: 'Expérience', value: 'Développement 3D' },
+        { label: 'Connexions', value: 'Professionnelles' },
       ],
       discovered: false,
     },
     {
       id: 'loc3',
-      name: 'Toulouse',
-      period: '1985 - 2005',
-      description: "Lieu d'origine et de formation initiale.",
-      coordinates: { lat: 43.6047, lng: 1.4442 }, // Coordonnées réelles de Toulouse
+      name: 'Yaoundé, Cameroun',
+      period: '2020 - 2023',
+      description: 
+        'Lieu des premières expériences professionnelles (stages chez SKOOVEL et Megasoft) et des études en Licence et DUT à l\'IUT de Bandjoun.',
+      coordinates: { lat: 3.8480, lng: 11.5021 }, // Coordonnées réelles de Yaoundé
       data: [
         { label: 'Influence', value: 'Fondamentale' },
-        { label: 'Formation initiale', value: 'Sciences' },
-        { label: 'Environnement', value: 'Familial' },
+        { label: 'Formation initiale', value: 'Informatique' },
+        { label: 'Expériences', value: 'Premières expériences professionnelles' },
+      ],
+      discovered: false,
+    },
+    {
+      id: 'loc4',
+      name: 'Bandjoun, Cameroun',
+      period: '2020 - 2023',
+      description: 
+        'Site de l\'IUT où ont été suivies les formations de DUT Génie Logiciel et de Licence Informatique et réseau.',
+      coordinates: { lat: 5.3772, lng: 10.4111 }, // Coordonnées approximatives de Bandjoun
+      data: [
+        { label: 'Influence', value: 'Académique' },
+        { label: 'Formation', value: 'DUT et Licence' },
+        { label: 'Environnement', value: 'Universitaire' },
       ],
       discovered: false,
     },
@@ -148,112 +163,86 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   educationTimeline: Education[] = [
     {
       id: 'edu1',
-      years: '2008 - 2010',
-      title: 'Master en Génie Logiciel',
-      institution: "École Supérieure d'Informatique, Paris",
+      years: '2024 - En cours',
+      title: 'Master Informatique',
+      institution: 'Université de Toulouse Jean Jaurès, Toulouse',
       description:
-        "Formation spécialisée dans la conception et le développement de systèmes informatiques complexes, avec une orientation vers l'architecture logicielle et les méthodes agiles.",
+        "Formation avancée en informatique avec spécialisation en développement d'applications, réalisée en alternance pour combiner théorie et pratique professionnelle chez Arthur Ngaku (ANG Tech).",
       skills: [
-        'Conception Orientée Objet',
-        'Architecture Logicielle',
-        'Java/J2EE',
-        'Gestion de Projet Agile',
+        'Développement Fullstack',
+        'Intégration 3D',
+        'Architecture logicielle',
+        'DevOps & CI/CD',
       ],
       achievements: [
-        "Projet de fin d'études : Développement d'une plateforme de collaboration en temps réel",
-        'Participation au concours de programmation inter-écoles (3ème place)',
-        "Stage de fin d'études dans une entreprise leader du secteur",
+        "Projet d'alternance : Développement d'une application web/mobile avec intégration 3D",
+        "Mise en place de pipelines CI/CD avec GitLab",
+        "Rédaction de documentation technique complète"
       ],
       discovered: true,
       expanded: false,
     },
     {
       id: 'edu2',
-      years: '2005 - 2008',
-      title: 'Licence en Informatique',
-      institution: 'Université de Montpellier',
+      years: '2022 - 2023',
+      title: 'Licence Informatique et réseau',
+      institution: 'IUT de Bandjoun, Cameroun',
       description:
-        "Formation fondamentale couvrant les aspects théoriques et pratiques de l'informatique, avec une spécialisation progressive vers le développement web et les bases de données.",
+        "Formation approfondie en informatique et réseaux, avec un focus sur les technologies web, les architectures de systèmes d'information et la sécurité informatique.",
       skills: [
-        'Programmation Web',
-        'Bases de Données',
-        'Algorithmes',
-        'Réseaux',
+        'Programmation avancée',
+        'Architecture réseau',
+        'Sécurité des systèmes',
+        'Bases de données relationnelles',
       ],
       achievements: [
-        "Projet étudiant : Création d'un système de gestion de bibliothèque",
-        'Participation à un hackathon régional',
-        'Tutorat auprès des étudiants de première année',
+        "Stage de 10 mois chez SKOOVEL en tant que consultant informatique",
+        "Projets académiques en développement web et gestion de bases de données",
+        "Analyse de données et support technique en environnement professionnel"
       ],
       discovered: true,
       expanded: false,
     },
     {
       id: 'edu3',
-      years: '2003 - 2005',
-      title: 'DUT Informatique',
-      institution: 'IUT de Toulouse',
+      years: '2020 - 2022',
+      title: 'DUT Génie Logiciel',
+      institution: 'IUT de Bandjoun, Cameroun',
       description:
-        "Formation technique et pratique axée sur les fondamentaux de l'informatique et les technologies du web, combinant théorie et applications concrètes par le biais de nombreux projets.",
-      skills: ['HTML/CSS', 'PHP', 'SQL', 'JavaScript'],
-      achievements: [
-        "Développement d'un site web pour une association locale",
-        "Stage en entreprise de 3 mois : Refonte d'un intranet",
-        'Projet interdisciplinaire avec le département Communication',
-      ],
-      discovered: true,
-      expanded: false,
-    },
-    {
-      id: 'edu4',
-      years: '2000 - 2003',
-      title: 'Baccalauréat Scientifique',
-      institution: 'Lycée Pierre de Fermat, Toulouse',
-      description:
-        'Formation générale avec une spécialisation en mathématiques et sciences physiques, développant une approche analytique et logique des problèmes.',
+        "Formation technique axée sur le développement logiciel, les méthodologies de conception et la programmation, établissant des bases solides en développement d'applications.",
       skills: [
-        'Mathématiques',
-        'Physique',
-        'Logique',
-        'Méthodologie scientifique',
+        'Java',
+        'PHP',
+        'JavaScript',
+        'Conception orientée objet',
       ],
       achievements: [
-        'Mention Très Bien',
-        "Option informatique : Création d'un jeu simple en langage Pascal",
-        'Participation aux Olympiades de Mathématiques',
+        "Stage de 3 mois chez Megasoft Sarl en développement web",
+        "Intégration d'API REST et maintenance d'applications",
+        "Optimisation de requêtes SQL et tests unitaires"
       ],
       discovered: true,
       expanded: false,
-    },
+    }
   ];
 
   // Données pour les graphiques
   skillsEvolution: SkillEvolution[] = [
-    { year: '2003', level: 20, tooltip: 'Compétences techniques basiques' },
-    { year: '2005', level: 35, tooltip: 'Développement web fondamental' },
-    {
-      year: '2008',
-      level: 60,
-      tooltip: 'Maîtrise des bases de données et frameworks',
-    },
-    { year: '2010', level: 75, tooltip: 'Architecture logicielle avancée' },
-    {
-      year: '2015',
-      level: 85,
-      tooltip: 'Expertise technique et gestion de projets',
-    },
-    {
-      year: '2020',
-      level: 95,
-      tooltip: 'Maîtrise complète et vision stratégique',
-    },
+    { year: '2020', level: 30, tooltip: 'Début DUT Génie Logiciel - Bases de programmation' },
+    { year: '2021', level: 45, tooltip: 'Milieu DUT - Compétences web fondamentales' },
+    { year: '2022', level: 60, tooltip: 'Stage Megasoft + Début Licence - Développement web et API' },
+    { year: '2023', level: 75, tooltip: 'Stage SKOOVEL - Polyvalence technique et bases de données' },
+    { year: '2024', level: 85, tooltip: 'Début Master et alternance - Développement Fullstack' },
+    { year: '2025', level: 95, tooltip: 'Projection - Expertise 3D et DevOps avancé' },
   ];
 
   keyIndicators: KeyIndicator[] = [
-    { label: 'Années de formation', value: '10', trend: 'neutral' },
-    { label: 'Spécialisations', value: '3', trend: 'up' },
-    { label: "Niveau d'expertise", value: 'Expert', trend: 'up' },
-    { label: 'Mobilité géographique', value: '3 villes', trend: 'neutral' },
+    { label: 'Années de formation', value: '5', trend: 'up' },
+    { label: 'Expériences professionnelles', value: '3', trend: 'up' },
+    { label: "Niveau d'expertise fullstack", value: 'Intermédiaire', trend: 'up' },
+    { label: 'Technologies maîtrisées', value: '10+', trend: 'up' },
+    { label: 'Compétences 3D web', value: 'Spécialisation', trend: 'up' },
+    { label: 'Mobilité géographique', value: '2 pays', trend: 'neutral' },
   ];
 
   isQuizModalOpen: boolean = false;
@@ -263,75 +252,109 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       id: 'q1',
       text: 'Quelle est la formation la plus récente du parcours éducatif ?',
       options: [
-        'Licence en Informatique',
-        'Master en Génie Logiciel',
-        'DUT Informatique',
-        'Baccalauréat Scientifique',
+        'Licence Informatique et réseau',
+        'Master Informatique',
+        'DUT Génie Logiciel',
+        'Stage chez SKOOVEL',
       ],
       correctOptionIndex: 1,
       feedback: {
         correct:
-          'Correct ! Le Master en Génie Logiciel est la formation la plus récente (2008-2010).',
+          'Correct ! Le Master Informatique à l\'Université de Toulouse Jean Jaurès est la formation la plus récente (2024-en cours).',
         incorrect:
-          'Incorrect. Le Master en Génie Logiciel (2008-2010) est la formation la plus récente du parcours.',
+          'Incorrect. Le Master Informatique à l\'Université de Toulouse Jean Jaurès (2024-en cours) est la formation la plus récente du parcours.',
       },
     },
     {
       id: 'q2',
-      text: 'Dans quelle ville le sujet a-t-il effectué sa formation initiale ?',
-      options: ['Paris', 'Montpellier', 'Toulouse', 'Lyon'],
+      text: 'Dans quelle ville le développeur effectue-t-il actuellement son alternance ?',
+      options: ['Toulouse', 'Yaoundé', 'Marseille', 'Bandjoun'],
       correctOptionIndex: 2,
       feedback: {
         correct:
-          "Correct ! Toulouse est le lieu d'origine et de formation initiale (1985-2005).",
+          'Correct ! L\'alternance chez Arthur Ngaku (ANG Tech) se déroule à Marseille.',
         incorrect:
-          "Incorrect. Toulouse est le lieu d'origine et de formation initiale du sujet (1985-2005).",
+          'Incorrect. L\'alternance chez Arthur Ngaku (ANG Tech) se déroule à Marseille, tandis que le Master est suivi à Toulouse.',
       },
     },
     {
       id: 'q3',
-      text: 'Quelle compétence a été acquise pendant le DUT Informatique ?',
+      text: 'Quelle technologie spécifique est mise en avant dans le poste actuel d\'alternant ?',
       options: [
-        'Architecture Logicielle',
-        'Algorithmes',
-        'JavaScript',
-        'Conception Orientée Objet',
+        'Intelligence artificielle',
+        'Blockchain',
+        'Intégration 3D',
+        'Internet des objets (IoT)',
       ],
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! JavaScript fait partie des compétences acquises pendant le DUT Informatique.',
+          'Correct ! L\'intégration 3D est une technologie clé dans le poste actuel chez Arthur Ngaku, avec le développement d\'une application web/mobile incorporant des fonctionnalités 3D.',
         incorrect:
-          'Incorrect. JavaScript fait partie des compétences acquises pendant le DUT Informatique, avec HTML/CSS, PHP et SQL.',
+          'Incorrect. L\'intégration 3D est la technologie spécifique mise en avant dans le poste actuel, notamment pour l\'analyse des mesures corporelles.',
       },
     },
     {
       id: 'q4',
-      text: "Quel est le pourcentage d'évolution des compétences techniques en 2015 ?",
+      text: 'Quel est le niveau d\'expertise fullstack atteint en 2024 selon l\'évolution des compétences ?',
       options: ['60%', '75%', '85%', '95%'],
       correctOptionIndex: 2,
       feedback: {
         correct:
-          "Correct ! En 2015, le niveau d'expertise technique était de 85%.",
+          'Correct ! En 2024, le niveau d\'expertise fullstack est de 85%, correspondant au début du Master et de l\'alternance.',
         incorrect:
-          'Incorrect. En 2015, le niveau d\'expertise technique était de 85%, correspondant à "Expertise technique et gestion de projets".',
+          'Incorrect. En 2024, le niveau d\'expertise fullstack est de 85%, marquant le début du Master Informatique et de l\'alternance chez Arthur Ngaku.',
       },
     },
     {
       id: 'q5',
-      text: 'Quel projet a été réalisé pendant la Licence en Informatique ?',
+      text: 'Quel framework frontend est principalement utilisé dans le poste actuel ?',
       options: [
-        "Développement d'une plateforme de collaboration en temps réel",
-        "Création d'un système de gestion de bibliothèque",
-        "Refonte d'un intranet",
-        "Développement d'un jeu en langage Pascal",
+        'React',
+        'Angular',
+        'Vue.js',
+        'Svelte',
       ],
-      correctOptionIndex: 1,
+      correctOptionIndex: 2,
       feedback: {
         correct:
-          "Correct ! La création d'un système de gestion de bibliothèque était un projet réalisé pendant la Licence.",
+          'Correct ! Vue.js est le framework frontend principal utilisé chez Arthur Ngaku pour le développement de l\'application web/mobile avec intégration 3D.',
         incorrect:
-          "Incorrect. La création d'un système de gestion de bibliothèque était un projet réalisé pendant la Licence en Informatique.",
+          'Incorrect. Vue.js est le framework frontend principalement utilisé dans le poste actuel pour développer l\'interface utilisateur de l\'application avec intégration 3D.',
+      },
+    },
+    {
+      id: 'q6',
+      text: 'Combien d\'expériences professionnelles figurent dans le parcours du développeur ?',
+      options: [
+        '1',
+        '2',
+        '3',
+        '4',
+      ],
+      correctOptionIndex: 2,
+      feedback: {
+        correct:
+          'Correct ! Le parcours comprend 3 expériences professionnelles : alternance chez Arthur Ngaku, stage chez SKOOVEL et stage chez Megasoft.',
+        incorrect:
+          'Incorrect. Le parcours comprend 3 expériences professionnelles distinctes : l\'alternance actuelle chez Arthur Ngaku, le stage de 10 mois chez SKOOVEL et le stage de 3 mois chez Megasoft.',
+      },
+    },
+    {
+      id: 'q7',
+      text: 'Quel outil DevOps est utilisé pour les pipelines CI/CD dans le poste actuel ?',
+      options: [
+        'Jenkins',
+        'GitHub Actions',
+        'GitLab CI/CD',
+        'Azure DevOps',
+      ],
+      correctOptionIndex: 2,
+      feedback: {
+        correct:
+          'Correct ! GitLab CI/CD est l\'outil utilisé pour mettre en place des pipelines d\'intégration et de déploiement continus chez Arthur Ngaku.',
+        incorrect:
+          'Incorrect. GitLab CI/CD est l\'outil DevOps utilisé dans le poste actuel pour automatiser les tests et déploiements.',
       },
     },
   ];

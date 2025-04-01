@@ -102,426 +102,374 @@ export class CentresInteretComponent
   quizPassed: boolean = false;
 
   // Indices à découvrir
-  evidenceItems: Evidence[] = [
-    {
-      id: 'evidence-tech',
-      name: 'Abonnements à des newsletters tech',
-      icon: 'bi-envelope-paper',
-      description:
-        "Plusieurs abonnements à des newsletters techniques spécialisées ont été découverts, révélant un intérêt constant pour l'actualité technologique et les tendances émergentes.",
-      discovered: false,
-      unlocksInterests: ['programming', 'tech-watch'],
-    },
-    {
-      id: 'evidence-books',
-      name: 'Collection de livres technique',
-      icon: 'bi-book',
-      description:
-        "Une vaste collection de livres techniques et de développement personnel a été trouvée, démontrant un engagement dans l'apprentissage continu et le perfectionnement de compétences diverses.",
-      discovered: false,
-      unlocksInterests: ['reading', 'learning'],
-    },
-    {
-      id: 'evidence-running',
-      name: 'Participation à des courses',
-      icon: 'bi-stopwatch',
-      description:
-        'Des dossards et médailles de courses à pied ont été retrouvés, indiquant une pratique régulière de la course à pied et une participation à des événements sportifs.',
-      discovered: false,
-      unlocksInterests: ['running', 'fitness'],
-    },
-    {
-      id: 'evidence-cooking',
-      name: 'Ustensiles de cuisine spécialisés',
-      icon: 'bi-egg-fried',
-      description:
-        "Un ensemble d'ustensiles de cuisine de qualité professionnelle et des ingrédients rares ont été découverts, suggérant une passion pour la gastronomie et la cuisine expérimentale.",
-      discovered: false,
-      unlocksInterests: ['cooking', 'gastronomy'],
-    },
-    {
-      id: 'evidence-travel',
-      name: 'Collection de souvenirs internationaux',
-      icon: 'bi-airplane',
-      description:
-        'De nombreux souvenirs de différents pays et cultures ont été retrouvés, révélant un goût prononcé pour les voyages et la découverte de nouvelles cultures.',
-      discovered: false,
-      unlocksInterests: ['travel', 'photography'],
-    },
-    {
-      id: 'evidence-music',
-      name: 'Équipement audio haut de gamme',
-      icon: 'bi-music-note-beamed',
-      description:
-        "Un système audio sophistiqué et une collection éclectique de musique ont été identifiés, démontrant une passion pour l'écoute musicale de qualité.",
-      discovered: false,
-      unlocksInterests: ['music', 'concerts'],
-    },
-    {
-      id: 'evidence-gaming',
-      name: 'Consoles et collection de jeux',
-      icon: 'bi-controller',
-      description:
-        'Plusieurs consoles de jeux et une importante bibliothèque de jeux vidéo ont été retrouvées, révélant un intérêt pour le gaming et la culture vidéoludique.',
-      discovered: false,
-      unlocksInterests: ['gaming', 'esports'],
-    },
-    {
-      id: 'evidence-nature',
-      name: 'Équipement de randonnée',
-      icon: 'bi-tree',
-      description:
-        "Du matériel de randonnée et de camping de qualité a été découvert, indiquant un attrait pour les activités de plein air et l'exploration de la nature.",
-      discovered: false,
-      unlocksInterests: ['hiking', 'nature'],
-    },
-  ];
+// Indices à découvrir adaptés au profil
+evidenceItems: Evidence[] = [
+  {
+    id: 'evidence-tech',
+    name: 'Abonnements à des newsletters tech',
+    icon: 'bi-envelope-paper',
+    description:
+      "Plusieurs abonnements à des newsletters sur Vue.js, Angular et les technologies 3D Web ont été découverts, révélant un intérêt constant pour les frameworks frontend et les technologies que vous utilisez déjà.",
+    discovered: false,
+    unlocksInterests: ['frontend', 'tech-watch'],
+  },
+  {
+    id: 'evidence-books',
+    name: 'Collection de livres techniques',
+    icon: 'bi-book',
+    description:
+      "Une collection de livres sur le développement Full Stack, Spring Boot et l'architecture API REST a été trouvée, démontrant votre engagement dans l'approfondissement de vos compétences techniques actuelles.",
+    discovered: false,
+    unlocksInterests: ['backend', 'architecture'],
+  },
+  {
+    id: 'evidence-cooking',
+    name: 'Ustensiles de cuisine spécialisés',
+    icon: 'bi-egg-fried',
+    description:
+      "Un ensemble d'ustensiles de cuisine de qualité et des ingrédients pour la pâtisserie ont été découverts, en accord avec vos centres d'intérêt mentionnés dans votre CV.",
+    discovered: false,
+    unlocksInterests: ['cooking', 'pastry'],
+  },
+  {
+    id: 'evidence-uni',
+    name: 'Notes de cours et projets universitaires',
+    icon: 'bi-mortarboard',
+    description:
+      "Des notes de cours bien organisées et des projets informatiques de votre Master à l'Université de Toulouse Jean Jaurès ont été retrouvés, témoignant de votre sérieux dans vos études.",
+    discovered: false,
+    unlocksInterests: ['academic', 'research'],
+  },
+  {
+    id: 'evidence-music',
+    name: 'Équipement audio et partitions',
+    icon: 'bi-music-note-beamed',
+    description:
+      "Un microphone de qualité et des partitions de chant ont été identifiés, en lien avec votre intérêt pour le chant mentionné dans votre CV.",
+    discovered: false,
+    unlocksInterests: ['singing', 'music'],
+  },
+  {
+    id: 'evidence-mobile',
+    name: 'Applications mobiles en développement',
+    icon: 'bi-phone',
+    description:
+      "Des prototypes d'applications mobiles et des notes de conception ont été trouvés, montrant votre intérêt pour étendre vos compétences web vers le développement mobile.",
+    discovered: false,
+    unlocksInterests: ['mobile-dev', 'ux-design'],
+  },
+  {
+    id: 'evidence-cinema',
+    name: 'Collection de films et analyses',
+    icon: 'bi-film',
+    description:
+      "Une collection éclectique de films et des notes d'analyse cinématographique ont été découvertes, en accord avec votre centre d'intérêt pour le cinéma.",
+    discovered: false,
+    unlocksInterests: ['cinema', 'storytelling'],
+  },
+  {
+    id: 'evidence-docs',
+    name: 'Modèles de documentation technique',
+    icon: 'bi-file-text',
+    description:
+      "Des modèles de documentation technique soigneusement élaborés ont été retrouvés, reflétant votre expérience en rédaction de documentation chez Arthur Ngaku.",
+    discovered: false,
+    unlocksInterests: ['technical-writing', 'knowledge-sharing'],
+  },
+];
 
   // Catégories d'intérêts
   interestCategories: InterestCategory[] = [
     {
-      id: 'tech',
-      name: 'Technologie & Innovation',
-      icon: 'bi-cpu',
+      id: 'dev-fullstack',
+      name: 'Développement Fullstack',
+      icon: 'bi-code-slash',
       requiredEvidences: 1,
     },
     {
-      id: 'culture',
-      name: 'Culture & Apprentissage',
-      icon: 'bi-book',
+      id: 'mobile-3d',
+      name: 'Mobile & Technologies 3D',
+      icon: 'bi-phone',
       requiredEvidences: 1,
     },
     {
-      id: 'outdoor',
-      name: 'Activités de plein air',
-      icon: 'bi-tree',
-      requiredEvidences: 2,
+      id: 'education',
+      name: 'Formation & Documentation',
+      icon: 'bi-mortarboard',
+      requiredEvidences: 1,
     },
     {
-      id: 'lifestyle',
-      name: 'Art de vivre',
-      icon: 'bi-cup-hot',
-      requiredEvidences: 2,
+      id: 'culinary',
+      name: 'Arts Culinaires',
+      icon: 'bi-egg-fried',
+      requiredEvidences: 1,
     },
     {
-      id: 'entertainment',
-      name: 'Divertissement',
-      icon: 'bi-controller',
-      requiredEvidences: 2,
+      id: 'arts',
+      name: 'Arts & Culture',
+      icon: 'bi-film',
+      requiredEvidences: 1,
     },
   ];
 
   // Centres d'intérêt détaillés
   interests: Interest[] = [
-    // Technologie & Innovation
+    // Développement Fullstack
     {
-      id: 'programming',
-      name: 'Programmation créative',
-      icon: 'bi-code-slash',
-      category: 'tech',
+      id: 'frontend',
+      name: 'Développement Frontend',
+      icon: 'bi-window',
+      category: 'dev-fullstack',
       description:
-        "Exploration de projets personnels de programmation, allant des applications web aux scripts d'automatisation, en passant par des expérimentations avec des technologies émergentes.",
-      since: '2015',
-      frequency: 'Plusieurs heures par semaine',
+        "Passion pour le développement d'interfaces utilisateur modernes et réactives avec Vue.js et Angular, en explorant les dernières tendances en matière d'expérience utilisateur.",
+      since: '2020',
+      frequency: 'Quotidienne (travail et projets personnels)',
       skillsRelated: [
-        'Problem Solving',
-        'Architecture Logicielle',
-        'Créativité Technique',
+        'UI/UX Design',
+        'JavaScript/TypeScript',
+        'Optimisation des performances'
       ],
       highlight:
-        'A contribué à plusieurs projets open source et partage régulièrement des outils et solutions sur GitHub.',
+        'A développé des interfaces frontend avancées chez Arthur Ngaku et expérimente régulièrement avec les nouvelles fonctionnalités de Vue.js.',
       requiredEvidence: 'evidence-tech',
     },
     {
-      id: 'tech-watch',
-      name: 'Veille technologique',
-      icon: 'bi-radar',
-      category: 'tech',
+      id: 'backend',
+      name: 'Architecture Backend',
+      icon: 'bi-server',
+      category: 'dev-fullstack',
       description:
-        'Suivi régulier des tendances, innovations et évolutions du monde technologique à travers des newsletters spécialisées, conférences en ligne et communautés professionnelles.',
-      frequency: 'Quotidienne',
+        'Intérêt pour la conception d\'architectures backend robustes et évolutives avec Spring Boot, Symfony et Node.js, en se concentrant sur les API REST sécurisées.',
+      since: '2020',
+      frequency: 'Régulière (professionnelle et académique)',
       skillsRelated: [
-        'Analyse de tendances',
-        'Curiosité intellectuelle',
-        'Adaptabilité',
+        'Conception API',
+        'Bases de données PostgreSQL/MySQL',
+        'Sécurité des applications'
       ],
       relatedImages: [
-        { caption: 'Conférence tech 2023' },
-        { caption: 'Meetup développeurs' },
+        { caption: 'Schéma d\'architecture microservices' },
+        { caption: 'Documentation API Swagger' }
       ],
-      requiredEvidence: 'evidence-tech',
-    },
-
-    // Culture & Apprentissage
-    {
-      id: 'reading',
-      name: 'Lecture technique et fiction',
-      icon: 'bi-journal-richtext',
-      category: 'culture',
-      description:
-        "Lecteur avide combinant ouvrages techniques pour le développement professionnel et littérature de fiction (science-fiction, thrillers) pour le plaisir et l'évasion.",
-      frequency: 'Quotidienne',
-      skillsRelated: [
-        'Acquisition de connaissances',
-        'Pensée critique',
-        'Créativité',
-      ],
-      relatedImages: [
-        { caption: 'Bibliothèque personnelle' },
-        { caption: 'Dernières lectures' },
-      ],
-      highlight:
-        'Participe activement à un club de lecture mensuel et maintient une liste de lecture constamment mise à jour.',
       requiredEvidence: 'evidence-books',
     },
+  
+    // Mobile & Technologies 3D
     {
-      id: 'learning',
-      name: 'Apprentissage continu',
+      id: 'mobile-dev',
+      name: 'Développement Mobile',
+      icon: 'bi-phone',
+      category: 'mobile-3d',
+      description:
+        'Exploration des technologies de développement mobile cross-platform en complément des compétences web, avec un intérêt particulier pour les applications hybrides.',
+      since: '2022',
+      frequency: 'Projets spécifiques et veille technologique',
+      skillsRelated: [
+        'Responsive Design',
+        'Expérience utilisateur mobile',
+        'Intégration API natives'
+      ],
+      requiredEvidence: 'evidence-mobile',
+    },
+    {
+      id: 'tech-3d',
+      name: 'Technologies 3D Web',
+      icon: 'bi-cube',
+      category: 'mobile-3d',
+      description:
+        'Expertise en développement d\'applications web intégrant des fonctionnalités 3D et des API de traitement d\'images, suite à l\'expérience acquise chez Arthur Ngaku.',
+      since: '2023',
+      frequency: 'Projets professionnels actuels',
+      skillsRelated: [
+        'WebGL',
+        'Traitement d\'images',
+        'Reconstruction 3D'
+      ],
+      highlight:
+        'A implémenté une solution de visualisation 3D pour l\'analyse des mesures corporelles dans un contexte e-commerce.',
+      requiredEvidence: 'evidence-tech',
+    },
+  
+    // Formation & Documentation
+    {
+      id: 'academic',
+      name: 'Formation Informatique',
       icon: 'bi-mortarboard',
-      category: 'culture',
+      category: 'education',
       description:
-        "Engagement dans un processus d'apprentissage permanent à travers des cours en ligne, webinaires, et certifications professionnelles dans divers domaines connexes à l'informatique.",
-      since: '2017',
-      frequency: 'Plusieurs heures par semaine',
-      skillsRelated: ['Auto-formation', 'Discipline', 'Adaptabilité'],
-      requiredEvidence: 'evidence-books',
-    },
-
-    // Activités de plein air
-    {
-      id: 'running',
-      name: 'Course à pied',
-      icon: 'bi-lightning',
-      category: 'outdoor',
-      description:
-        'Pratique régulière de la course à pied avec participation à plusieurs événements sportifs comme des semi-marathons et courses urbaines.',
-      since: '2019',
-      frequency: '3-4 sessions par semaine',
-      skillsRelated: ['Endurance', 'Persévérance', 'Gestion du stress'],
-      relatedImages: [
-        { caption: 'Semi-marathon 2022' },
-        { caption: 'Course urbaine nocturne' },
+        'Engagement dans la formation universitaire en informatique, avec un focus sur l\'approfondissement des connaissances théoriques et pratiques en développement logiciel.',
+      since: '2020',
+      frequency: 'Quotidienne (Master en alternance)',
+      skillsRelated: [
+        'Analyse algorithmique',
+        'Méthodologies de développement',
+        'Recherche et synthèse'
       ],
       highlight:
-        "A établi un record personnel de 1h45 au semi-marathon et continue de s'améliorer progressivement.",
-      requiredEvidence: 'evidence-running',
+        'Poursuit un Master en Informatique à l\'Université de Toulouse Jean Jaurès tout en appliquant les connaissances acquises en contexte professionnel.',
+      requiredEvidence: 'evidence-uni',
     },
     {
-      id: 'hiking',
-      name: 'Randonnée et exploration',
-      icon: 'bi-map',
-      category: 'outdoor',
+      id: 'technical-writing',
+      name: 'Documentation Technique',
+      icon: 'bi-file-text',
+      category: 'education',
       description:
-        "Amateur de randonnées en montagne et d'exploration de nouveaux sentiers, avec un intérêt particulier pour les paysages naturels préservés et la photographie de nature.",
-      frequency: 'Mensuelle, intensifiée pendant les vacances',
+        'Intérêt pour la création de documentations techniques claires et complètes, développé lors de la rédaction de guides d\'architecture et de maintenance chez Arthur Ngaku.',
+      since: '2023',
+      frequency: 'Régulière (contexte professionnel)',
       skillsRelated: [
-        'Planification',
-        'Orientation',
-        'Appréciation de la nature',
+        'Communication technique',
+        'Organisation de l\'information',
+        'Pédagogie'
       ],
-      relatedImages: [
-        { caption: 'Randonnée en montagne' },
-        { caption: 'Sentier côtier' },
-      ],
-      requiredEvidence: 'evidence-nature',
+      requiredEvidence: 'evidence-docs',
     },
-    {
-      id: 'nature',
-      name: 'Observation de la nature',
-      icon: 'bi-binoculars',
-      category: 'outdoor',
-      description:
-        "Intérêt pour l'observation de la faune et la flore locales, avec une attention particulière à la biodiversité et aux écosystèmes naturels.",
-      frequency: 'Régulière',
-      skillsRelated: [
-        'Patience',
-        'Attention aux détails',
-        'Conscience environnementale',
-      ],
-      requiredEvidence: 'evidence-nature',
-    },
-
-    // Art de vivre
+  
+    // Arts Culinaires
     {
       id: 'cooking',
-      name: 'Cuisine expérimentale',
+      name: 'Cuisine créative',
       icon: 'bi-egg-fried',
-      category: 'lifestyle',
+      category: 'culinary',
       description:
-        "Passion pour la cuisine créative et l'expérimentation culinaire, avec un intérêt particulier pour les techniques modernes et les fusions de cuisines internationales.",
+        'Passion pour l\'expérimentation culinaire et la préparation de plats créatifs, en explorant diverses techniques et influences internationales.',
       since: '2018',
       frequency: 'Plusieurs fois par semaine',
-      skillsRelated: ['Créativité', 'Précision', 'Adaptation'],
-      relatedImages: [
-        { caption: 'Plat fusion asiatique' },
-        { caption: 'Dessert moléculaire' },
-      ],
-      highlight:
-        "A participé à un atelier de cuisine avec un chef étoilé et continue d'explorer de nouvelles techniques culinaires.",
-      requiredEvidence: 'evidence-cooking',
-    },
-    {
-      id: 'gastronomy',
-      name: 'Découverte gastronomique',
-      icon: 'bi-cup-straw',
-      category: 'lifestyle',
-      description:
-        'Exploration de nouvelles cuisines, restaurants et produits gastronomiques, avec un intérêt pour les accords mets et vins et les traditions culinaires régionales.',
-      frequency: 'Bimensuelle',
       skillsRelated: [
-        'Sens du goût développé',
-        'Ouverture culturelle',
-        'Connaissance des produits',
+        'Créativité',
+        'Précision',
+        'Organisation'
+      ],
+      relatedImages: [
+        { caption: 'Plat signature maison' },
+        { caption: 'Préparation culinaire' }
       ],
       requiredEvidence: 'evidence-cooking',
     },
     {
-      id: 'travel',
-      name: 'Voyages culturels',
-      icon: 'bi-globe',
-      category: 'lifestyle',
+      id: 'pastry',
+      name: 'Pâtisserie',
+      icon: 'bi-cake',
+      category: 'culinary',
       description:
-        "Passion pour la découverte de nouvelles cultures, traditions et gastronomies à travers des voyages ciblés sur l'immersion culturelle plutôt que le tourisme de masse.",
-      since: '2010',
-      frequency: '2-3 voyages significatifs par an',
+        'Intérêt particulier pour l\'art de la pâtisserie, en explorant les techniques précises et créatives de cette discipline culinaire exigeante.',
+      frequency: 'Hebdomadaire',
       skillsRelated: [
-        'Adaptabilité culturelle',
-        'Communication interculturelle',
-        'Organisation',
+        'Précision',
+        'Patience',
+        'Créativité visuelle'
       ],
-      relatedImages: [
-        { caption: 'Marché local en Asie' },
-        { caption: 'Architecture européenne' },
-      ],
-      highlight:
-        'A visité plus de 20 pays sur 4 continents, avec une préférence pour les expériences authentiques et les rencontres locales.',
-      requiredEvidence: 'evidence-travel',
+      requiredEvidence: 'evidence-cooking',
     },
-
-    // Divertissement
+  
+    // Arts & Culture
     {
-      id: 'music',
-      name: 'Musique & Concerts',
-      icon: 'bi-music-note-list',
-      category: 'entertainment',
+      id: 'cinema',
+      name: 'Cinéma',
+      icon: 'bi-film',
+      category: 'arts',
       description:
-        'Passionné de musique avec des goûts éclectiques allant du rock alternatif à la musique électronique, avec une attention particulière à la qualité du son et aux performances live.',
-      frequency: '5-10 concerts par an',
+        'Passion pour le cinéma dans ses diverses formes et genres, avec un intérêt pour l\'analyse filmique et la découverte de nouvelles œuvres.',
+      frequency: 'Hebdomadaire',
       skillsRelated: [
+        'Analyse narrative',
         'Appréciation artistique',
-        'Connaissance musicale',
-        'Ouverture culturelle',
+        'Ouverture culturelle'
       ],
       relatedImages: [
-        { caption: "Festival d'été 2023" },
-        { caption: 'Concert indie rock' },
+        { caption: 'Festival de cinéma local' },
+        { caption: 'Collection de films' }
+      ],
+      requiredEvidence: 'evidence-cinema',
+    },
+    {
+      id: 'singing',
+      name: 'Chant',
+      icon: 'bi-mic',
+      category: 'arts',
+      description:
+        'Pratique du chant comme expression artistique personnelle, avec un plaisir à explorer différents styles et techniques vocales.',
+      frequency: 'Régulière',
+      skillsRelated: [
+        'Expression artistique',
+        'Technique vocale',
+        'Confiance en soi'
       ],
       requiredEvidence: 'evidence-music',
-    },
-    {
-      id: 'gaming',
-      name: 'Jeux vidéo narratifs',
-      icon: 'bi-controller',
-      category: 'entertainment',
-      description:
-        "Amateur de jeux vidéo avec une préférence pour les titres à forte composante narrative ou stratégique, appréciant particulièrement les RPG, jeux d'aventure et jeux indépendants innovants.",
-      since: '2000',
-      frequency: 'Quelques heures par semaine',
-      skillsRelated: [
-        'Résolution de problèmes',
-        'Pensée stratégique',
-        'Appréciation narrative',
-      ],
-      highlight:
-        "Suit activement l'évolution artistique et technologique du medium vidéoludique comme forme d'expression culturelle.",
-      requiredEvidence: 'evidence-gaming',
-    },
-    {
-      id: 'photography',
-      name: 'Photographie de voyage',
-      icon: 'bi-camera',
-      category: 'entertainment',
-      description:
-        "Pratique de la photographie lors des voyages et randonnées, avec un focus sur les paysages, l'architecture et la capture de moments culturels authentiques.",
-      frequency: 'Lors des voyages et sorties',
-      skillsRelated: [
-        'Composition visuelle',
-        'Attention aux détails',
-        'Patience',
-      ],
-      relatedImages: [
-        { caption: 'Coucher de soleil en montagne' },
-        { caption: 'Scène de rue urbaine' },
-      ],
-      requiredEvidence: 'evidence-travel',
-    },
-    {
-      id: 'esports',
-      name: 'Suivi des compétitions e-sport',
-      icon: 'bi-trophy',
-      category: 'entertainment',
-      description:
-        "Intérêt pour les compétitions professionnelles de jeux vidéo, particulièrement dans les genres stratégiques et les jeux d'équipe, avec suivi des tournois majeurs.",
-      frequency: 'Hebdomadaire, intensifié pendant les grands tournois',
-      skillsRelated: [
-        'Analyse stratégique',
-        "Compréhension des dynamiques d'équipe",
-        'Anticipation',
-      ],
-      requiredEvidence: 'evidence-gaming',
-    },
+    }
   ];
 
   quizQuestions: QuizQuestion[] = [
     {
-      question: "Quel centre d'intérêt est lié à la programmation créative?",
+      question: "Quelle technologie frontend est particulièrement mise en avant dans le profil du développeur?",
       options: [
-        "Activités de plein air",
-        "Technologie & Innovation",
-        "Art de vivre",
-        "Culture & Apprentissage"
+        "React",
+        "Vue.js",
+        "Ember",
+        "jQuery"
       ],
       correctAnswer: 1
     },
     {
-      question: "Depuis quand le sujet pratique-t-il la course à pied?",
+      question: "Depuis quand le développeur poursuit-il sa formation académique en informatique?",
       options: [
-        "2015",
         "2018",
         "2019",
-        "2010"
+        "2020",
+        "2022"
       ],
       correctAnswer: 2
     },
     {
-      question: "Quel est le centre d'intérêt lié à l'observation de la nature?",
+      question: "Quel projet spécifique a été réalisé lors de l'alternance chez Arthur Ngaku?",
       options: [
-        "Randonnée et exploration",
-        "Course à pied",
-        "Photographie de voyage",
-        "Observation de la nature"
+        "Un système de gestion de base de données",
+        "Une application de comptabilité",
+        "Une plateforme e-commerce standard",
+        "Une application avec intégration 3D et analyse des mesures corporelles"
       ],
       correctAnswer: 3
     },
     {
-      question: "Combien de pays le sujet a-t-il visité selon les informations disponibles?",
+      question: "Quels sont les deux centres d'intérêt culinaires mentionnés dans le profil?",
       options: [
-        "Plus de 5",
-        "Plus de 10",
-        "Plus de 20",
-        "Cette information n'est pas mentionnée"
+        "Cuisine et œnologie",
+        "Cuisine et pâtisserie",
+        "Pâtisserie et mixologie",
+        "Gastronomie moléculaire et cuisine du monde"
+      ],
+      correctAnswer: 1
+    },
+    {
+      question: "Quel indice révèle l'intérêt du développeur pour la documentation technique?",
+      options: [
+        "Collection de livres techniques",
+        "Applications mobiles en développement",
+        "Modèles de documentation technique",
+        "Notes de cours universitaires"
       ],
       correctAnswer: 2
     },
     {
-      question: "Quel indice révèle un intérêt pour la cuisine?",
+      question: "Quelle compétence DevOps fait partie du profil technique du développeur?",
       options: [
-        "Collection de souvenirs internationaux",
-        "Équipement audio haut de gamme",
-        "Ustensiles de cuisine spécialisés",
-        "Abonnements à des newsletters tech"
+        "Jenkins",
+        "Docker",
+        "Kubernetes",
+        "Terraform"
       ],
-      correctAnswer: 2
+      correctAnswer: 1
+    },
+    {
+      question: "Quel art est pratiqué par le développeur en complément de ses activités techniques?",
+      options: [
+        "Peinture",
+        "Chant",
+        "Danse",
+        "Théâtre"
+      ],
+      correctAnswer: 1
     }
   ];
 

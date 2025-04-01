@@ -86,231 +86,269 @@ export class ExperienceProComponent
   // Données des expériences professionnelles
   jobs: JobExperience[] = [
     {
-      title: 'Développeur Full Stack',
-      company: 'TechSolutions Inc.',
-      period: 'Janvier 2020 - Présent',
+      title: 'Alternant Développeur Fullstack',
+      company: 'Arthur Ngaku (ANG Tech)',
+      period: 'Décembre 2024 - Actuel',
       description:
-        "Responsable du développement d'applications web complexes en utilisant les dernières technologies. Chef d'équipe sur plusieurs projets critiques pour des clients de premier plan dans le secteur financier et e-commerce.",
+        "Poste en alternance dans le cadre du Master Informatique à l'Université de Toulouse Jean Jaurès. Développement d'une application web et mobile intégrant des technologies 3D et une API REST sécurisée.",
       clues: [
         {
-          title: 'Projet Client 1',
+          title: 'Intégration 3D',
           detail:
-            "Refonte complète du système de paiement en ligne d'un grand détaillant, augmentation de 30% du taux de conversion",
-          icon: 'bi-bank',
-          skill: 'Angular',
+            "Développement d'une application web/mobile intégrant la 3D pour l'analyse des mesures corporelles dans un contexte e-commerce",
+          icon: 'bi-box',
+          skill: 'Technologies 3D',
         },
         {
-          title: 'Architecture Système',
+          title: 'API Backend',
           detail:
-            "Conception et implémentation d'une architecture microservices avec haute disponibilité et redondance",
-          icon: 'bi-diagram-3',
-          skill: 'Architecture Logicielle',
+            "Conception et implémentation d'une API REST sécurisée pour la communication entre le frontend et les services de traitement d'images",
+          icon: 'bi-hdd-network',
+          skill: 'Backend API',
         },
         {
-          title: 'Base de Code Legacy',
+          title: 'Frontend Vue.js',
           detail:
-            "Migration réussie d'une application monolithique vers une architecture moderne et extensible",
-          icon: 'bi-code-square',
-          skill: 'Refactoring',
+            "Développement du frontend en Vue.js avec une interface utilisateur intuitive pour manipuler des objets 3D et visualiser des analyses",
+          icon: 'bi-window',
+          skill: 'Vue.js',
         },
         {
-          title: 'Innovation Technique',
+          title: 'Pipelines CI/CD',
           detail:
-            "Implémentation d'un système de CI/CD complet réduisant le temps de déploiement de 80%",
-          icon: 'bi-lightning',
+            "Mise en place de pipelines CI/CD avec GitLab pour automatiser les tests et déploiements de l'application",
+          icon: 'bi-gear-wide-connected',
           skill: 'DevOps',
         },
         {
-          title: 'Leadership Technique',
+          title: 'Documentation',
           detail:
-            "Mentorat de 5 développeurs juniors et direction technique d'une équipe de 8 personnes",
-          icon: 'bi-people',
-          skill: 'Leadership',
+            "Rédaction d'une documentation technique complète couvrant l'architecture, les guides utilisateur et les procédures de maintenance",
+          icon: 'bi-file-text',
+          skill: 'Documentation Technique',
         },
       ],
       skills: [
-        'Angular',
-        'Architecture Logicielle',
-        'Refactoring',
+        'Vue.js',
+        'API REST',
+        'Technologies 3D',
         'DevOps',
-        'Leadership',
+        'Documentation Technique',
       ],
       notes:
-        "Le suspect démontre une expertise technique remarquable et des capacités de leadership. Il semble particulièrement à l'aise avec les environnements technologiques complexes et la résolution de problèmes critiques. Son rôle de mentor suggère de bonnes compétences interpersonnelles.",
+        "Cette expérience en cours permet au candidat de combiner ses connaissances théoriques avec une application pratique dans un contexte professionnel. L'accent sur les technologies 3D et le développement fullstack enrichit considérablement son profil technique.",
       conclusion:
-        "L'analyse de cette expérience révèle un profil de développeur senior avec une forte orientation vers l'architecture et l'innovation technique. Les compétences acquises ici constituent un atout majeur pour des projets d'envergure nécessitant une expertise approfondie.",
-      achievement: 'Expert en Architecture Système',
+        "Cette alternance permet au candidat de développer des compétences avancées en intégration 3D et développement fullstack, tout en renforçant sa maîtrise des méthodologies DevOps et de la documentation technique, éléments essentiels pour un développeur fullstack moderne.",
+      achievement: 'Développeur Fullstack 3D',
     },
     {
-      title: 'Développeur Backend',
-      company: 'DataFlow Systems',
-      period: 'Mars 2017 - Décembre 2019',
+      title: 'Stagiaire Consultant Informatique',
+      company: 'SKOOVEL Sarl',
+      period: 'Octobre 2023 - Juillet 2024',
       description:
-        "Conception et développement de services backend robustes pour des applications à fort trafic. Spécialisation dans l'optimisation des performances et la sécurité des données sensibles.",
+        "Stage de 10 mois en tant que consultant informatique, avec des missions diversifiées incluant l'analyse de données, le support technique, le développement et la gestion de sites web, et la formation des utilisateurs.",
       clues: [
         {
-          title: 'APIs RESTful',
+          title: 'Analyse de Données',
           detail:
-            "Développement de plus de 50 endpoints API pour diverses applications d'entreprise",
-          icon: 'bi-hdd-network',
-          skill: 'Node.js',
+            "Analyse et traitement de données pour extraire des informations pertinentes et faciliter la prise de décision",
+          icon: 'bi-graph-up',
+          skill: 'Analyse de Données',
         },
         {
-          title: 'Sécurité Données',
+          title: 'Développement Web',
           detail:
-            'Implémentation de protocoles de sécurité avancés pour la protection des données utilisateurs',
-          icon: 'bi-shield-lock',
-          skill: 'Cybersécurité',
-        },
-        {
-          title: 'Performance',
-          detail:
-            "Optimisation d'une base de données qui a réduit les temps de réponse de 65%",
-          icon: 'bi-speedometer',
-          skill: 'Optimisation SQL',
-        },
-        {
-          title: 'Cloud Computing',
-          detail:
-            "Migration d'applications on-premise vers des infrastructures cloud scalables",
-          icon: 'bi-cloud',
-          skill: 'AWS',
-        },
-      ],
-      skills: ['Node.js', 'Cybersécurité', 'Optimisation SQL', 'AWS'],
-      notes:
-        "Cette période montre un développement significatif des compétences backend du suspect. L'accent mis sur la sécurité et les performances indique une compréhension approfondie des enjeux critiques du développement d'applications modernes.",
-      conclusion:
-        'Cette expérience a clairement renforcé les fondations techniques du suspect dans le domaine du backend. Sa maîtrise des APIs et des systèmes de bases de données est un atout précieux pour tout projet nécessitant stabilité et sécurité.',
-      achievement: 'Architecte Backend Sécurisé',
-    },
-    {
-      title: 'Développeur Frontend',
-      company: 'WebCreative Studio',
-      period: 'Juin 2015 - Février 2017',
-      description:
-        "Création d'interfaces utilisateur attractives et fonctionnelles pour divers clients. Spécialisation dans l'expérience utilisateur et les animations web avancées.",
-      clues: [
-        {
-          title: 'UI/UX Design',
-          detail:
-            "Conception d'interfaces utilisateur intuitives en collaboration avec l'équipe de design",
-          icon: 'bi-brush',
-          skill: 'UI/UX Design',
-        },
-        {
-          title: 'Animations Web',
-          detail:
-            "Création d'animations complexes pour améliorer l'expérience utilisateur et la conversion",
-          icon: 'bi-stars',
-          skill: 'CSS Avancé',
-        },
-        {
-          title: 'Développement Mobile',
-          detail: 'Adaptation de sites web pour une expérience mobile optimale',
-          icon: 'bi-phone',
-          skill: 'Design Responsive',
-        },
-        {
-          title: 'Framework JavaScript',
-          detail:
-            "Développement d'applications single-page hautement interactives",
+            "Développement et maintenance de sites web pour divers clients, en utilisant différentes technologies web",
           icon: 'bi-code-slash',
-          skill: 'React',
-        },
-      ],
-      skills: ['UI/UX Design', 'CSS Avancé', 'Design Responsive', 'React'],
-      notes:
-        'Les compétences frontend du suspect sont particulièrement remarquables. Il semble avoir une sensibilité esthétique combinée à une rigueur technique, ce qui est rare dans ce domaine. Sa capacité à créer des interfaces à la fois belles et fonctionnelles est un atout majeur.',
-      conclusion:
-        "Cette période a permis au suspect de développer des compétences solides en développement frontend moderne, avec une attention particulière à l'expérience utilisateur. Sa maîtrise des technologies de présentation complète parfaitement ses compétences backend.",
-      achievement: 'Expert UI/UX Frontend',
-    },
-    {
-      title: 'Développeur Junior',
-      company: 'StartupTech',
-      period: 'Septembre 2013 - Mai 2015',
-      description:
-        'Premier poste professionnel dans une startup dynamique. Participation au développement de plusieurs projets web et mobiles, avec une forte implication dans tous les aspects du cycle de développement.',
-      clues: [
-        {
-          title: 'Formation Initiale',
-          detail:
-            "Diplôme d'ingénieur en informatique avec spécialisation en développement web",
-          icon: 'bi-mortarboard',
-          skill: 'Formation Académique',
+          skill: 'Développement Web',
         },
         {
-          title: 'Premiers Projets',
+          title: 'Gestion Bases de Données',
           detail:
-            'Contribution à la création de 3 applications web de A à Z, y compris le frontend et le backend',
-          icon: 'bi-rocket',
-          skill: 'JavaScript',
+            "Administration et optimisation de bases de données pour assurer des performances optimales et la sécurité des données",
+          icon: 'bi-database',
+          skill: 'Bases de Données',
         },
         {
-          title: 'Méthodologie Agile',
+          title: 'Formation Utilisateurs',
           detail:
-            "Participation active aux rituels agiles et à la mise en place d'une culture DevOps",
+            "Conception et animation de sessions de formation pour les utilisateurs finaux sur l'utilisation des systèmes informatiques",
+          icon: 'bi-people',
+          skill: 'Formation',
+        },
+        {
+          title: 'Gestion de Projets',
+          detail:
+            "Coordination et suivi de divers projets informatiques, en assurant le respect des délais et des objectifs",
           icon: 'bi-kanban',
-          skill: 'Méthodologie Agile',
-        },
-        {
-          title: 'Intégration Équipe',
-          detail:
-            'Développement rapide des compétences techniques et relationnelles dans un environnement startup',
-          icon: 'bi-patch-check',
-          skill: 'Adaptabilité',
+          skill: 'Gestion de Projets',
         },
       ],
       skills: [
-        'Formation Académique',
-        'JavaScript',
-        'Méthodologie Agile',
-        'Adaptabilité',
+        'Analyse de Données',
+        'Développement Web',
+        'Bases de Données',
+        'Formation',
+        'Gestion de Projets',
       ],
       notes:
-        "Les débuts professionnels du suspect montrent une capacité d'apprentissage rapide et une adaptabilité remarquable. Son expérience dans une startup lui a permis de développer une approche polyvalente du développement logiciel, ainsi qu'une bonne compréhension des enjeux business.",
+        "Cette expérience a permis au candidat de développer une polyvalence technique et des compétences en communication client importantes. La diversité des missions a contribué à renforcer sa capacité d'adaptation et sa vision globale des problématiques informatiques.",
       conclusion:
-        'Cette première expérience a constitué une base solide pour la carrière du suspect, lui fournissant non seulement des compétences techniques fondamentales, mais aussi une compréhension de la dynamique des projets technologiques et du travail en équipe agile.',
-      achievement: 'Profil Polyvalent',
+        "Ce stage a constitué une expérience professionnelle enrichissante pour le candidat, lui permettant de découvrir différentes facettes du métier de consultant informatique et de développer des compétences transversales précieuses pour sa future carrière de développeur fullstack.",
+      achievement: 'Polyvalence Technique',
     },
+    {
+      title: 'Stagiaire Développeur Web',
+      company: 'Megasoft Sarl',
+      period: 'Avril 2022 - Juin 2022',
+      description:
+        "Premier stage en entreprise d'une durée de 3 mois, axé sur le développement web, l'intégration d'API REST, la maintenance d'applications existantes et l'optimisation de requêtes SQL.",
+      clues: [
+        {
+          title: 'Application Web/Mobile',
+          detail:
+            "Participation au développement d'une application web avec adaptation mobile pour un client du secteur commercial",
+          icon: 'bi-phone',
+          skill: 'Développement Web/Mobile',
+        },
+        {
+          title: 'Intégration API',
+          detail:
+            "Intégration d'API REST externes pour enrichir les fonctionnalités de l'application et assurer l'interopérabilité avec d'autres services",
+          icon: 'bi-link',
+          skill: 'Intégration API',
+        },
+        {
+          title: 'Maintenance',
+          detail:
+            "Correction de bugs et amélioration des fonctionnalités existantes sur des applications en production",
+          icon: 'bi-wrench',
+          skill: 'Maintenance Applicative',
+        },
+        {
+          title: 'Requêtes SQL',
+          detail:
+            "Création et optimisation de requêtes SQL pour améliorer les performances et l'efficacité des applications",
+          icon: 'bi-database',
+          skill: 'SQL',
+        },
+        {
+          title: 'Tests',
+          detail:
+            "Mise en place et exécution de tests unitaires et fonctionnels pour assurer la qualité des développements",
+          icon: 'bi-check-circle',
+          skill: 'Tests',
+        },
+      ],
+      skills: [
+        'Développement Web/Mobile',
+        'Intégration API',
+        'Maintenance Applicative',
+        'SQL',
+        'Tests',
+      ],
+      notes:
+        "Ce premier stage a constitué une introduction pratique au monde professionnel du développement web pour le candidat. Il a pu mettre en application les connaissances théoriques acquises durant sa formation et découvrir les réalités du développement en entreprise.",
+      conclusion:
+        "Cette expérience initiale a permis au candidat de se familiariser avec le cycle de développement complet d'une application web, depuis la conception jusqu'aux tests, en passant par l'intégration d'API et l'optimisation des performances. Elle a posé les bases de sa carrière de développeur fullstack.",
+      achievement: 'Fondamentaux du Développement Web',
+    },
+    {
+      title: 'Formation Académique',
+      company: 'Parcours Universitaire',
+      period: 'Septembre 2020 - Actuel',
+      description:
+        "Parcours de formation complet en informatique, du DUT Génie Logiciel au Master Informatique à l'Université de Toulouse Jean Jaurès, avec une spécialisation progressive vers le développement fullstack.",
+      clues: [
+        {
+          title: 'Master Informatique',
+          detail:
+            "Master en cours à l'Université de Toulouse Jean Jaurès, avec spécialisation en développement d'applications",
+          icon: 'bi-mortarboard',
+          skill: 'Formation Supérieure',
+        },
+        {
+          title: 'Licence Informatique',
+          detail:
+            "Licence Informatique et réseau obtenue à l'IUT de Bandjoun au Cameroun, avec acquisition des fondamentaux théoriques",
+          icon: 'bi-award',
+          skill: 'Informatique Théorique',
+        },
+        {
+          title: 'DUT Génie Logiciel',
+          detail:
+            "Formation initiale en Génie Logiciel à l'IUT de Bandjoun, avec introduction aux méthodes de développement et programmation",
+          icon: 'bi-code-square',
+          skill: 'Programmation',
+        },
+        {
+          title: 'Projets Académiques',
+          detail:
+            "Réalisation de nombreux projets pratiques dans le cadre de la formation, permettant d'explorer différentes technologies",
+          icon: 'bi-folder',
+          skill: 'Gestion de Projets',
+        },
+        {
+          title: 'Alternance',
+          detail:
+            "Choix d'un Master en alternance pour combiner formation théorique et expérience professionnelle concrète",
+          icon: 'bi-briefcase',
+          skill: 'Professionnalisation',
+        },
+      ],
+      skills: [
+        'Formation Supérieure',
+        'Informatique Théorique',
+        'Programmation',
+        'Gestion de Projets',
+        'Professionnalisation',
+      ],
+      notes:
+        "Le parcours académique du candidat montre une progression constante et une spécialisation progressive vers le développement d'applications. L'alternance choisie pour le Master témoigne d'une volonté de confronter la théorie à la pratique professionnelle.",
+      conclusion:
+        "Cette solide formation académique, complétée par l'alternance en cours, constitue une base théorique et technique robuste pour le candidat. Elle lui permet d'aborder le développement fullstack avec à la fois des connaissances théoriques approfondies et une expérience pratique en constante évolution.",
+      achievement: 'Fondements Théoriques Solides',
+    }
   ];
 
   // Données pour le quiz de matching (compétences/jobs)
   matchingSkills: string[] = [
-    'Angular',
-    'Architecture Logicielle',
-    'Leadership',
+    'Vue.js',
+    'Architecture API REST',
+    'Technologies 3D',
     'Node.js',
-    'Cybersécurité',
-    'UI/UX Design',
-    'React',
-    'Méthodologie Agile',
+    'Spring Boot',
+    'Symfony',
+    'PostgreSQL',
+    'MySQL',
+    'Documentation Technique',
+    'DevOps CI/CD',
   ];
+
   matchingJobs: {
     title: string;
     company: string;
     correctSkillIndices: number[];
   }[] = [
     {
-      title: 'Développeur Full Stack',
-      company: 'TechSolutions Inc.',
-      correctSkillIndices: [0, 1, 2],
+      title: 'Alternant Développeur Fullstack',
+      company: 'Arthur Ngaku (ANG Tech)',
+      correctSkillIndices: [0, 2, 9],
     },
     {
-      title: 'Développeur Backend',
-      company: 'DataFlow Systems',
-      correctSkillIndices: [3, 4],
+      title: 'Stagiaire Consultant Informatique',
+      company: 'SKOOVEL Sarl',
+      correctSkillIndices: [4, 5, 7, 8],
     },
     {
-      title: 'Développeur Frontend',
-      company: 'WebCreative Studio',
-      correctSkillIndices: [5, 6],
+      title: 'Stagiaire Développeur Web',
+      company: 'Megasoft Sarl',
+      correctSkillIndices: [1, 3, 6],
     },
     {
-      title: 'Développeur Junior',
-      company: 'StartupTech',
-      correctSkillIndices: [7],
+      title: 'Formation Académique',
+      company: 'Parcours Universitaire',
+      correctSkillIndices: [0, 1, 3, 4, 5, 6],
     },
   ];
 
