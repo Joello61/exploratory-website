@@ -34,12 +34,19 @@
       <i class="bi bi-briefcase"></i>
       <h3>Salle d'interrogatoire #2187 - Analyse des motivations</h3>
     </div>
+
+    <div class="previous-modules-info">
+      <div class="info-box">
+        <i class="bi bi-info-circle"></i>
+        <p>Les indices ci-dessous ont été découverts lors de votre progression dans les modules précédents. Utilisez-les pour analyser le profil motivationnel.</p>
+      </div>
+    </div>
     
     <!-- Mur d'indices -->
     <div class="evidence-wall">
       <div class="evidence-board">
         <div class="board-header">
-          <h4>Indices motivationnels recueillis</h4>
+          <h4>Indices motivationnels issus des modules précédents</h4>
           <div class="progress-indicator">
             <span>{{getDiscoveredCount()}} / {{evidenceItems.length}} indices</span>
             <div class="progress-track">
@@ -124,13 +131,13 @@
             </div>
             
             <div class="detail-actions">
-              <button class="action-btn" (click)="investigateConnections(selectedEvidence)" *ngIf="selectedEvidence.discovered && selectedEvidence.connections.length > 0">
+              <button class="action-btn" (click)="investigateConnections(selectedEvidence)" *ngIf="selectedEvidence.connections.length > 0">
                 <i class="bi bi-diagram-3"></i>
                 Étudier les connexions
               </button>
-              <button class="action-btn" (click)="discoverEvidence(selectedEvidence)" *ngIf="!selectedEvidence.discovered">
-                <i class="bi bi-unlock"></i>
-                Découvrir cet indice
+              <button class="action-btn" (click)="analyzeEvidence(selectedEvidence)">
+                <i class="bi bi-search"></i>
+                Analyser cet indice
               </button>
             </div>
           </div>
@@ -300,4 +307,156 @@
       Module complété ! L'analyse des motivations socio-professionnelles a été réalisée avec succès.
     </div>
   </div>
+
+  <!-- Ajouter ce bouton après les résultats d'analyse -->
+<div class="continue-section" *ngIf="analysisDone">
+  <button class="action-btn primary-action" (click)="openQuizModal()">
+    <i class="bi bi-check-circle"></i>
+    Finaliser cette étape
+  </button>
+  <div class="continue-hint">
+    <i class="bi bi-info-circle"></i>
+    <span>Testez votre compréhension des motivations identifiées pour continuer.</span>
+  </div>
+</div>
+
+<!-- Ajouter la modal du quiz -->
+<div class="quiz-modal-overlay" *ngIf="isQuizModalOpen">
+  <div class="quiz-modal">
+    <div class="quiz-header">
+      <h4>
+        <i class="bi bi-question-circle"></i>
+        Évaluation de compréhension: Motivations Socio-Professionnelles
+      </h4>
+      <button class="close-quiz-btn" (click)="closeQuizModal()" *ngIf="!quizResult">
+        <i class="bi bi-x-circle"></i>
+      </button>
+    </div>
+    
+    <div class="quiz-content" *ngIf="!quizResult">
+      <div class="quiz-intro">
+        <p>Répondez aux questions suivantes pour confirmer votre compréhension du profil motivationnel identifié. Un score minimum de 80% est requis pour valider cette étape.</p>
+      </div>
+      
+      <div class="quiz-questions">
+        <div *ngFor="let question of quizQuestions; let qIndex = index" class="quiz-question">
+          <div class="question-number">Question {{qIndex + 1}}/{{quizQuestions.length}}</div>
+          <div class="question-text">{{question.text}}</div>
+          
+          <div class="question-options">
+            <div *ngFor="let option of question.options; let oIndex = index" 
+                 class="option" 
+                 [class.selected]="userAnswers[qIndex] === oIndex"
+                 (click)="selectAnswer(qIndex, oIndex)">
+              <div class="option-marker">
+                <div class="option-marker-inner" *ngIf="userAnswers[qIndex] === oIndex"></div>
+              </div>
+              <div class="option-text">{{option}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quiz-actions">
+        <button class="submit-quiz-btn" (click)="submitQuiz()">
+          <i class="bi bi-send"></i>
+          Soumettre mes réponses
+        </button>
+      </div>
+    </div>
+    
+    <!-- Résultats du quiz -->
+    <div class="quiz-result" *ngIf="quizResult">
+      <div class="result-header" [class.success]="quizResult.passed" [class.failure]="!quizResult.passed">
+        <div class="result-icon">
+          <i class="bi" [class.bi-check-circle-fill]="quizResult.passed" [class.bi-x-circle-fill]="!quizResult.passed"></i>
+        </div>
+        <div class="result-title">
+          <h5>{{quizResult.passed ? 'Félicitations!' : 'À revoir'}}</h5>
+          <div class="result-subtitle">{{quizResult.passed ? 'Vous avez validé cette étape.' : 'Un minimum de 80% est requis pour continuer.'}}</div>
+        </div>
+      </div>
+      
+      <div class="result-details">
+        <div class="score-display">
+          <div class="score-circle" [style.--score-percentage]="quizResult.percentage + '%'">
+            <div class="score-value">{{quizResult.percentage}}%</div>
+          </div>
+          <div class="score-text">
+            <div class="score-label">Score obtenu</div>
+            <div class="score-ratio">{{quizResult.score}} / {{quizResult.totalQuestions}}</div>
+          </div>
+        </div>
+        
+        <div class="result-message">
+          <p *ngIf="quizResult.passed">
+            Vous avez démontré une bonne compréhension des motivations socio-professionnelles identifiées dans cette analyse. Ces insights vous aideront à mieux comprendre les facteurs qui animent le sujet dans sa vie professionnelle.
+          </p>
+          <p *ngIf="!quizResult.passed">
+            Certaines nuances des motivations socio-professionnelles nécessitent d'être revues. Prenez le temps de relire l'analyse des motivations avant de réessayer.
+          </p>
+        </div>
+
+        <div class="correction-section" *ngIf="incorrectAnswers.length > 0">
+          <div class="correction-header" (click)="toggleCorrections()">
+            <div class="correction-title">
+              <i class="bi" [class.bi-chevron-down]="!showCorrections" [class.bi-chevron-up]="showCorrections"></i>
+              <h6>Afficher le corrigé ({{incorrectAnswers.length}} question{{incorrectAnswers.length > 1 ? 's' : ''}} incorrecte{{incorrectAnswers.length > 1 ? 's' : ''}})</h6>
+            </div>
+          </div>
+        
+          <div class="correction-content" *ngIf="showCorrections">
+            <div *ngFor="let incorrect of incorrectAnswers" class="correction-item">
+              <div class="correction-question">
+                <div class="question-marker incorrect">
+                  <i class="bi bi-x"></i>
+                </div>
+                <div class="question-text">
+                  {{getQuestionById(incorrect.questionId)?.text}}
+                </div>
+              </div>
+        
+              <div class="correction-answers">
+                <div class="answer incorrect">
+                  <div class="answer-label">Votre réponse:</div>
+                  <div class="answer-text">
+                    {{getAnswerText(incorrect.questionId, incorrect.correctAnswer)}}
+                  </div>
+                </div>
+        
+                <div class="answer correct">
+                  <div class="answer-label">Réponse correcte:</div>
+                  <div class="answer-text">
+                    {{getAnswerText(incorrect.questionId, incorrect.userAnswer)}}
+                  </div>
+                </div>
+
+                <!-- Ajouter après la section answer correct -->
+<div class="answer-feedback">
+  <div class="feedback-label">Explication:</div>
+  <div class="feedback-text">{{incorrect.feedback}}</div>
+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="result-actions">
+        <button class="retry-btn" *ngIf="!quizResult.passed" (click)="retryQuiz()">
+          <i class="bi bi-arrow-repeat"></i>
+          Réessayer
+        </button>
+        <button class="next-module-btn" *ngIf="quizResult.passed" (click)="goToConclusion()">
+          <i class="bi bi-arrow-right-circle"></i>
+          Passer à la conclusion
+        </button>
+        <button class="close-result-btn" (click)="closeQuizModal()">
+          <i class="bi bi-x-circle"></i>
+          {{quizResult.passed ? 'Fermer' : 'Revoir l\'analyse'}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>

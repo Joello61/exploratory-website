@@ -265,7 +265,7 @@
         <div class="modal-body">
           <img [src]="cvImagePath" alt="CV du sujet" class="full-cv-image">
           
-          <div class="cv-annotations" [class.hidden]="!showAnnotations">
+          <div *ngIf="showAnnotations" class="cv-annotations">
             <div *ngFor="let note of cvAnnotations" 
                  class="cv-note" 
                  [style.top.%]="note.position.top" 

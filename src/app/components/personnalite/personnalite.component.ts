@@ -744,7 +744,11 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       character: 'detective'
     };
     this.dialogService.openDialog(dialogMessage);
-    this.dialogService.startTypewriter(response.outcome);
+    this.dialogService.startTypewriter(response.outcome, () => {
+      setTimeout(() => {
+        this.closeDialogTypeWriter()
+      }, 3000);
+    });
     
     // Marquer cette réponse comme explorée dans les données utilisateur
     this.userDataService.saveResponse(

@@ -6,6 +6,7 @@ import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
+import { Router } from '@angular/router';
 
 interface Evidence {
   id: string;
@@ -16,6 +17,27 @@ interface Evidence {
   keywords?: string[];
   discovered: boolean;
   connections: string[];
+}
+
+interface QuizQuestion {
+  id: number;
+  text: string;
+  options: string[];
+  correctAnswer: number; // Index de la bonne réponse
+}
+
+interface QuizResult {
+  score: number;
+  totalQuestions: number;
+  percentage: number;
+  passed: boolean;
+}
+
+interface IncorrectAnswer {
+  questionId: number;
+  userAnswer: number;
+  correctAnswer: number;
+  feedback: string; // Explication de la bonne réponse
 }
 
 interface Connection {
@@ -99,99 +121,69 @@ export class MotivationSocioProComponent implements OnInit, AfterViewInit, OnDes
   ];
 
   // Indices motivationnels
-  evidenceItems: Evidence[] = [
-    {
-      id: 'ev1',
-      title: 'Parcours académique',
-      icon: 'bi-mortarboard',
-      date: '09/2013',
-      description: 'Orientation délibérée vers une formation à forte composante technique, complétée par des modules d\'innovation et de gestion de projet. Le choix des spécialisations révèle une préférence précoce pour les environnements combinant rigueur analytique et créativité conceptuelle.',
-      keywords: ['Formation', 'Innovation', 'Technique'],
-      discovered: true,
-      connections: ['ev4', 'ev7']
-    },
-    {
-      id: 'ev2',
-      title: 'Projets personnels',
-      icon: 'bi-gear-wide-connected',
-      date: '2016-2024',
-      description: 'Développement régulier de projets personnels en dehors du cadre professionnel, orientés vers l\'exploration de nouvelles technologies et méthodologies. Ces initiatives sont caractérisées par une forte composante d\'apprentissage autodidacte et d\'expérimentation.',
-      keywords: ['Initiative', 'Apprentissage', 'Expérimentation'],
-      discovered: false,
-      connections: ['ev3', 'ev5']
-    },
-    {
-      id: 'ev3',
-      title: 'Choix technologiques',
-      icon: 'bi-code-slash',
-      date: '2017-2023',
-      description: 'Analyse des technologies adoptées dans différents contextes, révélant une préférence pour des outils offrant un équilibre entre performance et flexibilité créative. Les choix semblent guidés par une recherche d\'efficacité sans compromettre le potentiel d\'innovation.',
-      keywords: ['Innovation', 'Efficacité', 'Technologie'],
-      discovered: false,
-      connections: ['ev5', 'ev6']
-    },
-    {
-      id: 'ev4',
-      title: 'Évolution de carrière',
-      icon: 'bi-graph-up-arrow',
-      date: '2015-2024',
-      description: 'L\'analyse des transitions de carrière montre une progression constante vers des rôles offrant davantage d\'autonomie décisionnelle et d\'impact sur des projets stratégiques. Les changements professionnels semblent motivés par la recherche de défis intellectuels croissants plutôt que par des considérations purement hiérarchiques.',
-      keywords: ['Autonomie', 'Impact', 'Progression'],
-      discovered: true,
-      connections: ['ev1', 'ev8']
-    },
-    {
-      id: 'ev5',
-      title: 'Contributions techniques',
-      icon: 'bi-braces-asterisk',
-      date: '2018-2023',
-      description: 'Le pattern des contributions techniques montre une préférence pour résoudre des problèmes complexes nécessitant une approche novatrice. L\'attention particulière portée à l\'optimisation et à la maintenabilité suggère une vision à long terme et un souci d\'excellence technique.',
-      keywords: ['Excellence', 'Innovation', 'Complexité'],
-      discovered: false,
-      connections: ['ev2', 'ev3']
-    },
-    {
-      id: 'ev6',
-      title: 'Participation communautaire',
-      icon: 'bi-people',
-      date: '2017-2024',
-      description: 'Implication dans des communautés professionnelles et technologiques, avec un focus sur le partage de connaissances et la collaboration. Cette participation révèle une valorisation de l\'apprentissage collectif et une reconnaissance de l\'importance des réseaux professionnels.',
-      keywords: ['Collaboration', 'Partage', 'Communauté'],
-      discovered: false,
-      connections: ['ev3', 'ev8']
-    },
-    {
-      id: 'ev7',
-      title: 'Formation continue',
-      icon: 'bi-book',
-      date: '2016-2024',
-      description: 'Pattern constant d\'auto-formation et d\'acquisition de nouvelles compétences, transcendant les exigences immédiates des positions occupées. Cette démarche d\'apprentissage continu démontre une motivation intrinsèque pour la maîtrise et l\'évolution professionnelle.',
-      keywords: ['Apprentissage', 'Maîtrise', 'Évolution'],
-      discovered: true,
-      connections: ['ev1', 'ev9']
-    },
-    {
-      id: 'ev8',
-      title: 'Feedback d\'équipe',
-      icon: 'bi-chat-quote',
-      date: '2019-2023',
-      description: 'Les retours d\'équipe collectés indiquent une capacité à naviguer entre expertise technique et vision stratégique, avec une préférence pour des environnements collaboratifs tout en maintenant une forte autonomie individuelle.',
-      keywords: ['Équipe', 'Collaboration', 'Autonomie'],
-      discovered: false,
-      connections: ['ev4', 'ev6']
-    },
-    {
-      id: 'ev9',
-      title: 'Projets prioritaires',
-      icon: 'bi-kanban',
-      date: '2018-2024',
-      description: 'L\'analyse des projets priorisés révèle une attirance pour ceux offrant un impact tangible et des défis techniques significatifs. La motivation semble particulièrement élevée lorsque les projets combinent innovation technique et valeur ajoutée clairement définie.',
-      keywords: ['Impact', 'Innovation', 'Valeur'],
-      discovered: false,
-      connections: ['ev7']
-    }
-  ];
-
+  // Remplacer le tableau evidenceItems par celui-ci:
+evidenceItems: Evidence[] = [
+  {
+    id: 'ev1',
+    title: 'Centres d\'intérêt',
+    icon: 'bi-heart',
+    date: '2020-2024',
+    description: 'Les centres d\'intérêt révèlent une forte attirance pour l\'innovation technologique, l\'apprentissage continu et les activités créatives. Ces inclinaisons personnelles montrent une motivation intrinsèque pour rester à la pointe des évolutions du domaine et explorer de nouvelles approches.',
+    keywords: ['Innovation', 'Apprentissage', 'Créativité'],
+    discovered: true,
+    connections: ['ev2', 'ev5']
+  },
+  {
+    id: 'ev2',
+    title: 'Personnalité',
+    icon: 'bi-person-badge',
+    date: 'Profil établi',
+    description: 'L\'analyse de personnalité montre un profil analytique et orienté résolution de problèmes, avec une forte autonomie et une grande capacité d\'adaptation. Ces traits sont cohérents avec une motivation pour les environnements professionnels offrant liberté d\'action et défis intellectuels stimulants.',
+    keywords: ['Autonomie', 'Adaptabilité', 'Analyse'],
+    discovered: true,
+    connections: ['ev1', 'ev3']
+  },
+  {
+    id: 'ev3',
+    title: 'Itinéraire',
+    icon: 'bi-map',
+    date: '2015-2024',
+    description: 'Le parcours personnel et professionnel indique une progression délibérée vers des rôles demandant plus de responsabilité et d\'impact. Les choix de carrière montrent une préférence claire pour des environnements innovants privilégiant l\'excellence technique et l\'évolution continue.',
+    keywords: ['Progression', 'Impact', 'Évolution'],
+    discovered: true,
+    connections: ['ev4', 'ev6']
+  },
+  {
+    id: 'ev4',
+    title: 'Expérience professionnelle',
+    icon: 'bi-briefcase',
+    date: '2016-2024',
+    description: 'L\'analyse des expériences professionnelles révèle une constante recherche de défis techniques complexes et de projets à fort impact. Les transitions de carrière indiquent une motivation pour les environnements valorisant l\'expertise technique combinée à une vision stratégique.',
+    keywords: ['Expertise', 'Impact', 'Défis'],
+    discovered: true,
+    connections: ['ev3', 'ev5']
+  },
+  {
+    id: 'ev5',
+    title: 'Compétences',
+    icon: 'bi-tools',
+    date: 'Évaluation récente',
+    description: 'Le profil de compétences montre un investissement significatif dans l\'acquisition et le perfectionnement de savoir-faire techniques avancés, dépassant souvent les exigences immédiates des postes occupés. Cette démarche témoigne d\'une motivation intrinsèque pour la maîtrise et l\'excellence technique.',
+    keywords: ['Maîtrise', 'Excellence', 'Développement'],
+    discovered: true,
+    connections: ['ev1', 'ev4']
+  },
+  {
+    id: 'ev6',
+    title: 'Attentes professionnelles',
+    icon: 'bi-arrow-up-circle',
+    date: 'Projection future',
+    description: 'Les attentes professionnelles exprimées mettent en avant le désir d\'équilibrer défis techniques stimulants et vision stratégique, avec une forte valorisation de l\'autonomie et de l\'impact concret. La recherche d\'un environnement favorisant l\'innovation et l\'évolution continue est une constante.',
+    keywords: ['Autonomie', 'Impact', 'Innovation'],
+    discovered: true,
+    connections: ['ev3']
+  }
+];
   // Profils de motivation
   motivationProfiles: MotivationProfile[] = [
     {
@@ -265,6 +257,70 @@ export class MotivationSocioProComponent implements OnInit, AfterViewInit, OnDes
     }
   ];
 
+  userAnswers: number[] = [];
+quizResult: QuizResult | null = null;
+  isQuizModalOpen: boolean = false;
+quizQuestions: QuizQuestion[] = [
+  {
+    id: 1,
+    text: "Quel est le facteur de motivation principal identifié dans l'analyse ?",
+    options: [
+      "La reconnaissance externe et le statut social", 
+      "Les défis techniques et l'impact concret", 
+      "La stabilité professionnelle et la sécurité", 
+      "La progression hiérarchique rapide"
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 2,
+    text: "Quelle caractéristique d'environnement professionnel est la plus valorisée selon le profil motivationnel ?",
+    options: [
+      "Structure très hiérarchisée avec des directives claires", 
+      "Environnement compétitif orienté résultats individuels", 
+      "Cadre favorisant l'autonomie et l'innovation", 
+      "Organisation très structurée avec des processus standardisés"
+    ],
+    correctAnswer: 2
+  },
+  {
+    id: 3,
+    text: "Quel élément issu des centres d'intérêt influence positivement la motivation professionnelle ?",
+    options: [
+      "La pratique d'activités sportives compétitives", 
+      "L'intérêt pour les activités sociales et communautaires", 
+      "L'attirance pour l'innovation technologique et l'apprentissage continu", 
+      "La préférence pour les activités structurées et prévisibles"
+    ],
+    correctAnswer: 2
+  },
+  {
+    id: 4,
+    text: "Selon l'analyse de personnalité, quel trait contribue à la motivation pour des environnements professionnels spécifiques ?",
+    options: [
+      "La préférence pour le travail en équipe plutôt qu'individuel", 
+      "Le besoin de validation externe et de reconnaissance", 
+      "L'aversion pour le risque et l'incertitude", 
+      "L'autonomie et la capacité d'adaptation"
+    ],
+    correctAnswer: 3
+  },
+  {
+    id: 5,
+    text: "Quel facteur de motivation a été évalué avec le score le plus élevé (niveau 9) ?",
+    options: [
+      "Reconnaissance", 
+      "Stabilité", 
+      "Défis techniques", 
+      "Collaboration"
+    ],
+    correctAnswer: 2
+  }
+];
+
+showCorrections: boolean = false;
+incorrectAnswers: IncorrectAnswer[] = [];
+
   // Facteurs de motivation
   motivationFactors: MotivationFactor[] = [
     { name: 'Défis techniques', icon: 'bi-code-square', level: 9 },
@@ -283,7 +339,8 @@ export class MotivationSocioProComponent implements OnInit, AfterViewInit, OnDes
     private timeTrackerService: TimeTrackerService,
     private userDataService: UserDataService,
     private dialogService: DialogService,
-    private noteService: NoteService
+    private noteService: NoteService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -425,35 +482,41 @@ export class MotivationSocioProComponent implements OnInit, AfterViewInit, OnDes
   }
 
   // Marquer le module comme complété
-  completeModule(): void {
-    this.progressService.completeModule('motivations');
-    this.isModuleCompleted = true;
-    
-    // Ajouter une note automatique pour résumer ce qui a été fait
-    this.addCompletionNote();
-  }
-
+ // Remplacer cette méthode
+completeModule(): void {
+  // Le module ne devrait être complété qu'après avoir réussi le quiz
+  this.progressService.completeModule('motivations');
+  this.isModuleCompleted = true;
+  
+  // Ajouter une note automatique pour résumer ce qui a été fait
+  this.addCompletionNote();
+}
   // Ajouter une note récapitulative automatique
-  addCompletionNote(): void {
-    // Récupérer le profil principal identifié
-    const mainProfile = this.getSelectedProfile();
-    
-    // Récupérer les facteurs de motivation principaux (niveau >= 8)
-    const topFactors = this.motivationFactors
-      .filter(factor => factor.level >= 8)
-      .map(factor => factor.name)
-      .join(', ');
-    
-    const noteContent = `
+// Mettre à jour cette méthode
+addCompletionNote(): void {
+  // Récupérer le profil principal identifié
+  const mainProfile = this.getSelectedProfile();
+  
+  // Récupérer les facteurs de motivation principaux (niveau >= 8)
+  const topFactors = this.motivationFactors
+    .filter(factor => factor.level >= 8)
+    .map(factor => factor.name)
+    .join(', ');
+  
+  // Récupérer le score du quiz
+  const quizScore = this.quizResult ? this.quizResult.percentage : 0;
+  
+  const noteContent = `
 Module "Motivations Socio-Professionnelles" complété le ${new Date().toLocaleDateString()}.
 Indices analysés: ${this.getDiscoveredCount()}/${this.evidenceItems.length}.
 Profil motivationnel dominant: ${mainProfile ? mainProfile.name : 'Non identifié'}.
 Facteurs clés de motivation: ${topFactors}.
 Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
-    `;
-    
-    this.noteService.addNote(noteContent.trim());
-  }
+Évaluation finale: ${quizScore}% de réponses correctes.
+  `;
+  
+  this.noteService.addNote(noteContent.trim());
+}
 
   // Ouvrir le panneau de notes
   toggleNotes(): void {
@@ -592,4 +655,185 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
       day: 'numeric' 
     });
   }
+
+  // Ajouter cette méthode
+analyzeEvidence(evidence: Evidence): void {
+  // Fonction permettant d'afficher une analyse spécifique pour chaque type d'indice
+  let analysisTitle = '';
+  let analysisContent = '';
+  
+  switch(evidence.id) {
+    case 'ev1': // Centres d'intérêt
+      analysisTitle = 'Impact motivationnel des centres d\'intérêt';
+      analysisContent = 'L\'analyse des centres d\'intérêt révèle une forte motivation intrinsèque pour l\'innovation et l\'apprentissage continu. Ces facteurs personnels constituent le socle de la motivation professionnelle en favorisant un engagement durable et une attitude proactive face aux nouveaux défis. La valorisation de la créativité suggère également une préférence pour les environnements permettant l\'expression d\'idées originales et l\'expérimentation.';
+      break;
+    case 'ev2': // Personnalité
+      analysisTitle = 'Influence du profil de personnalité';
+      analysisContent = 'Les traits de personnalité identifiés indiquent une forte compatibilité avec des environnements professionnels valorisant l\'autonomie et proposant des défis analytiques complexes. La combinaison d\'indépendance et d\'adaptabilité suggère une motivation pour des rôles permettant à la fois une grande latitude décisionnelle et la flexibilité nécessaire pour naviguer dans des contextes changeants.';
+      break;
+    case 'ev3': // Itinéraire
+      analysisTitle = 'Significations motivationnelles du parcours';
+      analysisContent = 'L\'analyse du parcours personnel et professionnel montre une recherche constante d\'évolution et d\'impact. Les choix effectués révèlent une motivation profonde pour des rôles permettant d\'exercer une influence significative et de générer des résultats tangibles. La trajectoire observée indique également une valorisation des environnements favorisant l\'excellence et le développement continu des compétences.';
+      break;
+    case 'ev4': // Expérience professionnelle
+      analysisTitle = 'Enseignements motivationnels des expériences';
+      analysisContent = 'Les expériences professionnelles accumulées montrent une attraction constante vers les défis techniques complexes et les projets innovants. Cette tendance révèle une motivation forte pour les environnements stimulants intellectuellement et offrant l\'opportunité de résoudre des problèmes non conventionnels. La progression de carrière indique également une valorisation croissante de l\'impact stratégique au-delà de la pure exécution technique.';
+      break;
+    case 'ev5': // Compétences
+      analysisTitle = 'Dimensions motivationnelles des compétences';
+      analysisContent = 'Le développement soutenu et autodidacte de compétences avancées révèle une motivation profonde pour la maîtrise technique et l\'excellence dans son domaine. Cet investissement personnel, au-delà des exigences professionnelles immédiates, témoigne d\'une volonté intrinsèque de progression et d\'une satisfaction liée à l\'acquisition de savoir-faire complexes. Ces facteurs suggèrent une compatibilité optimale avec des environnements valorisant l\'expertise et l\'apprentissage continu.';
+      break;
+    case 'ev6': // Attentes
+      analysisTitle = 'Projection motivationnelle des attentes';
+      analysisContent = 'Les attentes professionnelles formulées révèlent une recherche d\'équilibre entre défis techniques stimulants et impact stratégique concret. Cette orientation suggère une motivation pour des rôles combinant mise en œuvre d\'expertise et contribution aux orientations plus larges des projets. La valorisation de l\'autonomie et de l\'innovation indique également une préférence pour les environnements encourageant l\'initiative personnelle et les approches novatrices.';
+      break;
+  }
+  
+  // Afficher l'analyse dans une modal ou un panneau dédié
+  this.dialogService.openDialog({
+    text: `${analysisTitle}\n\n${analysisContent}`,
+    character: 'detective'
+  });
+  
+  // Après un certain temps, fermer automatiquement le dialogue
+  setTimeout(() => {
+    this.dialogService.closeDialog();
+  }, 10000); // 10 secondes
+}
+
+openQuizModal(): void {
+  // Réinitialiser le quiz
+  this.userAnswers = new Array(this.quizQuestions.length).fill(-1);
+  this.quizResult = null;
+  this.isQuizModalOpen = true;
+}
+
+closeQuizModal(): void {
+  this.isQuizModalOpen = false;
+}
+
+selectAnswer(questionIndex: number, answerIndex: number): void {
+  this.userAnswers[questionIndex] = answerIndex;
+}
+
+submitQuiz(): void {
+  // Vérifier si toutes les questions ont une réponse
+  const unanswered = this.userAnswers.findIndex(answer => answer === -1);
+  if (unanswered !== -1) {
+    // Afficher un message d'alerte
+    this.dialogService.openDialog({
+      text: `Veuillez répondre à toutes les questions avant de soumettre le quiz.`,
+      character: 'detective'
+    });
+    
+    setTimeout(() => {
+      this.dialogService.closeDialog();
+    }, 3000);
+    
+    return;
+  }
+  
+  // Réinitialiser le tableau des réponses incorrectes
+  this.incorrectAnswers = [];
+  
+  // Calculer le score
+  let correctAnswers = 0;
+  for (let i = 0; i < this.quizQuestions.length; i++) {
+    if (this.userAnswers[i] === this.quizQuestions[i].correctAnswer) {
+      correctAnswers++;
+    } else {
+      // Préparation des feedbacks personnalisés pour chaque question
+      let feedback = '';
+      
+      switch(this.quizQuestions[i].id) {
+        case 1:
+          feedback = "Les défis techniques et l'impact concret sont identifiés comme les principaux facteurs de motivation, avec un score de 9/10 dans le rapport d'analyse. La reconnaissance externe n'est évaluée qu'à 5/10, tandis que la stabilité est à 4/10.";
+          break;
+        case 2:
+          feedback = "L'analyse montre une forte préférence pour les environnements favorisant l'autonomie et l'innovation, comme en témoignent les conditions optimales identifiées et le profil motivationnel 'Collaborateur autonome'.";
+          break;
+        case 3:
+          feedback = "L'indice 'Centres d'intérêt' révèle une forte attirance pour l'innovation technologique et l'apprentissage continu, ce qui constitue un facteur de motivation intrinsèque important dans le contexte professionnel.";
+          break;
+        case 4:
+          feedback = "L'analyse de personnalité met en évidence l'autonomie et la capacité d'adaptation comme traits déterminants dans la motivation pour des environnements professionnels spécifiques, contrairement au besoin de validation externe.";
+          break;
+        case 5:
+          feedback = "Dans le graphique radar des facteurs de motivation, les 'Défis techniques' atteignent un score de 9/10, à égalité avec 'Impact concret' et 'Apprentissage', tandis que 'Reconnaissance' n'est qu'à 5/10 et 'Stabilité' à 4/10.";
+          break;
+        default:
+          feedback = "Consultez l'analyse complète pour mieux comprendre cette dimension du profil motivationnel.";
+      }
+      
+      // Ajouter cette question aux réponses incorrectes avec son feedback
+      this.incorrectAnswers.push({
+        questionId: this.quizQuestions[i].id,
+        userAnswer: this.userAnswers[i],
+        correctAnswer: this.quizQuestions[i].correctAnswer,
+        feedback: feedback
+      });
+    }
+  }
+  
+  const percentage = (correctAnswers / this.quizQuestions.length) * 100;
+  const passed = percentage >= 80;
+  
+  this.quizResult = {
+    score: correctAnswers,
+    totalQuestions: this.quizQuestions.length,
+    percentage: percentage,
+    passed: passed
+  };
+  
+  // Afficher les corrections si l'utilisateur n'a pas tout bon
+  this.showCorrections = this.incorrectAnswers.length > 0;
+  
+  // Sauvegarder le résultat
+  this.userDataService.saveResponse('motivations', 'quiz_score', percentage);
+  this.userDataService.saveResponse('motivations', 'quiz_passed', passed);
+  
+  // Si l'utilisateur a réussi, marquer le module comme complété
+  if (passed) {
+    this.progressService.completeModule('motivations');
+    this.isModuleCompleted = true;
+    
+    // Ajouter une note automatique avec le résultat du quiz
+    this.addCompletionNote();
+    
+    // Préparer la redirection
+    setTimeout(() => {
+      this.goToConclusion();
+    }, 3000);
+  }
+}
+
+retryQuiz(): void {
+  this.quizResult = null;
+  this.userAnswers = new Array(this.quizQuestions.length).fill(-1);
+  this.showCorrections = false;
+  this.incorrectAnswers = [];
+}
+
+toggleCorrections(): void {
+  this.showCorrections = !this.showCorrections;
+}
+
+// Ajouter cette méthode pour récupérer une question par ID
+getQuestionById(id: number): QuizQuestion | undefined {
+  return this.quizQuestions.find(q => q.id === id);
+}
+
+// Ajouter cette méthode au composant
+getAnswerText(questionId: number, answerIndex: number): string {
+  const question = this.getQuestionById(questionId);
+  if (!question || !question.options || answerIndex < 0 || answerIndex >= question.options.length) {
+    return 'Réponse non disponible';
+  }
+  return question.options[answerIndex];
+}
+
+goToConclusion(): void {
+  // Redirection vers la page de conclusion
+  this.router.navigate(['/conclusion']);
+}
 }
