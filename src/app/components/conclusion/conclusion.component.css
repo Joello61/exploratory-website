@@ -310,11 +310,53 @@
   padding: 15px;
   background: rgba(40, 40, 80, 0.5);
   border-bottom: 1px solid rgba(0, 191, 255, 0.2);
+  position: relative;
 }
 
 .profile-header i {
   font-size: 1.2rem;
   color: #00bfff;
+}
+
+.download-cv-btn {
+  position: absolute;
+  right: 15px;
+  background: rgba(0, 127, 255, 0.3);
+  border: 1px solid rgba(0, 191, 255, 0.2);
+  color: #d0d0ff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.download-cv-btn:hover {
+  background: rgba(0, 191, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2), 0 0 8px rgba(0, 191, 255, 0.3);
+}
+
+.download-cv-btn i {
+  font-size: 1rem;
+  color: #00bfff;
+}
+
+/* Ajustement pour le responsive */
+@media (max-width: 576px) {
+  .profile-header {
+    flex-wrap: wrap;
+  }
+  
+  .download-cv-btn {
+    position: relative;
+    right: auto;
+    margin-top: 10px;
+    margin-left: auto;
+  }
 }
 
 .profile-header h5 {

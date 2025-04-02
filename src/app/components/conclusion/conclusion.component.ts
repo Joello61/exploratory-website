@@ -300,7 +300,7 @@ cvAnnotations: CvAnnotation[] = [
   title: 'Formation académique',
   text: "Parcours complet du DUT au Master, avec spécialisation progressive en développement Fullstack.",
   position: {
-    top: 85,
+    top: 260,
     left: 45,
   },
 },
@@ -309,7 +309,7 @@ cvAnnotations: CvAnnotation[] = [
   title: 'Expérience en alternance',
   text: "Poste actuel permettant de développer une expertise distinctive en intégration 3D et API REST.",
   position: {
-    top: 40,
+    top: 120,
     left: 60,
   },
 },
@@ -318,8 +318,8 @@ cvAnnotations: CvAnnotation[] = [
   title: 'Compétences techniques',
   text: "Profil Fullstack équilibré entre frontend, backend, et compétences complémentaires (DevOps, documentation).",
   position: {
-    top: 25,
-    left: 25,
+    top: 140,
+    left: 10,
   },
 },
 {
@@ -327,8 +327,8 @@ cvAnnotations: CvAnnotation[] = [
   title: 'Centres d\'intérêt',
   text: "Personnalité équilibrée avec des intérêts variés (cuisine, chant, basketball, technologies) témoignant d'une ouverture d'esprit.",
   position: {
-    top: 65,
-    left: 15,
+    top: 210,
+    left: 10,
   },
 },
 ];
@@ -583,5 +583,18 @@ Environnement recommandé: ${this.compatibilityEnvironments[0].name} (${
       compatibility: this.compatibilityEnvironments,
       // Vous pourriez ajouter d'autres données ici
     };
+  }
+
+  downloadCV(): void {
+    // Ici, utilisez l'URL de votre PDF
+    const pdfUrl = '/doc/cv.pdf';
+    
+    // Créer un lien temporaire
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = 'CV_Tchinda_Tchoffo_Timothée_Joel.pdf'; // Nom du fichier lors du téléchargement
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }

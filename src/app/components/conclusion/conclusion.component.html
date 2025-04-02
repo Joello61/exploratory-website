@@ -57,6 +57,11 @@
               <div class="profile-header">
                 <i class="bi bi-person-badge"></i>
                 <h5>Profil du sujet</h5>
+                <!-- Ajout du bouton de téléchargement PDF -->
+                <button class="download-cv-btn" (click)="downloadCV()">
+                  <i class="bi bi-file-earmark-pdf"></i>
+                  <span>Télécharger PDF</span>
+                </button>
               </div>
               <div class="cv-preview">
                 <img [src]="cvImagePath" alt="CV du sujet" class="cv-image">
