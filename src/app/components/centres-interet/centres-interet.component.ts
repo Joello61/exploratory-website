@@ -12,8 +12,8 @@ import { Subscription } from 'rxjs';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
-import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
+import { Router } from '@angular/router';
 
 interface QuizQuestion {
   question: string;
@@ -68,6 +68,8 @@ export class CentresInteretComponent
 {
   @ViewChild('typewriterText') typewriterText!: ElementRef;
 
+    // Identifiant du module
+    private readonly MODULE_ID = 'motivations';
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, pour compléter le profil de notre sujet, nous devons analyser ses centres d'intérêt personnels. Ces activités hors travail peuvent révéler des aspects clés de sa personnalité, ses motivations et ses compétences transversales. Recueillez des indices et explorez chaque domaine en profondeur.";
@@ -102,382 +104,216 @@ export class CentresInteretComponent
   quizPassed: boolean = false;
 
   // Indices à découvrir
-// Indices à découvrir adaptés au profil
-evidenceItems: Evidence[] = [
-  {
-    id: 'evidence-tech',
-    name: 'Abonnements à des newsletters tech',
-    icon: 'bi-envelope-paper',
-    description:
-      "Plusieurs abonnements à des newsletters sur Vue.js, Angular et les technologies 3D Web ont été découverts, révélant un intérêt constant pour les frameworks frontend et les technologies que vous utilisez déjà.",
-    discovered: false,
-    unlocksInterests: ['frontend', 'tech-watch'],
-  },
-  {
-    id: 'evidence-books',
-    name: 'Collection de livres techniques',
-    icon: 'bi-book',
-    description:
-      "Une collection de livres sur le développement Full Stack, Spring Boot et l'architecture API REST a été trouvée, démontrant votre engagement dans l'approfondissement de vos compétences techniques actuelles.",
-    discovered: false,
-    unlocksInterests: ['backend', 'architecture'],
-  },
-  {
-    id: 'evidence-cooking',
-    name: 'Ustensiles de cuisine spécialisés',
-    icon: 'bi-egg-fried',
-    description:
-      "Un ensemble d'ustensiles de cuisine de qualité et des ingrédients pour la pâtisserie ont été découverts, en accord avec vos centres d'intérêt mentionnés dans votre CV.",
-    discovered: false,
-    unlocksInterests: ['cooking', 'pastry'],
-  },
-  {
-    id: 'evidence-uni',
-    name: 'Notes de cours et projets universitaires',
-    icon: 'bi-mortarboard',
-    description:
-      "Des notes de cours bien organisées et des projets informatiques de votre Master à l'Université de Toulouse Jean Jaurès ont été retrouvés, témoignant de votre sérieux dans vos études.",
-    discovered: false,
-    unlocksInterests: ['academic', 'research'],
-  },
-  {
-    id: 'evidence-music',
-    name: 'Équipement audio et partitions',
-    icon: 'bi-music-note-beamed',
-    description:
-      "Un microphone de qualité et des partitions de chant ont été identifiés, en lien avec votre intérêt pour le chant mentionné dans votre CV.",
-    discovered: false,
-    unlocksInterests: ['singing', 'music'],
-  },
-  {
-    id: 'evidence-mobile',
-    name: 'Applications mobiles en développement',
-    icon: 'bi-phone',
-    description:
-      "Des prototypes d'applications mobiles et des notes de conception ont été trouvés, montrant votre intérêt pour étendre vos compétences web vers le développement mobile.",
-    discovered: false,
-    unlocksInterests: ['mobile-dev', 'ux-design'],
-  },
-  {
-    id: 'evidence-cinema',
-    name: 'Collection de films et analyses',
-    icon: 'bi-film',
-    description:
-      "Une collection éclectique de films et des notes d'analyse cinématographique ont été découvertes, en accord avec votre centre d'intérêt pour le cinéma.",
-    discovered: false,
-    unlocksInterests: ['cinema', 'storytelling'],
-  },
-  {
-    id: 'evidence-docs',
-    name: 'Modèles de documentation technique',
-    icon: 'bi-file-text',
-    description:
-      "Des modèles de documentation technique soigneusement élaborés ont été retrouvés, reflétant votre expérience en rédaction de documentation chez Arthur Ngaku.",
-    discovered: false,
-    unlocksInterests: ['technical-writing', 'knowledge-sharing'],
-  },
-];
+  // Indices à découvrir adaptés au profil
+  evidenceItems: Evidence[] = [
+    {
+      id: 'evidence-cooking',
+      name: 'Ustensiles de cuisine spécialisés',
+      icon: 'bi-egg-fried',
+      description:
+        "Un ensemble d'ustensiles de cuisine de qualité et des ingrédients variés ont été découverts, témoignant d'une passion pour l'expérimentation culinaire et la préparation de plats créatifs.",
+      discovered: false,
+      unlocksInterests: ['cooking'],
+    },
+    {
+      id: 'evidence-music',
+      name: 'Équipement audio et partitions',
+      icon: 'bi-music-note-beamed',
+      description:
+        "Un microphone de qualité et des partitions de chant ont été identifiés, révélant une pratique régulière du chant et un intérêt pour l'exploration de différents styles vocaux.",
+      discovered: false,
+      unlocksInterests: ['singing'],
+    },
+    {
+      id: 'evidence-sports',
+      name: 'Équipement de basketball',
+      icon: 'bi-dribbble',
+      description:
+        'Un ballon de basketball, des chaussures de sport spécialisées et un abonnement à un complexe sportif ont été trouvés, indiquant une pratique hebdomadaire du basketball en loisir.',
+      discovered: false,
+      unlocksInterests: ['basketball'],
+    },
+    {
+      id: 'evidence-tech',
+      name: 'Abonnements à des newsletters tech',
+      icon: 'bi-cpu',
+      description:
+        "Plusieurs abonnements à des newsletters sur les innovations technologiques, notamment dans les domaines du développement web, mobile et des technologies 3D, témoignent d'une veille quotidienne sur les avancées du secteur.",
+      discovered: false,
+      unlocksInterests: ['new-tech'],
+    },
+  ];
 
   // Catégories d'intérêts
   interestCategories: InterestCategory[] = [
     {
-      id: 'dev-fullstack',
-      name: 'Développement Fullstack',
-      icon: 'bi-code-slash',
-      requiredEvidences: 1,
-    },
-    {
-      id: 'mobile-3d',
-      name: 'Mobile & Technologies 3D',
-      icon: 'bi-phone',
-      requiredEvidences: 1,
-    },
-    {
-      id: 'education',
-      name: 'Formation & Documentation',
-      icon: 'bi-mortarboard',
-      requiredEvidences: 1,
-    },
-    {
       id: 'culinary',
-      name: 'Arts Culinaires',
+      name: 'Cuisine',
       icon: 'bi-egg-fried',
       requiredEvidences: 1,
     },
     {
-      id: 'arts',
-      name: 'Arts & Culture',
-      icon: 'bi-film',
+      id: 'music',
+      name: 'Musique',
+      icon: 'bi-music-note-beamed',
+      requiredEvidences: 1,
+    },
+    {
+      id: 'sports',
+      name: 'Basketball',
+      icon: 'bi-dribbble',
+      requiredEvidences: 1,
+    },
+    {
+      id: 'tech',
+      name: 'Nouvelles Technologies',
+      icon: 'bi-cpu',
       requiredEvidences: 1,
     },
   ];
 
   // Centres d'intérêt détaillés
   interests: Interest[] = [
-    // Développement Fullstack
-    {
-      id: 'frontend',
-      name: 'Développement Frontend',
-      icon: 'bi-window',
-      category: 'dev-fullstack',
-      description:
-        "Passion pour le développement d'interfaces utilisateur modernes et réactives avec Vue.js et Angular, en explorant les dernières tendances en matière d'expérience utilisateur.",
-      since: '2020',
-      frequency: 'Quotidienne (travail et projets personnels)',
-      skillsRelated: [
-        'UI/UX Design',
-        'JavaScript/TypeScript',
-        'Optimisation des performances'
-      ],
-      highlight:
-        'A développé des interfaces frontend avancées chez Arthur Ngaku et expérimente régulièrement avec les nouvelles fonctionnalités de Vue.js.',
-      requiredEvidence: 'evidence-tech',
-    },
-    {
-      id: 'backend',
-      name: 'Architecture Backend',
-      icon: 'bi-server',
-      category: 'dev-fullstack',
-      description:
-        'Intérêt pour la conception d\'architectures backend robustes et évolutives avec Spring Boot, Symfony et Node.js, en se concentrant sur les API REST sécurisées.',
-      since: '2020',
-      frequency: 'Régulière (professionnelle et académique)',
-      skillsRelated: [
-        'Conception API',
-        'Bases de données PostgreSQL/MySQL',
-        'Sécurité des applications'
-      ],
-      relatedImages: [
-        { caption: 'Schéma d\'architecture microservices' },
-        { caption: 'Documentation API Swagger' }
-      ],
-      requiredEvidence: 'evidence-books',
-    },
-  
-    // Mobile & Technologies 3D
-    {
-      id: 'mobile-dev',
-      name: 'Développement Mobile',
-      icon: 'bi-phone',
-      category: 'mobile-3d',
-      description:
-        'Exploration des technologies de développement mobile cross-platform en complément des compétences web, avec un intérêt particulier pour les applications hybrides.',
-      since: '2022',
-      frequency: 'Projets spécifiques et veille technologique',
-      skillsRelated: [
-        'Responsive Design',
-        'Expérience utilisateur mobile',
-        'Intégration API natives'
-      ],
-      requiredEvidence: 'evidence-mobile',
-    },
-    {
-      id: 'tech-3d',
-      name: 'Technologies 3D Web',
-      icon: 'bi-cube',
-      category: 'mobile-3d',
-      description:
-        'Expertise en développement d\'applications web intégrant des fonctionnalités 3D et des API de traitement d\'images, suite à l\'expérience acquise chez Arthur Ngaku.',
-      since: '2023',
-      frequency: 'Projets professionnels actuels',
-      skillsRelated: [
-        'WebGL',
-        'Traitement d\'images',
-        'Reconstruction 3D'
-      ],
-      highlight:
-        'A implémenté une solution de visualisation 3D pour l\'analyse des mesures corporelles dans un contexte e-commerce.',
-      requiredEvidence: 'evidence-tech',
-    },
-  
-    // Formation & Documentation
-    {
-      id: 'academic',
-      name: 'Formation Informatique',
-      icon: 'bi-mortarboard',
-      category: 'education',
-      description:
-        'Engagement dans la formation universitaire en informatique, avec un focus sur l\'approfondissement des connaissances théoriques et pratiques en développement logiciel.',
-      since: '2020',
-      frequency: 'Quotidienne (Master en alternance)',
-      skillsRelated: [
-        'Analyse algorithmique',
-        'Méthodologies de développement',
-        'Recherche et synthèse'
-      ],
-      highlight:
-        'Poursuit un Master en Informatique à l\'Université de Toulouse Jean Jaurès tout en appliquant les connaissances acquises en contexte professionnel.',
-      requiredEvidence: 'evidence-uni',
-    },
-    {
-      id: 'technical-writing',
-      name: 'Documentation Technique',
-      icon: 'bi-file-text',
-      category: 'education',
-      description:
-        'Intérêt pour la création de documentations techniques claires et complètes, développé lors de la rédaction de guides d\'architecture et de maintenance chez Arthur Ngaku.',
-      since: '2023',
-      frequency: 'Régulière (contexte professionnel)',
-      skillsRelated: [
-        'Communication technique',
-        'Organisation de l\'information',
-        'Pédagogie'
-      ],
-      requiredEvidence: 'evidence-docs',
-    },
-  
-    // Arts Culinaires
+    // Cuisine
     {
       id: 'cooking',
-      name: 'Cuisine créative',
+      name: 'Cuisine',
       icon: 'bi-egg-fried',
       category: 'culinary',
       description:
-        'Passion pour l\'expérimentation culinaire et la préparation de plats créatifs, en explorant diverses techniques et influences internationales.',
-      since: '2018',
+        "Passion pour l'expérimentation culinaire et la préparation de plats créatifs, en explorant diverses techniques et influences internationales.",
       frequency: 'Plusieurs fois par semaine',
-      skillsRelated: [
-        'Créativité',
-        'Précision',
-        'Organisation'
-      ],
-      relatedImages: [
-        { caption: 'Plat signature maison' },
-        { caption: 'Préparation culinaire' }
-      ],
+      skillsRelated: ['Créativité', 'Précision', 'Organisation'],
       requiredEvidence: 'evidence-cooking',
     },
-    {
-      id: 'pastry',
-      name: 'Pâtisserie',
-      icon: 'bi-cake',
-      category: 'culinary',
-      description:
-        'Intérêt particulier pour l\'art de la pâtisserie, en explorant les techniques précises et créatives de cette discipline culinaire exigeante.',
-      frequency: 'Hebdomadaire',
-      skillsRelated: [
-        'Précision',
-        'Patience',
-        'Créativité visuelle'
-      ],
-      requiredEvidence: 'evidence-cooking',
-    },
-  
-    // Arts & Culture
-    {
-      id: 'cinema',
-      name: 'Cinéma',
-      icon: 'bi-film',
-      category: 'arts',
-      description:
-        'Passion pour le cinéma dans ses diverses formes et genres, avec un intérêt pour l\'analyse filmique et la découverte de nouvelles œuvres.',
-      frequency: 'Hebdomadaire',
-      skillsRelated: [
-        'Analyse narrative',
-        'Appréciation artistique',
-        'Ouverture culturelle'
-      ],
-      relatedImages: [
-        { caption: 'Festival de cinéma local' },
-        { caption: 'Collection de films' }
-      ],
-      requiredEvidence: 'evidence-cinema',
-    },
+
+    // Musique
     {
       id: 'singing',
       name: 'Chant',
       icon: 'bi-mic',
-      category: 'arts',
+      category: 'music',
       description:
         'Pratique du chant comme expression artistique personnelle, avec un plaisir à explorer différents styles et techniques vocales.',
       frequency: 'Régulière',
       skillsRelated: [
         'Expression artistique',
         'Technique vocale',
-        'Confiance en soi'
+        'Confiance en soi',
       ],
       requiredEvidence: 'evidence-music',
-    }
+    },
+
+    // Basketball
+    {
+      id: 'basketball',
+      name: 'Basketball',
+      icon: 'bi-dribbble',
+      category: 'sports',
+      description:
+        "Pratique du basketball en loisir, permettant de maintenir une bonne condition physique tout en développant l'esprit d'équipe.",
+      frequency: 'Hebdomadaire',
+      skillsRelated: ["Esprit d'équipe", 'Coordination', 'Endurance'],
+      requiredEvidence: 'evidence-sports',
+    },
+
+    // Nouvelles Technologies
+    {
+      id: 'new-tech',
+      name: 'Nouvelles Technologies',
+      icon: 'bi-cpu',
+      category: 'tech',
+      description:
+        'Veille constante sur les innovations technologiques, particulièrement dans les domaines du développement web, mobile et des technologies 3D.',
+      frequency: 'Quotidienne',
+      skillsRelated: [
+        'Curiosité technique',
+        'Adaptabilité',
+        'Apprentissage continu',
+      ],
+      requiredEvidence: 'evidence-tech',
+    },
   ];
 
   quizQuestions: QuizQuestion[] = [
     {
-      question: "Quelle technologie frontend est particulièrement mise en avant dans le profil du développeur?",
+      question:
+        'À quelle fréquence la cuisine est-elle pratiquée selon le profil?',
       options: [
-        "React",
-        "Vue.js",
-        "Ember",
-        "jQuery"
+        'Quotidiennement',
+        'Plusieurs fois par semaine',
+        'Mensuellement',
+        'Occasionnellement',
       ],
-      correctAnswer: 1
+      correctAnswer: 1,
     },
     {
-      question: "Depuis quand le développeur poursuit-il sa formation académique en informatique?",
+      question: 'Quelle compétence est associée à la pratique du chant?',
       options: [
-        "2018",
-        "2019",
-        "2020",
-        "2022"
+        'Patience',
+        'Coordination',
+        'Expression artistique',
+        'Adaptabilité',
       ],
-      correctAnswer: 2
+      correctAnswer: 2,
     },
     {
-      question: "Quel projet spécifique a été réalisé lors de l'alternance chez Arthur Ngaku?",
+      question: 'À quelle fréquence le basketball est-il pratiqué?',
       options: [
-        "Un système de gestion de base de données",
-        "Une application de comptabilité",
-        "Une plateforme e-commerce standard",
-        "Une application avec intégration 3D et analyse des mesures corporelles"
+        'Quotidiennement',
+        'Plusieurs fois par semaine',
+        'Hebdomadaire',
+        'Mensuellement',
       ],
-      correctAnswer: 3
+      correctAnswer: 2,
     },
     {
-      question: "Quels sont les deux centres d'intérêt culinaires mentionnés dans le profil?",
+      question:
+        'Quelle valeur est développée par la pratique du basketball selon le profil?',
       options: [
-        "Cuisine et œnologie",
-        "Cuisine et pâtisserie",
-        "Pâtisserie et mixologie",
-        "Gastronomie moléculaire et cuisine du monde"
+        'Créativité',
+        "Esprit d'équipe",
+        'Technique vocale',
+        'Curiosité',
       ],
-      correctAnswer: 1
+      correctAnswer: 1,
     },
     {
-      question: "Quel indice révèle l'intérêt du développeur pour la documentation technique?",
+      question:
+        'Dans quels domaines spécifiques porte la veille technologique?',
       options: [
-        "Collection de livres techniques",
-        "Applications mobiles en développement",
-        "Modèles de documentation technique",
-        "Notes de cours universitaires"
+        'Développement web, mobile et technologies 3D',
+        'Intelligence artificielle et machine learning',
+        'Cybersécurité et protection des données',
+        'Blockchain et cryptomonnaies',
       ],
-      correctAnswer: 2
+      correctAnswer: 0,
     },
     {
-      question: "Quelle compétence DevOps fait partie du profil technique du développeur?",
+      question:
+        "Quelle compétence est associée à l'intérêt pour les nouvelles technologies?",
       options: [
-        "Jenkins",
-        "Docker",
-        "Kubernetes",
-        "Terraform"
+        'Précision',
+        'Coordination',
+        'Adaptabilité',
+        'Expression artistique',
       ],
-      correctAnswer: 1
+      correctAnswer: 2,
     },
     {
-      question: "Quel art est pratiqué par le développeur en complément de ses activités techniques?",
-      options: [
-        "Peinture",
-        "Chant",
-        "Danse",
-        "Théâtre"
-      ],
-      correctAnswer: 1
-    }
+      question:
+        'Quelle compétence est commune à la cuisine et au basketball selon le profil?',
+      options: ['Créativité', 'Coordination', 'Précision', 'Organisation'],
+      correctAnswer: 1,
+    },
   ];
 
   constructor(
     private progressService: ProgressService,
     private userDataService: UserDataService,
     private dialogService: DialogService,
-    private noteService: NoteService
+    private noteService: NoteService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -534,7 +370,7 @@ evidenceItems: Evidence[] = [
     this.dialogService.openDialog(dialogMessage);
     this.dialogService.startTypewriter(this.fullText, () => {
       setTimeout(() => {
-        this.dialogService.closeDialog()
+        this.dialogService.closeDialog();
       }, 3000);
     });
   }
@@ -838,21 +674,24 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
     this.selectedAnswer = null;
     this.quizScore = 0;
   }
-  
+
   // Sélectionner une réponse au quiz
   selectQuizAnswer(index: number): void {
     this.selectedAnswer = index;
   }
-  
+
   // Valider la réponse au quiz et passer à la question suivante
   submitQuizAnswer(): void {
     if (this.selectedAnswer === null) return;
-    
+
     // Vérifier si la réponse est correcte
-    if (this.selectedAnswer === this.quizQuestions[this.currentQuizQuestion].correctAnswer) {
+    if (
+      this.selectedAnswer ===
+      this.quizQuestions[this.currentQuizQuestion].correctAnswer
+    ) {
       this.quizScore++;
     }
-    
+
     // Passer à la question suivante ou terminer le quiz
     if (this.currentQuizQuestion < this.quizQuestions.length - 1) {
       this.currentQuizQuestion++;
@@ -861,93 +700,102 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
       this.completeQuiz();
     }
   }
-  
+
   // Terminer le quiz et afficher les résultats
   completeQuiz(): void {
     const passScore = Math.ceil(this.quizQuestions.length * 0.7); // 70% pour réussir
     this.quizPassed = this.quizScore >= passScore;
-    
+
     if (this.quizPassed) {
       // Marquer le module comme complété
       this.isModuleCompleted = true;
       this.progressService.completeModule('centres');
-      
+
       // Ajouter une note automatique
       this.addCompletionNote();
     }
-    
+
     // Sauvegarder le résultat du quiz
     this.userDataService.saveResponse(
       'centres',
       'quiz_passed',
       this.quizPassed
     );
-    
-    this.userDataService.saveResponse(
-      'centres',
-      'quiz_score',
-      this.quizScore
-    );
+
+    this.userDataService.saveResponse('centres', 'quiz_score', this.quizScore);
   }
-  
+
   // Fermer le modal du quiz
   closeQuizModal(): void {
     this.showQuizModal = false;
-    
+
     // Si le quiz a été réussi, afficher un message de félicitations
     if (this.quizPassed) {
-      const message = "Félicitations ! Vous avez correctement analysé les centres d'intérêt du sujet. Vous avez maintenant accès à l'ensemble des données et pouvez passer au module suivant.";
-      
+      const message =
+        "Félicitations ! Vous avez correctement analysé les centres d'intérêt du sujet. Vous avez maintenant accès à l'ensemble des données et pouvez passer au module suivant.";
+
       const dialogMessage: DialogMessage = {
         text: message,
-        character: 'detective'
+        character: 'detective',
       };
-      
+
       this.dialogService.openDialog(dialogMessage);
       this.dialogService.startTypewriter(message);
     }
   }
-  
+
   // Obtenir le score de passage pour le quiz (70%)
   getPassScore(): number {
     return Math.ceil(this.quizQuestions.length * 0.7);
   }
-  
+
   // Naviguer vers le module suivant
   continueToNextModule(): void {
     if (this.isModuleCompleted) {
-      // Afficher un message de confirmation
-      const message = "Module d'analyse des centres d'intérêt complété. Vous pouvez maintenant passer au module suivant.";
+
+      this.userDataService.saveResponse(
+        this.MODULE_ID,
+        'module_completed',
+        true
+      );
       
+      // Marquer officiellement le module comme complété dans le service de progression
+      this.progressService.completeModule(this.MODULE_ID);
+
+      // Afficher un message de confirmation
+      const message =
+        "Module d'analyse des centres d'intérêt complété. Vous pouvez maintenant passer au module suivant.";
+  
       const dialogMessage: DialogMessage = {
         text: message,
-        character: 'detective'
+        character: 'detective',
       };
-      
+  
       this.dialogService.openDialog(dialogMessage);
       this.dialogService.startTypewriter(message);
+  
+      // D'abord fermer le modal
+      this.closeQuizModal();
       
-      // Rediriger vers le prochain module après un court délai
-      // Cette partie dépendra de votre implémentation de navigation
+      // Puis rediriger vers le prochain module après un court délai
       setTimeout(() => {
-        // Navigation au module suivant - à adapter selon votre système de routing
-        // Par exemple : this.router.navigate(['/next-module']);
-        
-        // Fermeture du dialogue
-        this.dialogService.closeDialog();
+        this.router.navigate(['/conclusion']);
       }, 5000);
-    } else if (this.getDiscoveredCount() >= Math.ceil(this.evidenceItems.length * 0.75)) {
+    } else if (
+      this.getDiscoveredCount() >= Math.ceil(this.evidenceItems.length * 0.75)
+    ) {
       // Si suffisamment d'indices ont été découverts mais le quiz n'a pas été réussi
       this.startQuiz();
     } else {
       // Si pas assez d'indices ont été découverts
-      const message = "Vous devez découvrir plus d'indices avant de pouvoir passer au module suivant.";
-      
+      const message =
+        "Vous devez découvrir plus d'indices avant de pouvoir passer au module suivant.";
+  
       const dialogMessage: DialogMessage = {
         text: message,
-        character: 'detective'
+        character: 'detective',
       };
-      
+  
       this.dialogService.openDialog(dialogMessage);
       this.dialogService.startTypewriter(message);
     }
@@ -955,7 +803,7 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
 
   getPinDistance(index: number): number {
     const totalItems = this.evidenceItems.length;
-    
+
     const baseDistance = 200;
     let variation = 0;
     if (index % 2 === 0) {
@@ -963,13 +811,14 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
     } else {
       variation = -20;
     }
-    
-    const angleAdjustment = Math.sin((index * (360 / totalItems)) * (Math.PI / 180)) * 10;
-    
+
+    const angleAdjustment =
+      Math.sin(index * (360 / totalItems) * (Math.PI / 180)) * 10;
+
     return baseDistance + variation + angleAdjustment;
   }
 
-getResponseLetter(index: number): string {
-  return String.fromCharCode(65 + index);
-}
+  getResponseLetter(index: number): string {
+    return String.fromCharCode(65 + index);
+  }
 }

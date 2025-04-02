@@ -87,7 +87,7 @@ export class ExperienceProComponent
   jobs: JobExperience[] = [
     {
       title: 'Alternant Développeur Fullstack',
-      company: 'Arthur Ngaku (ANG Tech)',
+      company: 'ANG Tech',
       period: 'Décembre 2024 - Actuel',
       description:
         "Poste en alternance dans le cadre du Master Informatique à l'Université de Toulouse Jean Jaurès. Développement d'une application web et mobile intégrant des technologies 3D et une API REST sécurisée.",
@@ -332,7 +332,7 @@ export class ExperienceProComponent
   }[] = [
     {
       title: 'Alternant Développeur Fullstack',
-      company: 'Arthur Ngaku (ANG Tech)',
+      company: 'ANG Tech',
       correctSkillIndices: [0, 2, 9],
     },
     {
@@ -801,16 +801,16 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
   initializeChronologyQuiz(): void {
     // Créer les objets pour le quiz de chronologie
     this.originalChronology = [
-      { title: 'Développeur Junior', company: 'StartupTech', order: 0 },
+      { title: 'Stagiaire Développeur Web', company: 'Megasoft Sarl', order: 0 },
       {
-        title: 'Développeur Frontend',
-        company: 'WebCreative Studio',
+        title: 'Stagiaire Consultant Informatique',
+        company: 'SKOOVEL Sarl',
         order: 1,
       },
-      { title: 'Développeur Backend', company: 'DataFlow Systems', order: 2 },
+      { title: 'Alternant Développeur Fullstack', company: 'ANG Tech', order: 2 },
       {
-        title: 'Développeur Full Stack',
-        company: 'TechSolutions Inc.',
+        title: 'Futur Développeur Fullstack Senior',
+        company: 'À déterminer',
         order: 3,
       },
     ];
@@ -836,6 +836,11 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
     if (this.skillMatched[index]) return;
     this.selectedSkillIndex = index;
     this.incorrectMatch = null;
+    
+    // Si un job est déjà sélectionné, vérifier automatiquement l'association
+    if (this.selectedJobMatchIndex !== null) {
+      this.checkMatch();
+    }
   }
 
   // Sélectionner un job
@@ -843,40 +848,45 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
     if (this.jobMatched[index]) return;
     this.selectedJobMatchIndex = index;
     this.incorrectMatch = null;
+    
+    // Si une compétence est déjà sélectionnée, vérifier automatiquement l'association
+    if (this.selectedSkillIndex !== null) {
+      this.checkMatch();
+    }
   }
 
   // Vérifier si l'association compétence-job est correcte
   checkMatch(): void {
     if (this.selectedSkillIndex === null || this.selectedJobMatchIndex === null)
       return;
-
+  
     const skill = this.selectedSkillIndex;
     const job = this.selectedJobMatchIndex;
-
+  
     // Vérifier si cette compétence est associée à ce job
     const isCorrect =
       this.matchingJobs[job].correctSkillIndices.includes(skill);
-
+  
     if (isCorrect) {
       // Marquer comme associé
       this.skillMatched[skill] = true;
       this.skillToJobMapping[skill] = job;
-
+  
       // Vérifier si toutes les compétences pour ce job sont associées
       const allJobSkillsMatched = this.matchingJobs[
         job
       ].correctSkillIndices.every(
         (skillIndex) => this.skillMatched[skillIndex]
       );
-
+  
       if (allJobSkillsMatched) {
         this.jobMatched[job] = true;
       }
-
+  
       // Réinitialiser la sélection
       this.selectedSkillIndex = null;
       this.selectedJobMatchIndex = null;
-
+  
       // Vérifier si toutes les associations sont faites
       if (this.allSkillsMatched()) {
         setTimeout(() => {
@@ -890,7 +900,7 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
         this.incorrectMatch = null;
         this.selectedSkillIndex = null;
         this.selectedJobMatchIndex = null;
-      }, 1500);
+      }, 800); // Délai plus court pour une meilleure expérience utilisateur
     }
   }
 

@@ -76,7 +76,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       name: 'Vue.js',
       category: 'frontend',
       level: 4,
-      description: 'Développement d\'interfaces utilisateur réactives avec Vue.js, utilisé notamment pour le frontend de l\'application 3D chez Arthur Ngaku.',
+      description: 'Développement d\'interfaces utilisateur réactives avec Vue.js, utilisé notamment pour le frontend de l\'application 3D chez ANG Tech.',
       icon: 'bi-code-slash',
       projects: ['Application web/mobile avec intégration 3D', 'Interfaces utilisateur réactives'],
       discovered: false
@@ -162,7 +162,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       level: 3,
       description: 'Création d\'applications web adaptées aux appareils mobiles, avec une expérience utilisateur optimisée.',
       icon: 'bi-phone',
-      projects: ['Applications web/mobile chez Arthur Ngaku', 'Interfaces responsives'],
+      projects: ['Applications web/mobile chez ANG Tech', 'Interfaces responsives'],
       discovered: false
     },
     {
@@ -214,7 +214,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       level: 3,
       description: 'Configuration et utilisation de pipelines CI/CD avec GitLab pour automatiser les tests et déploiements.',
       icon: 'bi-arrow-repeat',
-      projects: ['Pipelines CI/CD chez Arthur Ngaku', 'Automatisation de tests'],
+      projects: ['Pipelines CI/CD chez ANG Tech', 'Automatisation de tests'],
       discovered: false
     },
     
@@ -258,7 +258,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       level: 3,
       description: 'Rédaction de documentation technique claire et complète, incluant l\'architecture, les guides utilisateur et la maintenance.',
       icon: 'bi-file-text',
-      projects: ['Documentation chez Arthur Ngaku', 'Guides techniques'],
+      projects: ['Documentation chez ANG Tech', 'Guides techniques'],
       discovered: false
     },
     {

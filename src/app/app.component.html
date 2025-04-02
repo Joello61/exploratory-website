@@ -11,7 +11,7 @@
 <div class="light-effect"></div>
 
 <!-- Barre de progression -->
-<div class="progress-bar-container">
+<div *ngIf="isAuthenticated" class="progress-bar-container">
   <div class="progress-info">
     <span class="progress-percentage">{{completionPercentage}}% complété</span>
     <span class="elapsed-time">Temps: {{elapsedTime}}</span>
@@ -22,7 +22,7 @@
 </div>
 
 <!-- Barre de navigation avec état des modules -->
-<div class="d-flex mt-4 justify-content-center gap-3">
+<div *ngIf="isAuthenticated" class="d-flex mt-4 justify-content-center gap-3">
   <a class="btn" 
      [ngClass]="{'btn-primary': true, 'btn-disabled': !isModuleAvailable('home')}" 
      routerLink="/">Accueil</a>
@@ -57,7 +57,7 @@
 </div>
 
 <!-- Boutons utilitaires -->
-<div class="utility-buttons">
+<div *ngIf="isAuthenticated" class="utility-buttons">
   <button class="utility-btn export-btn" (click)="exportData()" title="Exporter vos données">
     <i class="bi bi-download"></i>
   </button>
@@ -73,7 +73,7 @@
 </div>
 
 <!-- Notes de l'enquêteur -->
-<div class="investigator-notes" *ngIf="showNotes">
+<div *ngIf="isAuthenticated && showNotes" class="investigator-notes">
   <div class="notes-header">
     <h3><i class="bi bi-journal-text"></i> Notes de l'enquêteur</h3>
     <button class="close-notes" (click)="toggleNotes()">
@@ -94,7 +94,7 @@
 </div>
 
 <!-- Bouton pour afficher/masquer les notes -->
-<button class="toggle-notes-btn" (click)="toggleNotes()">
+<button *ngIf="isAuthenticated" class="toggle-notes-btn" (click)="toggleNotes()">
   <i
     class="bi"
     [ngClass]="showNotes ? 'bi-chevron-down' : 'bi-journal-text'"

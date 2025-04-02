@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 // Import des services
@@ -9,6 +9,7 @@ import { TimeTrackerService } from './services/time-tracker.service';
 import { AppStateService } from './services/app-state.service';
 import { NoteService } from './services/note.service';
 import { CommonModule } from '@angular/common';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
   completionPercentage: number = 0;
   elapsedTime: string = '00:00:00';
   isFirstVisit: boolean = true;
+  isAuthenticated: boolean = false;
 
     // État des notes
     showNotes: boolean = false;
@@ -45,13 +47,26 @@ export class AppComponent implements OnInit, OnDestroy {
     private progressService: ProgressService,
     private timeTracker: TimeTrackerService,
     private appStateService: AppStateService,
-    private noteService: NoteService
+    private noteService: NoteService,
+    private authService: AuthService,
+    private router: Router
   ) {}
   
   ngOnInit(): void {
     // Initialiser les effets visuels
     this.initMouseLightEffect();
     this.animateBackground();
+
+    // S'abonner à l'état d'authentification
+    this.subscriptions.push(
+      this.authService.isAuthenticated$.subscribe(isAuth => {
+        this.isAuthenticated = isAuth;
+      })
+    );
+
+    if (!this.isAuthenticated){
+      this.router.navigate(['/']);
+    }
     
     // Vérifier et gérer le son
     if (!this.soundService.authSound) {
@@ -162,6 +177,8 @@ export class AppComponent implements OnInit, OnDestroy {
   resetApplication(): void {
     if (confirm('Êtes-vous sûr de vouloir réinitialiser toute votre progression? Cette action est irréversible.')) {
       this.appStateService.resetApplication();
+      // Déconnecter l'utilisateur également
+      this.authService.logout();
     }
   }
   

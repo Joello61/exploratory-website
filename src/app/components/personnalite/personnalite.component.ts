@@ -6,6 +6,7 @@ import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { UserDataService } from '../../services/user-data.service';
+import { Router } from '@angular/router';
 
 interface Scenario {
   id: string;
@@ -112,6 +113,8 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   quizScore: number = 0;
   quizPassed: boolean = false;
 
+  isUpdatingInsights: boolean = false;
+
   // Onglets du dossier
   activeTab: string = 'investigation';
   profileTabs: TabInfo[] = [
@@ -125,7 +128,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   investigationProgress: number = 0;
   maxInvestigationProgress: number = 100;
   insightsDiscovered: number = 0;
-  totalInsights: number = 20;
+  totalInsights: number = 21;
   currentScenarioIndex: number = 0;
   selectedResponse: number | null = null;
   
@@ -472,11 +475,16 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     private userDataService: UserDataService,
     public dialogService: DialogService,
     public noteService: NoteService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     // Charger les progrès précédents
     this.loadUserProgress();
+
+    if (this.investigationProgress >= 70) {
+      this.enableFinalQuiz();
+    }
 
     // Souscrire au dialogue
     this.subscriptions.push(
@@ -576,8 +584,8 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateInsightsDiscovered();
   }
 
-  // Mettre à jour le nombre d'insights découverts
-  updateInsightsDiscovered(): void {
+
+  updateInsightsCount(): void {
     let count = 0;
     
     // Compter tous les éléments découverts
@@ -607,7 +615,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     
     this.insightsDiscovered = count;
     
-    // Mettre à jour la progression globale
+    // Mettre à jour la progression globale sans déclencher d'autres actions
     this.investigationProgress = Math.min(
       Math.round((this.insightsDiscovered / this.totalInsights) * 100),
       this.maxInvestigationProgress
@@ -620,11 +628,95 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.investigationProgress
     );
     
-    // Si progression à 100%, marquer comme complété
-    if (this.investigationProgress >= this.maxInvestigationProgress) {
-      this.revealAllTraits();
+    // Activer le quiz si nécessaire
+    if (this.investigationProgress >= 70) {
+      this.enableFinalQuiz();
     }
   }
+  // Mettre à jour le nombre d'insights découverts
+updateInsightsDiscovered(): void {
+  // Éviter la récursion
+  if (this.isUpdatingInsights) {
+    return;
+  }
+  
+  this.isUpdatingInsights = true;
+  
+  let count = 0;
+  
+  // Compter tous les éléments découverts
+  this.personalityTraits.forEach(trait => {
+    if (trait.discovered) count++;
+  });
+  
+  this.collaborationAspects.forEach(aspect => {
+    if (aspect.discovered) count++;
+  });
+  
+  this.workProcesses.forEach(process => {
+    if (process.discovered) count++;
+  });
+  
+  this.motivationFactors.forEach(factor => {
+    if (factor.discovered) count++;
+  });
+  
+  this.coreValues.forEach(value => {
+    if (value.discovered) count++;
+  });
+  
+  this.workPreferences.forEach(pref => {
+    if (pref.discovered) count++;
+  });
+  
+  this.insightsDiscovered = count;
+  
+  // Mettre à jour la progression globale
+  this.investigationProgress = Math.min(
+    Math.round((this.insightsDiscovered / this.totalInsights) * 100),
+    this.maxInvestigationProgress
+  );
+  
+  // Sauvegarder la progression
+  this.userDataService.saveResponse(
+    this.MODULE_ID,
+    'investigation_progress',
+    this.investigationProgress
+  );
+
+  if (this.investigationProgress >= 70) {
+    this.enableFinalQuiz();
+  }
+  
+  // Si tous les insights sont découverts, activer forcément le quiz
+  if (this.insightsDiscovered >= this.totalInsights) {
+    this.enableFinalQuiz();
+  }
+  
+  // SUPPRESSION de la condition qui créait la boucle infinie
+  // Ne plus appeler revealAllTraits() ici
+  
+  // Vérifier si le quiz peut être activé (à 70% de progression)
+  if (this.investigationProgress >= 70 && !this.isQuizAvailable()) {
+    this.enableFinalQuiz();
+    this.showQuizAvailableMessage();
+  }
+  
+  this.isUpdatingInsights = false;
+}
+
+// Ajouter cette méthode pour notifier l'utilisateur
+showQuizAvailableMessage(): void {
+  const message = "Vous avez découvert suffisamment d'insights pour tenter l'évaluation finale. Celle-ci est maintenant disponible dans la section d'investigation.";
+  
+  const dialogMessage: DialogMessage = {
+    text: message,
+    character: 'detective'
+  };
+  
+  this.dialogService.openDialog(dialogMessage);
+  this.dialogService.startTypewriter(message);
+}
 
   // Révéler tous les traits
   revealAllTraits(): void {
@@ -684,7 +776,10 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     });
     
-    this.updateInsightsDiscovered();
+    // Mettre à jour les insights découverts sans créer de boucle
+    if (!this.isUpdatingInsights) {
+      this.updateInsightsCount();
+    }
   }
 
   // Afficher le dialogue d'introduction
@@ -771,7 +866,6 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
         this.currentScenarioIndex
       );
     } else {
-      // Tous les scénarios ont été explorés
       if (this.investigationProgress >= 70) {
         this.showCompleteInvestigationMessage();
       }
@@ -884,11 +978,16 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Activer le quiz final
   enableFinalQuiz(): void {
+    // Sauvegarder explicitement comme une valeur booléenne
     this.userDataService.saveResponse(
       this.MODULE_ID,
       'quiz_available',
       true
     );
+    
+    // Forcer la mise à jour en vérifiant à nouveau la disponibilité
+    const checkSaved = this.userDataService.getResponse(this.MODULE_ID, 'quiz_available');
+    console.log('Quiz disponibilité sauvegardée:', checkSaved);
   }
 
   // Démarrer le quiz final
@@ -1136,8 +1235,22 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Vérifier si le quiz final est disponible
   isQuizAvailable(): boolean {
+    // Vérifier d'abord si la valeur est déjà sauvegardée
     const quizAvailableResponse = this.userDataService.getResponse(this.MODULE_ID, 'quiz_available');
-    return quizAvailableResponse ? (quizAvailableResponse.response as boolean) : false;
+    
+    // Si déjà sauvegardé comme disponible, retourner true
+    if (quizAvailableResponse && quizAvailableResponse.response === true) {
+      return true;
+    }
+    
+    // Sinon, vérifier si la progression est suffisante (>= 70%)
+    if (this.investigationProgress >= 70) {
+      // Sauvegarder l'état pour les prochaines vérifications
+      this.enableFinalQuiz();
+      return true;
+    }
+    
+    return false;
   }
 
   // Vérifier si le module est complété
@@ -1148,6 +1261,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   
   // Fonction pour continuer au module suivant
   continueToNextModule(): void {
+    console.log(this.isModuleCompleted)
     if (this.isModuleCompleted()) {
       // Vérifier que toutes les données sont bien sauvegardées
       this.userDataService.saveResponse(
@@ -1174,7 +1288,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       // Cette partie dépendra de votre implémentation de navigation
       setTimeout(() => {
         // Navigation au module suivant - à adapter selon votre système de routing
-        // Par exemple : this.router.navigate(['/next-module']);
+      this.router.navigate(['/centres']);
         
         // Fermeture du dialogue
         this.dialogService.closeDialog();

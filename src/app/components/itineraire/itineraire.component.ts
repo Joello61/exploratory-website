@@ -118,7 +118,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       name: 'Marseille',
       period: '2024 - Présent',
       description:
-        'Lieu de l\'alternance chez Arthur Ngaku (ANG Tech), où se déroule l\'expérience professionnelle actuelle en développement Fullstack.',
+        'Lieu de l\'alternance chez ANG Tech, où se déroule l\'expérience professionnelle actuelle en développement Fullstack.',
       coordinates: { lat: 43.2965, lng: 5.3698 }, // Coordonnées réelles de Marseille
       data: [
         { label: 'Influence', value: 'Professionnelle' },
@@ -167,7 +167,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       title: 'Master Informatique',
       institution: 'Université de Toulouse Jean Jaurès, Toulouse',
       description:
-        "Formation avancée en informatique avec spécialisation en développement d'applications, réalisée en alternance pour combiner théorie et pratique professionnelle chez Arthur Ngaku (ANG Tech).",
+        "Formation avancée en informatique avec spécialisation en développement d'applications, réalisée en alternance pour combiner théorie et pratique professionnelle chez ANG Tech.",
       skills: [
         'Développement Fullstack',
         'Intégration 3D',
@@ -272,9 +272,9 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! L\'alternance chez Arthur Ngaku (ANG Tech) se déroule à Marseille.',
+          'Correct ! L\'alternance chez ANG Tech se déroule à Marseille.',
         incorrect:
-          'Incorrect. L\'alternance chez Arthur Ngaku (ANG Tech) se déroule à Marseille, tandis que le Master est suivi à Toulouse.',
+          'Incorrect. L\'alternance chez ANG Tech se déroule à Marseille, tandis que le Master est suivi à Toulouse.',
       },
     },
     {
@@ -289,7 +289,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! L\'intégration 3D est une technologie clé dans le poste actuel chez Arthur Ngaku, avec le développement d\'une application web/mobile incorporant des fonctionnalités 3D.',
+          'Correct ! L\'intégration 3D est une technologie clé dans le poste actuel chez ANG Tech, avec le développement d\'une application web/mobile incorporant des fonctionnalités 3D.',
         incorrect:
           'Incorrect. L\'intégration 3D est la technologie spécifique mise en avant dans le poste actuel, notamment pour l\'analyse des mesures corporelles.',
       },
@@ -303,7 +303,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
         correct:
           'Correct ! En 2024, le niveau d\'expertise fullstack est de 85%, correspondant au début du Master et de l\'alternance.',
         incorrect:
-          'Incorrect. En 2024, le niveau d\'expertise fullstack est de 85%, marquant le début du Master Informatique et de l\'alternance chez Arthur Ngaku.',
+          'Incorrect. En 2024, le niveau d\'expertise fullstack est de 85%, marquant le début du Master Informatique et de l\'alternance chez ANG Tech.',
       },
     },
     {
@@ -318,7 +318,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! Vue.js est le framework frontend principal utilisé chez Arthur Ngaku pour le développement de l\'application web/mobile avec intégration 3D.',
+          'Correct ! Vue.js est le framework frontend principal utilisé chez ANG Tech pour le développement de l\'application web/mobile avec intégration 3D.',
         incorrect:
           'Incorrect. Vue.js est le framework frontend principalement utilisé dans le poste actuel pour développer l\'interface utilisateur de l\'application avec intégration 3D.',
       },
@@ -335,9 +335,9 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! Le parcours comprend 3 expériences professionnelles : alternance chez Arthur Ngaku, stage chez SKOOVEL et stage chez Megasoft.',
+          'Correct ! Le parcours comprend 3 expériences professionnelles : alternance chez ANG Tech, stage chez SKOOVEL et stage chez Megasoft.',
         incorrect:
-          'Incorrect. Le parcours comprend 3 expériences professionnelles distinctes : l\'alternance actuelle chez Arthur Ngaku, le stage de 10 mois chez SKOOVEL et le stage de 3 mois chez Megasoft.',
+          'Incorrect. Le parcours comprend 3 expériences professionnelles distinctes : l\'alternance actuelle chez ANG Tech, le stage de 10 mois chez SKOOVEL et le stage de 3 mois chez Megasoft.',
       },
     },
     {
@@ -352,7 +352,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! GitLab CI/CD est l\'outil utilisé pour mettre en place des pipelines d\'intégration et de déploiement continus chez Arthur Ngaku.',
+          'Correct ! GitLab CI/CD est l\'outil utilisé pour mettre en place des pipelines d\'intégration et de déploiement continus chez ANG Tech.',
         incorrect:
           'Incorrect. GitLab CI/CD est l\'outil DevOps utilisé dans le poste actuel pour automatiser les tests et déploiements.',
       },

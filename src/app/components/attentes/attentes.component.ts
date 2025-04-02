@@ -159,7 +159,7 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           title: 'Technologies 3D Web',
           icon: 'bi-box',
-          description: 'Approfondir vos compétences en intégration 3D web, en vous appuyant sur votre expérience acquise chez Arthur Ngaku dans le développement d\'applications intégrant la 3D.',
+          description: 'Approfondir vos compétences en intégration 3D web, en vous appuyant sur votre expérience acquise chez ANG Tech dans le développement d\'applications intégrant la 3D.',
           priority: 'medium',
           revealed: false
         },
@@ -300,7 +300,7 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
       priority: 'high',
       tags: ['Vue.js', '3D Web', 'WebGL', 'API REST'],
       objectives: [
-        'Approfondir l\'expérience acquise en développement 3D chez Arthur Ngaku',
+        'Approfondir l\'expérience acquise en développement 3D chez ANG Tech',
         'Intégrer des API avancées de traitement d\'images et de reconstruction 3D',
         'Concevoir une interface utilisateur intuitive pour manipuler des objets 3D'
       ]
@@ -419,7 +419,7 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         {
           title: 'Expérimentation 3D/mobile',
-          description: 'Opportunités de développer des applications intégrant des technologies 3D et mobiles, prolongeant votre expérience actuelle chez Arthur Ngaku.',
+          description: 'Opportunités de développer des applications intégrant des technologies 3D et mobiles, prolongeant votre expérience actuelle chez ANG Tech.',
           icon: 'bi-phone'
         },
         {
@@ -461,7 +461,7 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         {
           title: 'Documentation et formation',
-          description: 'Opportunités de renforcer vos compétences en rédaction technique et documentation, suite à votre expérience chez Arthur Ngaku.',
+          description: 'Opportunités de renforcer vos compétences en rédaction technique et documentation, suite à votre expérience chez ANG Tech.',
           icon: 'bi-file-text'
         },
         {
@@ -557,7 +557,7 @@ scenarios: Scenario[] = [
     ],
     correctOption: 2,
     feedback: {
-      correct: 'Excellent choix! Votre profil montre une volonté d\'exploiter vos compétences web existantes tout en les étendant vers le mobile, ce qui correspond à votre expérience chez Arthur Ngaku.',
+      correct: 'Excellent choix! Votre profil montre une volonté d\'exploiter vos compétences web existantes tout en les étendant vers le mobile, ce qui correspond à votre expérience chez ANG Tech.',
       incorrect: 'Compte tenu de votre profil, vous privilégieriez une solution hybride qui combine vos compétences web actuelles (Vue.js) tout en développant votre expertise mobile, comme l\'indique votre expérience en développement d\'applications web/mobile.'
     }
   },
@@ -617,8 +617,8 @@ scenarios: Scenario[] = [
     ],
     correctOption: 3,
     feedback: {
-      correct: 'Parfait choix! Une application fullstack avec des fonctionnalités 3D s\'aligne parfaitement avec votre expérience chez Arthur Ngaku et valorise l\'ensemble de vos compétences frontend, backend et 3D.',
-      incorrect: 'Votre profil et votre expérience chez Arthur Ngaku suggèrent qu\'une application fullstack intégrant des éléments 3D serait idéale pour mettre en valeur l\'ensemble de vos compétences techniques.'
+      correct: 'Parfait choix! Une application fullstack avec des fonctionnalités 3D s\'aligne parfaitement avec votre expérience chez ANG Tech et valorise l\'ensemble de vos compétences frontend, backend et 3D.',
+      incorrect: 'Votre profil et votre expérience chez ANG Tech suggèrent qu\'une application fullstack intégrant des éléments 3D serait idéale pour mettre en valeur l\'ensemble de vos compétences techniques.'
     }
   }
 ];

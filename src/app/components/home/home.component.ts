@@ -8,6 +8,7 @@ import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -30,9 +31,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   // État d'authentification
   agentId: string = '2475';
   accessCode: string = '123456789';
-  isAuthenticating: boolean = false;
-  isScanning: boolean = false;
-  scannerText: string = 'En attente d\'authentification...';
+
+  get isAuthenticating(): boolean { return this.authService.isAuthenticating; }
+  get isScanning(): boolean { return this.authService.isScanning; }
+  get scannerText(): string { return this.authService.scannerText; }
   
   // Date actuelle pour les informations système
   currentDate: Date = new Date();
@@ -48,7 +50,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private timeTrackerService: TimeTrackerService,
     private userDataService: UserDataService,
     private dialogService: DialogService,
-    private appStateService: AppStateService
+    private appStateService: AppStateService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -72,19 +75,22 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isFirstVisit = isFirstVisit;
       })
     );
+    
+    this.subscriptions.add(
+      this.authService.isAuthenticated$.subscribe(isAuth => {
+        this.showAuthScreen = !isAuth;
+        this.showMainContent = isAuth;
+      })
+    );
 
-    // Vérifier si l'utilisateur a déjà été authentifié
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-    if (isAuthenticated === 'true') {
-      this.agentId = localStorage.getItem('agentId') || 'UNKNOWN';
-      this.showAuthScreen = false;
-      this.showMainContent = true;
-      
-      // Marquer le module home comme complété si ce n'est pas déjà fait
-      /*if (!this.progressService.moduleStatuses$.value.home) {
-        this.progressService.completeModule('home');
-      }*/
-    }
+    // S'abonner à l'ID de l'agent
+    this.subscriptions.add(
+      this.authService.agentId$.subscribe(id => {
+        if (id) {
+          this.agentId = id;
+        }
+      })
+    );
 
     // Charger les données sauvegardées
     this.loadSavedState();
@@ -160,49 +166,30 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Processus d'authentification
+
   authenticate(): void {
-    if (this.isAuthenticating) return;
     if (!this.agentId || !this.accessCode) {
-      this.scannerText = 'Erreur: ID Agent et Code d\'accès requis';
+      // Le service gère déjà cette validation, mais on peut la garder ici
       return;
     }
 
-    this.isAuthenticating = true;
-    this.isScanning = true;
-    this.scannerText = 'Analyse des identifiants...';
-
-    // Simuler un processus d'authentification
-    setTimeout(() => {
-      // Pour la démo, tout code est accepté
-      if (this.accessCode.length >= 4) {
-        this.scannerText = 'Authentification réussie!';
-        
-        // Sauvegarder l'authentification et l'ID
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('agentId', this.agentId);
-        this.saveState();
-        
-        // Marquer le module home comme complété
-        this.progressService.completeModule('home');
-        
-        // Afficher le contenu principal
-        setTimeout(() => {
-          this.showAuthScreen = false;
-          this.showMainContent = true;
-          this.isAuthenticating = false;
-          this.isScanning = false;
+    this.authService.authenticate(this.agentId, this.accessCode)
+      .then(success => {
+        if (success) {
+          // Sauvegarder l'état
+          this.saveState();
+          
+          // Marquer le module home comme complété
+          this.progressService.completeModule('home');
           
           // Afficher le message de bienvenue si c'est la première visite
           if (this.isFirstVisit) {
-            this.showWelcomeDialog();
+            setTimeout(() => {
+              this.showWelcomeDialog();
+            }, 1000);
           }
-        }, 1000);
-      } else {
-        this.scannerText = 'Erreur d\'authentification. Réessayez.';
-        this.isAuthenticating = false;
-        this.isScanning = false;
-      }
-    }, 2000);
+        }
+      });
   }
 
   // Démarrer l'investigation (redirection vers le menu)
