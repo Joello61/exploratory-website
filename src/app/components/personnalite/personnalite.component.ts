@@ -8,81 +8,22 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { Subject, takeUntil } from 'rxjs';
+import { DialogService } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { UserDataService } from '../../services/user-data.service';
 import { Router } from '@angular/router';
-
-interface Scenario {
-  id: string;
-  title: string;
-  description: string;
-  responses: Response[];
-}
-
-interface Response {
-  id: string;
-  text: string;
-  outcome: string;
-  insightRevealed: string[];
-}
-
-interface TabInfo {
-  id: string;
-  name: string;
-  icon: string;
-}
-
-interface PersonalityTrait {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  manifestations: string[];
-  workImpact: string;
-  discovered: boolean;
-}
-
-interface CollaborationAspect {
-  name: string;
-  icon: string;
-  description: string;
-  discovered: boolean;
-}
-
-interface WorkProcess {
-  name: string;
-  icon: string;
-  description: string;
-  discovered: boolean;
-}
-
-interface MotivationFactor {
-  name: string;
-  icon: string;
-  description: string;
-  discovered: boolean;
-}
-
-interface CoreValue {
-  name: string;
-  importance: number; // 1-10
-  discovered: boolean;
-}
-
-interface WorkPreference {
-  text: string;
-  preferred: boolean;
-  discovered: boolean;
-}
-
-interface QuizQuestion {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-}
+import { Scenario } from '../../models/personnalite/scenario';
+import { QuizQuestion } from '../../models/personnalite/quiz-question';
+import { MotivationFactor } from '../../models/personnalite/motivation-factor';
+import { CollaborationAspect } from '../../models/personnalite/collaboration-aspect';
+import { CoreValue } from '../../models/personnalite/core-value';
+import { PersonalityTrait } from '../../models/personnalite/personality-trait';
+import { TabInfo } from '../../models/personnalite/tab-info';
+import { WorkPreference } from '../../models/personnalite/work-preference';
+import { WorkProcess } from '../../models/personnalite/work-process';
+import { DialogMessage } from '../../models/others/dialod-message';
 
 @Component({
   selector: 'app-personnalite',
@@ -109,9 +50,6 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, votre mission aujourd'hui est de découvrir mon profil psychologique. En explorant les différentes situations et indices, vous révélerez progressivement mes traits de personnalité, mon style de travail et mes motivations principales. Cette analyse est essentielle pour comprendre ma compatibilité avec votre équipe.";
-
-  // Subscriptions pour gestion de la mémoire
-  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = false;

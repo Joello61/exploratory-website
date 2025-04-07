@@ -8,11 +8,13 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subscription, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
-import { ModuleStatus, ProgressService } from '../../services/progress.service';
+import { DialogService } from '../../services/dialog.service';
+import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
+import { DialogMessage } from '../../models/others/dialod-message';
+import { ModuleStatus } from '../../models/others/modul-status';
 
 @Component({
   selector: 'app-menu',
@@ -45,7 +47,8 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     'home', // Toujours débloqué par défaut
     'itineraire', // Se débloque après intro
     'experience', // Se débloque après itinéraire
-    'attentes', // Se débloque après expérience pro
+    'competences', // Se débloque après expérience
+    'attentes', // Se débloque après compétences
     'personnalite', // Se débloque après attentes
     'centres', // Se débloque après personnalité
     'motivations', // Se débloque après centres d'intérêt
@@ -57,9 +60,9 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     home: true, // L'intro est considérée comme complétée par défaut
     itineraire: false,
     experience: false,
+    competences: false,
     attentes: false,
     personnalite: false,
-    competences: false,
     centres: false,
     motivations: false,
     conclusion: false,

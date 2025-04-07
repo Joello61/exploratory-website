@@ -7,8 +7,8 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { Subject, takeUntil } from 'rxjs';
+import { DialogService } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { UserDataService } from '../../services/user-data.service';
@@ -17,59 +17,12 @@ import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { latLng, tileLayer, Map, marker, Marker, icon } from 'leaflet';
 import { Chart, TooltipItem } from 'chart.js/auto';
 
-// Interfaces pour les données
-interface LocationData {
-  label: string;
-  value: string;
-}
-
-interface Location {
-  id: string;
-  name: string;
-  period: string;
-  description: string;
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
-  data: LocationData[];
-  discovered?: boolean;
-}
-
-interface Education {
-  id: string;
-  years: string;
-  title: string;
-  institution: string;
-  description: string;
-  skills: string[];
-  achievements: string[];
-  discovered: boolean;
-  expanded: boolean;
-}
-
-interface SkillEvolution {
-  year: string;
-  level: number;
-  tooltip: string;
-}
-
-interface KeyIndicator {
-  label: string;
-  value: string;
-  trend: 'up' | 'down' | 'neutral';
-}
-
-interface QuizQuestion {
-  id: string;
-  text: string;
-  options: string[];
-  correctOptionIndex: number;
-  feedback: {
-    correct: string;
-    incorrect: string;
-  };
-}
+import { Education } from '../../models/itineraire/education';
+import { KeyIndicator } from '../../models/itineraire/key-indicator';
+import { SkillEvolution } from '../../models/itineraire/skill-evolution';
+import { Location } from '../../models/itineraire/location';
+import { QuizQuestion } from '../../models/itineraire/quiz-question';
+import { DialogMessage } from '../../models/others/dialod-message';
 
 @Component({
   selector: 'app-itineraire',
@@ -95,7 +48,6 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, cette section détaille l'itinéraire personnel et éducatif du sujet. Examinez attentivement ces informations pour comprendre son parcours. Certaines données sont encore cryptées et nécessitent une découverte progressive. Collectez tous les éléments pour obtenir une vision complète de sa formation et de ses origines.";
-  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;

@@ -7,8 +7,8 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { Subject, takeUntil } from 'rxjs';
+import { DialogService } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
@@ -24,58 +24,14 @@ import Chart, {
   RadialLinearScale,
   Tooltip,
 } from 'chart.js/auto';
-
-interface KeyStat {
-  icon: string;
-  value: string;
-  label: string;
-  highlight: boolean;
-}
-
-interface Keyword {
-  text: string;
-  category: string;
-}
-
-interface KeyFinding {
-  icon: string;
-  title: string;
-  description: string;
-  source: string;
-}
-
-interface CompatibilityFactor {
-  name: string;
-  level: number; // 1-10
-}
-
-interface CompatibilityEnvironment {
-  name: string;
-  icon: string;
-  score: number; // percentage
-}
-
-interface RecommendationItem {
-  content: string;
-}
-
-interface RecommendationCategory {
-  title: string;
-  icon: string;
-  expanded: boolean;
-  items: RecommendationItem[];
-}
-
-interface CvAnnotation {
-  id: string;
-  title: string;
-  text: string;
-  position: {
-    top: number;
-    left: number;
-  };
-  target?: string; // Identifiant de l'élément cible (optionnel)
-}
+import { CompatibilityEnvironment } from '../../models/conclusion/compatibility-environment';
+import { CompatibilityFactor } from '../../models/conclusion/compatibility-factor';
+import { CvAnnotation } from '../../models/conclusion/cv-annotation';
+import { KeyFinding } from '../../models/conclusion/key-finding';
+import { KeyStat } from '../../models/conclusion/key-stat';
+import { Keyword } from '../../models/conclusion/keyword';
+import { RecommendationCategory } from '../../models/conclusion/recommendation-category';
+import { DialogMessage } from '../../models/others/dialod-message';
 
 @Component({
   selector: 'app-conclusion',
@@ -104,7 +60,6 @@ export class ConclusionComponent implements OnInit, AfterViewInit, OnDestroy {
   // Texte du dialogue d'introduction
   private fullText: string =
     "Félicitations, agent. L'enquête motivationnelle est maintenant complète. Vous avez recueilli suffisamment d'indices pour dresser un portrait complet du profil. Ce rapport synthétise l'ensemble des découvertes et présente nos conclusions ainsi que des recommandations stratégiques. Examinez-le attentivement avant transmission au département des ressources humaines.";
-  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;

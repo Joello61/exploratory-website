@@ -7,29 +7,26 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { Subject, takeUntil } from 'rxjs';
+import { DialogService } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
-
-interface SkillCategory {
-  id: string;
-  name: string;
-  icon: string;
-}
-
-interface Skill {
-  id: string;
-  name: string;
-  category: string;
-  level: number;
-  description: string;
-  icon: string;
-  projects: string[];
-  discovered: boolean;
-}
+import Chart, {
+  ChartConfiguration,
+  Filler,
+  Legend,
+  LineElement,
+  PointElement,
+  RadarController,
+  RadialLinearScale,
+  Tooltip,
+} from 'chart.js/auto';
+import { Router } from '@angular/router';
+import { Skill } from '../../models/competences/skill';
+import { SkillCategory } from '../../models/competences/skill-category';
+import { DialogMessage } from '../../models/others/dialod-message';
 
 @Component({
   selector: 'app-competences',
@@ -40,6 +37,9 @@ interface Skill {
 })
 export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;
+
+  @ViewChild('radarCanvas') radarCanvas!: ElementRef<HTMLCanvasElement>;
+  private radarChart!: Chart;
 
   // Pour gérer la destruction proprement
   private destroy$ = new Subject<void>();
@@ -53,7 +53,6 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, nous avons besoin d'une analyse complète des compétences techniques de notre sujet. Utilisez notre laboratoire d'analyse pour scanner et identifier ses capacités. Chaque domaine de compétence doit être examiné minutieusement pour évaluer son niveau d'expertise.";
-  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;
@@ -408,12 +407,29 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
 
+  // Nouvelles propriétés pour le jeu interactif
+  isQuizModalOpen: boolean = false;
+  quizCompleted: boolean = false;
+  quizPassed: boolean = false;
+  quizScore: number = 0;
+  redirectInProgress: boolean = false;
+
+  // Un jeu simple de matching de compétences avec leurs catégories
+  quizQuestions: {
+    skill: string;
+    category: string;
+    correctCategory: string;
+  }[] = [];
+  selectedQuizQuestion: number = 0;
+  userAnswers: string[] = [];
+
   constructor(
     private progressService: ProgressService,
     private timeTrackerService: TimeTrackerService,
     private userDataService: UserDataService,
     private dialogService: DialogService,
-    private noteService: NoteService
+    private noteService: NoteService, 
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -436,14 +452,15 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.progressService.moduleStatuses$
       .pipe(takeUntil(this.destroy$))
       .subscribe((statuses) => {
-        this.isModuleCompleted = statuses.personnalite;
+        // Corriger cette ligne pour utiliser le bon module
+        this.isModuleCompleted = statuses.competences;
         this.moduleProgressPercentage =
           this.progressService.getCompletionPercentage();
 
-        // Si le module est déjà complété, on peut pré-charger les réponses utilisateur
+        // Charger l'état si le module est complété ou si des réponses existent
         if (
           this.isModuleCompleted ||
-          this.userDataService.getModuleResponses('personnalite').length > 0
+          this.userDataService.getModuleResponses('competences').length > 0
         ) {
           this.loadSavedState();
         }
@@ -475,6 +492,9 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showIntroDialog();
       this.introDialogTimeoutId = null;
     }, 500);
+
+    // Initialiser le graphique radar dès que le canvas est disponible
+    this.initRadarChart();
   }
 
   ngOnDestroy(): void {
@@ -488,6 +508,11 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Fermer tout dialogue ouvert
     if (this.isDialogOpen) {
       this.dialogService.closeDialog();
+    }
+
+    // Détruire le graphique pour libérer des ressources
+    if (this.radarChart) {
+      this.radarChart.destroy();
     }
   }
 
@@ -525,6 +550,161 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dialogService.startTypewriter(this.fullText);
   }
 
+  // Initialiser le graphique radar avec Chart.js
+  initRadarChart(): void {
+    // Enregistrer les composants nécessaires de Chart.js
+    Chart.register(
+      RadarController,
+      RadialLinearScale,
+      PointElement,
+      LineElement,
+      Filler,
+      Tooltip,
+      Legend
+    );
+
+    const labels = this.skillCategories.map((category) => category.name);
+    const data = this.skillCategories.map((category) =>
+      this.getCategoryAverageLevel(category.id)
+    );
+
+    // Création d'un dégradé pour le fond du radar
+    const ctx = this.radarCanvas.nativeElement.getContext('2d');
+
+    // Vérification que ctx n'est pas null
+    if (!ctx) {
+      console.error("Impossible d'obtenir le contexte 2D du canvas");
+      return;
+    }
+
+    const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientFill.addColorStop(0, 'rgba(0, 191, 255, 0.3)');
+    gradientFill.addColorStop(1, 'rgba(0, 115, 255, 0.1)');
+
+    const chartData = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Niveau moyen',
+          data: data,
+          backgroundColor: gradientFill,
+          borderColor: '#00bfff',
+          borderWidth: 2,
+          pointBackgroundColor: '#33ccff',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: '#00bfff',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true,
+        },
+      ],
+    };
+
+    const config: ChartConfiguration<'radar'> = {
+      type: 'radar',
+      data: chartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              color: '#a0d8ff',
+              font: {
+                size: 14,
+                family: 'Roboto, sans-serif',
+              },
+              padding: 20,
+            },
+          },
+          tooltip: {
+            backgroundColor: 'rgba(26, 26, 46, 0.8)',
+            titleColor: '#00bfff',
+            bodyColor: '#f5f5f5',
+            borderColor: '#00bfff',
+            borderWidth: 1,
+            padding: 12,
+            boxPadding: 6,
+            usePointStyle: true,
+            callbacks: {
+              label: function (context) {
+                return `Niveau: ${context.parsed.r}/5`;
+              },
+            },
+          },
+        },
+        scales: {
+          r: {
+            min: 0,
+            max: 5,
+            ticks: {
+              stepSize: 1,
+              display: true,
+              backdropColor: 'transparent',
+              color: '#80b9d8',
+            },
+            angleLines: {
+              color: 'rgba(0, 191, 255, 0.1)',
+              lineWidth: 1,
+            },
+            grid: {
+              color: 'rgba(0, 191, 255, 0.15)',
+              circular: true,
+            },
+            pointLabels: {
+              color: '#d0f0ff',
+              font: {
+                size: 12,
+                family: 'Roboto, sans-serif',
+              },
+            },
+          },
+        },
+        animation: {
+          duration: 1500,
+          // Utiliser un type d'easing valide selon Chart.js
+          easing: 'easeOutQuart',
+        },
+      },
+      plugins: [
+        {
+          id: 'glowEffect',
+          beforeDraw: (chart) => {
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 191, 255, 0.5)';
+            ctx.shadowBlur = 10;
+            ctx.strokeStyle = '#00bfff';
+            ctx.lineWidth = 2;
+          },
+          afterDraw: (chart) => {
+            chart.ctx.restore();
+          },
+        },
+      ],
+    };
+
+    // Vérifier si le graphique existe déjà et le détruire
+    if (this.radarChart) {
+      this.radarChart.destroy();
+    }
+
+    // Créer le nouveau graphique
+    this.radarChart = new Chart(this.radarCanvas.nativeElement, config);
+  }
+
+  // Méthode optionnelle pour mettre à jour le graphique, par exemple après révélation d'une compétence
+  updateRadarChart(): void {
+    if (this.radarChart) {
+      this.radarChart.data.datasets[0].data = this.skillCategories.map(
+        (category) => this.getCategoryAverageLevel(category.id)
+      );
+      this.radarChart.update();
+    }
+  }
+
   // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
@@ -532,7 +712,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Charger l'état sauvegardé précédemment
   loadSavedState(): void {
-    const responses = this.userDataService.getModuleResponses('personnalite');
+    const responses = this.userDataService.getModuleResponses('competences');
 
     if (responses.length > 0) {
       // Charger les compétences découvertes
@@ -568,7 +748,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       .map((skill) => skill.id);
 
     this.userDataService.saveResponse(
-      'personnalite',
+      'competences',
       'discovered_skills',
       discoveredIds
     );
@@ -576,7 +756,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Sauvegarder la catégorie sélectionnée
     if (this.selectedCategory) {
       this.userDataService.saveResponse(
-        'personnalite',
+        'competences',
         'selected_category',
         this.selectedCategory
       );
@@ -601,7 +781,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Marquer le module comme complété
   completeModule(): void {
-    this.progressService.completeModule('personnalite');
+    this.progressService.completeModule('competences');
     this.isModuleCompleted = true;
 
     // Ajouter une note automatique pour résumer ce qui a été fait
@@ -864,4 +1044,118 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
     // Normaliser le niveau pour qu'il soit entre 0.3 (plus proche du centre) et 1.0 (plus loin du centre)
     return 0.3 + ((level - 1) / 4) * 0.7;
   }
+
+
+  // Méthode pour ouvrir le modal du quiz
+openQuizModal(): void {
+  if (this.redirectInProgress) return;
+  
+  // Générer les questions du quiz
+  this.generateQuizQuestions();
+  
+  // Réinitialiser les états du quiz
+  this.quizCompleted = false;
+  this.quizPassed = false;
+  this.quizScore = 0;
+  this.selectedQuizQuestion = 0;
+  this.userAnswers = new Array(this.quizQuestions.length).fill('');
+  
+  // Ouvrir la modal
+  this.isQuizModalOpen = true;
+}
+
+// Générer les questions du quiz à partir des compétences découvertes
+generateQuizQuestions(): void {
+  // Récupérer toutes les compétences découvertes
+  const discoveredSkills = this.skills.filter(skill => skill.discovered);
+  
+  // Mélanger les compétences et prendre les 10 premières (ou moins si pas assez)
+  this.shuffleArray(discoveredSkills);
+  const selectedSkills = discoveredSkills.slice(0, Math.min(10, discoveredSkills.length));
+  
+  // Créer les questions
+  this.quizQuestions = selectedSkills.map(skill => {
+    // Obtenir la catégorie correcte
+    const correctCategory = this.getCategoryName(skill.category);
+    
+    // Créer des options incorrectes (autres catégories)
+    const otherCategories = this.skillCategories
+      .filter(cat => cat.id !== skill.category)
+      .map(cat => cat.name);
+    
+    return {
+      skill: skill.name,
+      category: skill.category,
+      correctCategory: correctCategory
+    };
+  });
+}
+
+// Mélanger un tableau (algorithme de Fisher-Yates)
+shuffleArray(array: any[]): void {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+// Répondre à une question du quiz
+answerQuestion(categoryId: string): void {
+  if (this.selectedQuizQuestion >= this.quizQuestions.length) return;
+  
+  // Sauvegarder la réponse
+  this.userAnswers[this.selectedQuizQuestion] = categoryId;
+  
+  // Passer à la question suivante ou terminer le quiz
+  if (this.selectedQuizQuestion < this.quizQuestions.length - 1) {
+    this.selectedQuizQuestion++;
+  } else {
+    this.completeQuiz();
+  }
+}
+
+// Terminer le quiz et calculer le score
+completeQuiz(): void {
+  let correctAnswers = 0;
+  
+  // Compter les réponses correctes
+  for (let i = 0; i < this.quizQuestions.length; i++) {
+    if (this.userAnswers[i] === this.quizQuestions[i].category) {
+      correctAnswers++;
+    }
+  }
+  
+  // Calculer le score en pourcentage
+  this.quizScore = Math.round((correctAnswers / this.quizQuestions.length) * 100);
+  
+  // Déterminer si le quiz est réussi (>= 80%)
+  this.quizPassed = this.quizScore >= 80;
+  
+  // Marquer le quiz comme terminé
+  this.quizCompleted = true;
+  
+  // Si le quiz est réussi, marquer le module comme complété
+  if (this.quizPassed && !this.isModuleCompleted) {
+    this.completeModule();
+  }
+}
+
+// Méthode pour fermer le modal du quiz
+closeQuizModal(): void {
+  this.isQuizModalOpen = false;
+}
+
+// Méthode pour naviguer vers le module suivant
+navigateToNextModule(): void {
+  if (this.redirectInProgress) return;
+  
+  this.redirectInProgress = true;
+  this.closeQuizModal();
+  
+  // Rediriger vers le module suivant
+  setTimeout(() => {
+    this.router.navigate(['/attentes']);
+    this.redirectInProgress = false;
+  }, 500);
+}
 }

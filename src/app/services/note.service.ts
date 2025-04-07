@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-
-export interface Note {
-  id: string;
-  content: string;
-  timestamp: number;
-}
+import { Note } from '../models/others/note';
 
 @Injectable({
   providedIn: 'root',

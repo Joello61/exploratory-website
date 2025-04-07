@@ -5,11 +5,10 @@ import {
   OnInit,
   ViewChild,
   AfterViewInit,
-  Renderer2,
   OnDestroy,
 } from '@angular/core';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { Subject, takeUntil } from 'rxjs';
+import { DialogService } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
@@ -26,65 +25,15 @@ import Chart, {
   RadialLinearScale,
   Tooltip,
 } from 'chart.js/auto';
+import { Evidence } from '../../models/motivations/evidence';
+import { QuizQuestion } from '../../models/motivations/quiz-question';
+import { Connection } from '../../models/motivations/connection';
+import { IncorrectAnswer } from '../../models/motivations/incorrect-answer';
+import { MotivationFactor } from '../../models/motivations/motivation-factor';
+import { MotivationProfile } from '../../models/motivations/motivation-profile';
+import { QuizResult } from '../../models/motivations/quiz-result';
+import { DialogMessage } from '../../models/others/dialod-message';
 
-interface Evidence {
-  id: string;
-  title: string;
-  icon: string;
-  date: string;
-  description: string;
-  keywords?: string[];
-  discovered: boolean;
-  connections: string[];
-}
-
-interface QuizQuestion {
-  id: number;
-  text: string;
-  options: string[];
-  correctAnswer: number; // Index de la bonne réponse
-}
-
-interface QuizResult {
-  score: number;
-  totalQuestions: number;
-  percentage: number;
-  passed: boolean;
-}
-
-interface IncorrectAnswer {
-  questionId: number;
-  userAnswer: number;
-  correctAnswer: number;
-  feedback: string; // Explication de la bonne réponse
-}
-
-interface Connection {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-}
-
-interface MotivationProfile {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  aspects: ProfileAspect[];
-}
-
-interface ProfileAspect {
-  title: string;
-  icon: string;
-  description: string;
-}
-
-interface MotivationFactor {
-  name: string;
-  icon: string;
-  level: number; // 1-10
-}
 
 @Component({
   selector: 'app-motivation-socio-pro',
@@ -115,8 +64,6 @@ export class MotivationSocioProComponent
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, nous entrons dans une phase critique de notre enquête. Nous devons maintenant analyser les motivations socio-professionnelles du sujet. Examinez les indices recueillis et établissez les connexions entre eux pour identifier les facteurs qui guident ses choix de carrière et ses aspirations. Cette analyse nous permettra de comprendre ce qui l'anime vraiment.";
-
-  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;

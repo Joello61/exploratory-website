@@ -7,8 +7,8 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { Subject, takeUntil } from 'rxjs';
+import { DialogService } from '../../services/dialog.service';
 import { ProgressService } from '../../services/progress.service';
 import { UserDataService } from '../../services/user-data.service';
 import {
@@ -18,25 +18,8 @@ import {
 } from '@angular/cdk/drag-drop';
 import { Router } from '@angular/router';
 import { NoteService } from '../../services/note.service';
-
-interface JobClue {
-  title: string;
-  detail: string;
-  icon: string;
-  skill: string;
-}
-
-interface JobExperience {
-  title: string;
-  company: string;
-  period: string;
-  description: string;
-  clues: JobClue[];
-  skills: string[];
-  notes: string;
-  conclusion: string;
-  achievement: string;
-}
+import { JobExperience } from '../../models/experiences/job-experience';
+import { DialogMessage } from '../../models/others/dialod-message';
 
 @Component({
   selector: 'app-experience-pro',
@@ -67,7 +50,6 @@ export class ExperienceProComponent
   // Texte du dialogue d'introduction
   private fullText: string =
     'Agent, approfondissons notre enquête. Le suspect a un parcours professionnel intéressant. Examinez ces dossiers confidentiels pour découvrir ses compétences, réalisations et contacts. Chaque indice compte pour établir son profil complet.';
-  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;

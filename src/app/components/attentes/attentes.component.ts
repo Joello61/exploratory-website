@@ -5,7 +5,6 @@ import {
   OnInit,
   ViewChild,
   AfterViewInit,
-  Renderer2,
   OnDestroy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -16,83 +15,20 @@ import {
 } from '@angular/cdk/drag-drop';
 import { Router } from '@angular/router';
 
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { ProgressService } from '../../services/progress.service';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { DialogService } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
-
-interface TerminalLine {
-  type: 'input' | 'output';
-  text: string;
-  active: boolean;
-}
-
-interface AspirationBranch {
-  title: string;
-  icon: string;
-  priority: 'high' | 'medium' | 'low';
-  revealed: boolean;
-  subBranches: SubBranch[];
-}
-
-interface SubBranch {
-  title: string;
-  icon: string;
-  description: string;
-  priority: 'high' | 'medium' | 'low';
-  revealed: boolean;
-}
-
-interface FutureProject {
-  title: string;
-  description: string;
-  type: 'project' | 'opportunity';
-  timeline: 'short' | 'mid' | 'long';
-  priority: 'high' | 'medium' | 'low';
-  tags: string[];
-  objectives: string[];
-}
-
-interface EnvironmentCategory {
-  title: string;
-  icon: string;
-  items: EnvironmentItem[];
-}
-
-interface EnvironmentItem {
-  title: string;
-  description: string;
-  icon: string;
-}
-
-// Ajouter ces interfaces
-interface PrioritizationItem {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  correctRank: number;
-}
-
-interface Scenario {
-  title: string;
-  description: string;
-  options: string[];
-  correctOption: number;
-  feedback: {
-    correct: string;
-    incorrect: string;
-  };
-}
-
-interface CompatibilityItem {
-  title: string;
-  description: string;
-  icon: string;
-  correctRating: number;
-}
+import { AspirationBranch } from '../../models/attentes/aspiration-branch';
+import { CompatibilityItem } from '../../models/attentes/compatibility-item';
+import { EnvironmentCategory } from '../../models/attentes/environment-category';
+import { FutureProject } from '../../models/attentes/future-project';
+import { Scenario } from '../../models/attentes/scenario';
+import { TerminalLine } from '../../models/attentes/terminal-line';
+import { PrioritizationItem } from '../../models/attentes/prioritization-time';
+import { DialogMessage } from '../../models/others/dialod-message';
 
 @Component({
   selector: 'app-attentes',
@@ -121,7 +57,6 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, nous avons besoin d'une projection des intentions futures du sujet. Utilisez le terminal prédictif pour accéder à ses aspirations professionnelles, projets et environnement idéal. Ces informations sont cruciales pour comprendre sa trajectoire de carrière.";
-  private subscriptions: Subscription[] = [];
 
   // État du dialogue
   isDialogOpen: boolean = true;

@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-
-export interface DialogMessage {
-  text: string;
-  character?: string;
-  imageUrl?: string;
-}
+import { DialogMessage } from '../models/others/dialod-message';
 
 @Injectable({
   providedIn: 'root',

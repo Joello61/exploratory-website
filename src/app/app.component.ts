@@ -1,22 +1,18 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
-import { Subscription, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
 // Import des services
 import { SoundService } from './services/sound.service';
-import { ProgressService, ModuleStatus } from './services/progress.service';
+import { ProgressService } from './services/progress.service';
 import { TimeTrackerService } from './services/time-tracker.service';
 import { AppStateService } from './services/app-state.service';
 import { NoteService } from './services/note.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
-
-interface Note {
-  id: string;
-  content: string;
-  timestamp: number;
-}
+import { ModuleStatus } from './models/others/modul-status';
+import { Note } from './models/others/note';
 
 @Component({
   selector: 'app-root',

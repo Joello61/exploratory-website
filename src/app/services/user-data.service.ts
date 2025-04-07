@@ -1,12 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-
-export interface UserResponse {
-  moduleId: string;
-  questionId: string;
-  response: string | string[] | number | boolean;
-  timestamp: number;
-}
+import { UserResponse } from '../models/others/user-response';
 
 @Injectable({
   providedIn: 'root',

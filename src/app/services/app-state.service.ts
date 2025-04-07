@@ -4,7 +4,6 @@ import { ProgressService } from './progress.service';
 import { TimeTrackerService } from './time-tracker.service';
 import { UserDataService } from './user-data.service';
 import { AuthService } from './auth.service';
-import { NoteService } from './note.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +21,6 @@ export class AppStateService {
     private timeTrackerService: TimeTrackerService,
     private userDataService: UserDataService,
     private authService: AuthService,
-    private noteService: NoteService
   ) {
     this.checkFirstVisit();
   }

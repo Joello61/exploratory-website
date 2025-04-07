@@ -8,53 +8,18 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { Subject, takeUntil } from 'rxjs';
+import { DialogService } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { UserDataService } from '../../services/user-data.service';
 import { Router } from '@angular/router';
+import { Evidence } from '../../models/centres/evidence';
+import { Interest } from '../../models/centres/interest';
+import { InterestCategory } from '../../models/centres/interest-category';
+import { QuizQuestion } from '../../models/centres/quiz-question';
+import { DialogMessage } from '../../models/others/dialod-message';
 
-interface QuizQuestion {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-}
-
-interface Evidence {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  discovered: boolean;
-  unlocksInterests: string[];
-}
-
-interface InterestCategory {
-  id: string;
-  name: string;
-  icon: string;
-  requiredEvidences: number;
-}
-
-interface RelatedImage {
-  url?: string;
-  caption: string;
-}
-
-interface Interest {
-  id: string;
-  name: string;
-  icon: string;
-  category: string;
-  description: string;
-  since?: string;
-  frequency?: string;
-  skillsRelated?: string[];
-  relatedImages?: RelatedImage[];
-  highlight?: string;
-  requiredEvidence: string;
-}
 
 @Component({
   selector: 'app-centres-interet',
@@ -82,7 +47,6 @@ export class CentresInteretComponent
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, pour compléter le profil de notre sujet, nous devons analyser ses centres d'intérêt personnels. Ces activités hors travail peuvent révéler des aspects clés de sa personnalité, ses motivations et ses compétences transversales. Recueillez des indices et explorez chaque domaine en profondeur.";
-  private subscriptions: Subscription[] = [];
 
   // Données de progression et de temps
   isModuleCompleted: boolean = false;
@@ -841,7 +805,7 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
         this.clearAllTimeouts();
 
         // Naviguer vers le module suivant
-        this.router.navigate(['/conclusion']);
+        this.router.navigate(['/motivations']);
 
         this.navigationTimeoutId = null;
       }, 5000);

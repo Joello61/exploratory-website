@@ -27,20 +27,11 @@
   <div class="section-header">
     <h2 class="section-title">Laboratoire d'analyse: Profil de compétences</h2>
     <div class="lab-status">
+      Statut :
       <span *ngIf="isModuleCompleted" class="status-badge completed"
         >Complété</span
       >
       <span *ngIf="!isModuleCompleted" class="status-badge">En analyse</span>
-      <span class="time-elapsed">Temps écoulé: {{ elapsedTime }}</span>
-      <span class="progress-percentage"
-        >Progression totale: {{ moduleProgressPercentage }}%</span
-      >
-
-      <!-- Bouton pour afficher les notes -->
-      <button class="notes-button" (click)="toggleNotes()">
-        <i class="bi bi-journal-text"></i>
-        Notes
-      </button>
     </div>
   </div>
 
@@ -212,31 +203,28 @@
       </div>
     </div>
 
-    <div class="skill-map" *ngIf="getDiscoveredSkillsCount() > 5">
-      <h4>Cartographie des compétences</h4>
-      <div class="radar-chart">
-        <!-- Ici, on pourrait ajouter un composant de chart radar si on avait une bibliothèque de graphiques -->
-        <div class="placeholder-chart">
-          <div
-            class="chart-axis"
-            *ngFor="let category of skillCategories; let i = index"
-            [style.--axis-angle]="i * (360 / skillCategories.length)"
-          >
-            <div class="axis-label">{{ category.name }}</div>
-          </div>
-          <div class="chart-web" *ngFor="let level of [0.2, 0.4, 0.6, 0.8, 1]">
-            <div class="web-level" [style.--web-scale]="level"></div>
-          </div>
-          <div class="chart-area">
-            <div
-              class="area-point"
-              *ngFor="let category of skillCategories; let i = index"
-              [style.--point-angle]="i * (360 / skillCategories.length)"
-              [style.--point-distance]="
-                getCategoryAverageLevel(category.id) / 5
-              "
-            ></div>
-          </div>
+    <!-- Cartographie des compétences avec Chart.js -->
+    <!-- Cartographie des compétences avec Chart.js -->
+    <div
+      class="skill-map"
+      *ngIf="getDiscoveredSkillsCount() > 5"
+      [@fadeInAnimation]
+    >
+      <h4>
+        <i class="fas fa-chart-radar me-2"></i>Cartographie des compétences
+      </h4>
+      <div class="radar-chart-container">
+        <div class="radar-chart">
+          <!-- Canvas pour Chart.js -->
+          <canvas #radarCanvas></canvas>
+        </div>
+        <div class="chart-legend">
+          <p>
+            Découvert: {{ getDiscoveredSkillsCount() }}/{{
+              getTotalSkillsCount()
+            }}
+            compétences
+          </p>
         </div>
       </div>
     </div>
@@ -249,4 +237,88 @@
       Module complété ! Analyse des compétences terminée avec succès.
     </div>
   </div>
+
+  <div class="continue-section" *ngIf="getDiscoveredSkillsCount() >= 15 && !redirectInProgress">
+    <button class="btn btn-primary action-btn" (click)="openQuizModal()">
+      <i class="bi bi-arrow-right-circle"></i>
+      Continuer vers le jeu interactif
+    </button>
+  </div>
+
+  <!-- Modal Quiz -->
+<div class="quiz-modal-overlay" *ngIf="isQuizModalOpen" (click)="closeQuizModal()">
+  <div class="quiz-modal" (click)="$event.stopPropagation()">
+    <div class="quiz-header">
+      <h3>Testez vos connaissances</h3>
+      <button class="close-modal" (click)="closeQuizModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="quiz-content">
+      <!-- Section des questions -->
+      <div *ngIf="!quizCompleted">
+        <div class="quiz-question">
+          <p class="question-text">À quelle catégorie appartient la compétence suivante ?</p>
+          <h4 class="skill-name">{{ quizQuestions[selectedQuizQuestion].skill }}</h4>
+        </div>
+
+        <div class="quiz-options">
+          <button 
+            *ngFor="let category of skillCategories" 
+            class="option-btn"
+            (click)="answerQuestion(category.id)"
+          >
+            <i [class]="'bi ' + category.icon"></i>
+            <span>{{ category.name }}</span>
+          </button>
+        </div>
+
+        <div class="quiz-progress">
+          <span class="progress-text">Question {{ selectedQuizQuestion + 1 }} / {{ quizQuestions.length }}</span>
+          <div class="progress-container">
+            <div class="progress-fill" [style.width.%]="(selectedQuizQuestion / quizQuestions.length) * 100"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Résultats du quiz -->
+      <div class="quiz-results" *ngIf="quizCompleted">
+        <div class="results-score">
+          <div class="score-circle">
+            <span class="score-value">{{ quizScore }}%</span>
+          </div>
+          <div class="score-label">Score final</div>
+        </div>
+
+        <div class="results-message">
+          <p *ngIf="quizPassed">
+            Félicitations ! Vous avez bien assimilé les différentes compétences et leurs catégories.
+          </p>
+          <p *ngIf="!quizPassed">
+            Vous pourriez encore améliorer votre connaissance des compétences. Essayez de revoir les différentes catégories.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-footer">
+      <button 
+        *ngIf="quizCompleted && quizPassed" 
+        class="btn btn-primary action-btn"
+        (click)="navigateToNextModule()"
+      >
+        Continuer vers le prochain module
+      </button>
+
+      <button 
+        *ngIf="quizCompleted && !quizPassed" 
+        class="btn btn-secondary action-btn"
+        (click)="closeQuizModal()"
+      >
+        Réessayer plus tard
+      </button>
+    </div>
+  </div>
+</div>
 </div>

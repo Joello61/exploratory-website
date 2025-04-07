@@ -1,17 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-
-export interface ModuleStatus {
-  home: boolean;
-  itineraire: boolean;
-  experience: boolean;
-  attentes: boolean;
-  personnalite: boolean;
-  competences: boolean;
-  centres: boolean;
-  motivations: boolean;
-  conclusion: boolean;
-}
+import { ModuleStatus } from '../models/others/modul-status';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +11,7 @@ export class ProgressService {
     'home',
     'itineraire',
     'experience',
+    'competences',
     'attentes',
     'personnalite',
     'centres',
@@ -33,9 +23,9 @@ export class ProgressService {
     home: true, // L'intro est considérée comme complétée par défaut
     itineraire: false,
     experience: false,
+    competences: false,
     attentes: false,
     personnalite: false,
-    competences: false,
     centres: false,
     motivations: false,
     conclusion: false,
@@ -138,9 +128,9 @@ export class ProgressService {
       home: true,
       itineraire: false,
       experience: false,
+      competences: false,
       attentes: false,
       personnalite: false,
-      competences: false,
       centres: false,
       motivations: false,
       conclusion: false,

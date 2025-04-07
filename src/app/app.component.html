@@ -65,6 +65,17 @@
   <a
     class="btn"
     [ngClass]="{
+      'btn-primary': isModuleAvailable('competences'),
+      'btn-secondary': !isModuleAvailable('competences'),
+      'btn-disabled': !isModuleAvailable('competences')
+    }"
+    routerLink="/competences"
+    >Compétences</a
+  >
+
+  <a
+    class="btn"
+    [ngClass]="{
       'btn-primary': isModuleAvailable('attentes'),
       'btn-secondary': !isModuleAvailable('attentes'),
       'btn-disabled': !isModuleAvailable('attentes')
