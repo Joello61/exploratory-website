@@ -69,7 +69,7 @@ export class CentresInteretComponent
   @ViewChild('typewriterText') typewriterText!: ElementRef;
 
     // Identifiant du module
-    private readonly MODULE_ID = 'motivations';
+    private readonly MODULE_ID = 'centres';
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, pour compléter le profil de notre sujet, nous devons analyser ses centres d'intérêt personnels. Ces activités hors travail peuvent révéler des aspects clés de sa personnalité, ses motivations et ses compétences transversales. Recueillez des indices et explorez chaque domaine en profondeur.";
@@ -803,19 +803,24 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
 
   getPinDistance(index: number): number {
     const totalItems = this.evidenceItems.length;
-
-    const baseDistance = 200;
-    let variation = 0;
-    if (index % 2 === 0) {
-      variation = 30;
-    } else {
-      variation = -20;
-    }
-
-    const angleAdjustment =
-      Math.sin(index * (360 / totalItems) * (Math.PI / 180)) * 10;
-
-    return baseDistance + variation + angleAdjustment;
+    
+    // Calculer l'angle du pin en radians (distribué uniformément autour du cercle)
+    const angle = (index * 2 * Math.PI / totalItems);
+    
+    // Dimensions du polaroid
+    const polaroidWidth = 200;
+    const polaroidHeight = 300;
+    
+    const baseDistance = 90; // Distance minimale depuis le bord du polaroid
+    
+    // Calculer une distance qui suit approximativement le contour du rectangle
+    const horizontalComponent = Math.abs(Math.cos(angle)) * (polaroidWidth/2);
+    const verticalComponent = Math.abs(Math.sin(angle)) * (polaroidHeight/2);
+    
+    // Utiliser la plus grande des deux composantes pour déterminer la distance
+    const rectangleRadius = Math.max(horizontalComponent, verticalComponent);
+    
+    return rectangleRadius + baseDistance;
   }
 
   getResponseLetter(index: number): string {

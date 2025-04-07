@@ -14,7 +14,8 @@ import { ProgressService } from '../../services/progress.service';
 import { UserDataService } from '../../services/user-data.service';
 import { Router } from '@angular/router';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
-import { latLng, tileLayer, Map, marker, Marker, Popup, icon } from 'leaflet';
+import { latLng, tileLayer, Map, marker, Marker, icon } from 'leaflet';
+import { Chart, TooltipItem } from 'chart.js/auto';
 
 // Interfaces pour les données
 interface LocationData {
@@ -379,8 +380,8 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
         attribution: '&amp;copy; OpenStreetMap contributors'
       })
     ],
-    zoom: 5,
-    center: latLng([48.8566, 2.3522])
+    zoom: 3,
+    center: latLng([30.8566, 2.3522])
   };
 
   constructor(
@@ -449,11 +450,50 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.showIntroDialog();
     }, 500);
+
+    this.initSkillsChart();
   }
 
   ngOnDestroy(): void {
     // Nettoyer les souscriptions pour éviter les fuites de mémoire
     this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
+
+  initSkillsChart() {
+    const ctx = document.getElementById('skillsEvolutionChart') as HTMLCanvasElement;
+    
+    const skillsChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: this.skillsEvolution.map(skill => skill.year),
+        datasets: [{
+          label: 'Niveau de compétence',
+          data: this.skillsEvolution.map(skill => skill.level),
+          backgroundColor: 'rgba(0, 191, 255, 0.6)',
+          borderColor: 'rgba(0, 191, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (context: TooltipItem<'bar'>) => {
+                const index = context.dataIndex;
+                return this.skillsEvolution[index].tooltip;
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   onMapReady(map: Map) {

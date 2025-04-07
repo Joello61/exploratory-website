@@ -284,7 +284,7 @@
 .pin-connector {
   position: absolute;
   top: 50%;
-  left: -5px; /* Ajusté pour mieux s'aligner */
+  left: 20px; /* Ajusté pour mieux s'aligner */
   width: var(--pin-distance);
   height: 2px;
   background: rgba(0, 191, 255, 0.2); /* Plus visible */

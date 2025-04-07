@@ -24,7 +24,6 @@
     <div class="investigation-status">
       <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
       <span *ngIf="!isModuleCompleted" class="status-badge">Analyses requises</span>
-      <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
     </div>
   </div>
   
@@ -241,26 +240,8 @@
           
           <div class="radar-chart">
             <div class="chart-container">
-              <!-- Chart placeholder -->
-              <div class="radar-placeholder">
-                <div *ngFor="let factor of motivationFactors; let i = index" 
-                     class="radar-axis" 
-                     [style.--axis-angle]="(i * 360 / motivationFactors.length) + 'deg'">
-                  <div class="axis-label">{{factor.name}}</div>
-                </div>
-                <div *ngFor="let level of [0.2, 0.4, 0.6, 0.8, 1]" 
-                     class="radar-level" 
-                     [style.--level-scale]="level">
-                </div>
-                <div class="radar-area">
-                  <div *ngFor="let factor of motivationFactors; let i = index" 
-                       class="area-point" 
-                       [style.--point-angle]="(i * 360 / motivationFactors.length) + 'deg'"
-                       [style.--point-distance]="factor.level / 10">
-                  </div>
-                </div>
-              </div>
-            </div>
+            <canvas #radarChart></canvas>
+          </div>
             
             <div class="factors-details">
               <div *ngFor="let factor of motivationFactors" class="factor-detail">
@@ -380,7 +361,7 @@
       <div class="result-details">
         <div class="score-display">
           <div class="score-circle" [style.--score-percentage]="quizResult.percentage + '%'">
-            <div class="score-value">{{quizResult.percentage}}%</div>
+            <div class="score-value">{{quizResult.percentage | number:'1.0-0'}}%</div>
           </div>
           <div class="score-text">
             <div class="score-label">Score obtenu</div>
@@ -415,27 +396,27 @@
                   {{getQuestionById(incorrect.questionId)?.text}}
                 </div>
               </div>
-        
+          
               <div class="correction-answers">
+                <!-- Correction: inversion des paramètres pour afficher correctement les réponses -->
                 <div class="answer incorrect">
                   <div class="answer-label">Votre réponse:</div>
-                  <div class="answer-text">
-                    {{getAnswerText(incorrect.questionId, incorrect.correctAnswer)}}
-                  </div>
-                </div>
-        
-                <div class="answer correct">
-                  <div class="answer-label">Réponse correcte:</div>
                   <div class="answer-text">
                     {{getAnswerText(incorrect.questionId, incorrect.userAnswer)}}
                   </div>
                 </div>
-
-                <!-- Ajouter après la section answer correct -->
-<div class="answer-feedback">
-  <div class="feedback-label">Explication:</div>
-  <div class="feedback-text">{{incorrect.feedback}}</div>
-</div>
+          
+                <div class="answer correct">
+                  <div class="answer-label">Réponse correcte:</div>
+                  <div class="answer-text">
+                    {{getAnswerText(incorrect.questionId, incorrect.correctAnswer)}}
+                  </div>
+                </div>
+          
+                <div class="answer-feedback">
+                  <div class="feedback-label">Explication:</div>
+                  <div class="feedback-text">{{incorrect.feedback}}</div>
+                </div>
               </div>
             </div>
           </div>

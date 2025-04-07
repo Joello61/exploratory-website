@@ -152,19 +152,8 @@
       <div class="stats-evolution">
         <h4 class="stats-title">Évolution des compétences</h4>
         <div class="evolution-chart">
-          <!-- Intégrer un graphique ici (utiliser Canvas ou une bibliothèque de graphiques) -->
-          <div class="chart-placeholder">
-            <!-- Barres verticales pour simuler un graphique -->
-            <div
-              class="chart-bar"
-              *ngFor="let skill of skillsEvolution; let i = index"
-              [style.height.%]="skill.level"
-              [style.left.%]="i * 10 + 10"
-            >
-              <div class="bar-label">{{ skill.year }}</div>
-              <div class="bar-tooltip">{{ skill.tooltip }}</div>
-            </div>
-          </div>
+          <!-- Utilisation de Chart.js avec un canvas -->
+          <canvas id="skillsEvolutionChart"></canvas>
         </div>
       </div>
 
@@ -193,7 +182,6 @@
       </div>
     </div>
   </div>
-  <!-- Ajouter ce code à la fin du HTML, juste avant la fermeture de la div .itineraire-container -->
 
   <!-- Bouton Continuer -->
   <div class="continue-section">
@@ -219,7 +207,7 @@
             <div
               class="progress-fill"
               [style.width.%]="
-                (currentQuestionIndex / quizQuestions.length) * 100
+                ((currentQuestionIndex + 1) / quizQuestions.length) * 100
               "
             ></div>
           </div>
@@ -228,7 +216,7 @@
           </div>
         </div>
 
-        <div class="quiz-question" *ngIf="currentQuestion">
+        <div class="quiz-question" *ngIf="currentQuestion && !quizCompleted">
           <h4>{{ currentQuestion.text }}</h4>
 
           <div class="question-options">

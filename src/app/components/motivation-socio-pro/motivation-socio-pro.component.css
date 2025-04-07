@@ -1101,69 +1101,39 @@
 }
 
 .chart-container {
-  width: 300px;
-  height: 300px;
-  position: relative;
-}
-
-.radar-placeholder {
   width: 100%;
-  height: 100%;
+  height: 500px;
+  width: 60%;
+  margin: 0 auto;
   position: relative;
-}
-
-.radar-axis {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 150px;
-  height: 1px;
-  background: rgba(0, 191, 255, 0.1);
-  transform-origin: left center;
-  transform: rotate(var(--axis-angle));
-}
-
-.axis-label {
-  position: absolute;
-  left: 100%;
-  top: -10px;
-  padding-left: 10px;
-  white-space: nowrap;
-  font-size: 0.85rem;
-  color: #a0d8ff;
-  transform: rotate(calc(-1 * var(--axis-angle)));
-}
-
-.radar-level {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: calc(100% * var(--level-scale));
-  height: calc(100% * var(--level-scale));
+  background: rgba(15, 15, 26, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(0, 191, 255, 0.1);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
 }
 
-.radar-area {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  clip-path: polygon(50% 50%, 50% 0%, 100% 50%, 50% 100%, 0% 50%);
+canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
-.area-point {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  background: rgba(0, 191, 255, 0.8);
-  border-radius: 50%;
-  transform: rotate(var(--point-angle)) translateX(calc(var(--point-distance) * 150px)) rotate(calc(-1 * var(--point-angle)));
-  box-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
+/* Média queries pour la responsivité */
+@media (max-width: 992px) {
+  .radar-chart {
+    flex-direction: column;
+  }
+  
+  .chart-container {
+    height: 350px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .chart-container {
+    height: 300px;
+  }
 }
 
 .factors-details {

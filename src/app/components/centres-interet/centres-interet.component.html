@@ -23,7 +23,6 @@
     <div class="investigation-status">Statut : 
       <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
       <span *ngIf="!isModuleCompleted" class="status-badge">En analyse</span>
-      <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
     </div>
   </div>
 
@@ -173,27 +172,6 @@
       </div>
     </div>
     
-    <div class="window-footer">
-      <div class="filter-options">
-        <label class="toggle-container">
-          <input type="checkbox" [(ngModel)]="showUndiscoveredInterests">
-          <span class="toggle-label">Afficher centres d'intérêt non découverts</span>
-        </label>
-      </div>
-      <div class="navigation-buttons" *ngIf="getInterestsByCategory().length > 0">
-        <button class="nav-btn" (click)="showPreviousInterest()" [disabled]="currentInterestIndex <= 0">
-          <i class="bi bi-arrow-left"></i>
-          Précédent
-        </button>
-        <div class="nav-indicator">
-          {{currentInterestIndex + 1}} / {{getInterestsByCategory().length}}
-        </div>
-        <button class="nav-btn" (click)="showNextInterest()" [disabled]="currentInterestIndex >= getInterestsByCategory().length - 1">
-          Suivant
-          <i class="bi bi-arrow-right"></i>
-        </button>
-      </div>
-    </div>
   </div>
   
   <!-- Modal de découverte d'indice -->

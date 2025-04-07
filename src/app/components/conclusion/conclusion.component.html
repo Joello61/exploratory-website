@@ -156,31 +156,35 @@
           <h4>Profil de compatibilité</h4>
         </div>
         
-        <div class="compatibility-visualization">
+        <!-- Section supérieure: graphique et barres de progression des facteurs -->
+        <div class="compatibility-top-section">
           <div class="radar-chart">
             <div class="chart-container">
-              <!-- Chart placeholder -->
-              <div class="radar-placeholder">
-                <div *ngFor="let factor of compatibilityFactors; let i = index" 
-                     class="radar-axis" 
-                     [style.--axis-angle]="(i * 360 / compatibilityFactors.length) + 'deg'">
-                  <div class="axis-label">{{factor.name}}</div>
-                </div>
-                <div *ngFor="let level of [0.2, 0.4, 0.6, 0.8, 1]" 
-                     class="radar-level" 
-                     [style.--level-scale]="level">
-                </div>
-                <div class="radar-area">
-                  <div *ngFor="let factor of compatibilityFactors; let i = index" 
-                       class="area-point" 
-                       [style.--point-angle]="(i * 360 / compatibilityFactors.length) + 'deg'"
-                       [style.--point-distance]="factor.level / 10">
-                  </div>
-                </div>
-              </div>
+              <canvas #compatibilityChart class="compatibility-radar-chart"></canvas>
             </div>
           </div>
           
+          <!-- Nouvelle section: Barres de progression des facteurs -->
+          <div class="factors-progress">
+            <div class="factors-header">
+              <h5>Niveaux des facteurs</h5>
+            </div>
+            <div class="factors-list">
+              <div *ngFor="let factor of compatibilityFactors" class="factor-item">
+                <div class="factor-name">
+                  <span>{{factor.name}}</span>
+                </div>
+                <div class="factor-track">
+                  <div class="factor-fill" [style.width.%]="factor.level * 10"></div>
+                </div>
+                <div class="factor-value">{{factor.level}}/10</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section inférieure: Compatibilité par environnement -->
+        <div class="compatibility-bottom-section">
           <div class="compatibility-scores">
             <div class="score-header">
               <h5>Compatibilité par environnement</h5>

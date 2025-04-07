@@ -13,6 +13,7 @@ import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
+import Chart, { ChartConfiguration, ChartData, Legend, LinearScale, LineElement, PointElement, RadarController, RadialLinearScale, Tooltip } from 'chart.js/auto';
 
 interface KeyStat {
   icon: string;
@@ -63,6 +64,7 @@ interface CvAnnotation {
     top: number;
     left: number;
   };
+  target?: string; // Identifiant de l'élément cible (optionnel)
 }
 
 @Component({
@@ -91,6 +93,12 @@ export class ConclusionComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Taux de complétion global
   completionRate: number = 97;
+
+  // Chart
+
+@ViewChild('compatibilityChart') compatibilityChartCanvas!: ElementRef<HTMLCanvasElement>;
+
+private compatibilityRadarChart: Chart | null = null;
 
   // Chemin vers l'image du CV
   cvImagePath: string = '/img/cv.jpg';
@@ -300,8 +308,8 @@ cvAnnotations: CvAnnotation[] = [
   title: 'Formation académique',
   text: "Parcours complet du DUT au Master, avec spécialisation progressive en développement Fullstack.",
   position: {
-    top: 260,
-    left: 45,
+    top: 85,
+    left: 50,
   },
 },
 {
@@ -309,8 +317,8 @@ cvAnnotations: CvAnnotation[] = [
   title: 'Expérience en alternance',
   text: "Poste actuel permettant de développer une expertise distinctive en intégration 3D et API REST.",
   position: {
-    top: 120,
-    left: 60,
+    top: 40,
+    left: 50,
   },
 },
 {
@@ -318,7 +326,7 @@ cvAnnotations: CvAnnotation[] = [
   title: 'Compétences techniques',
   text: "Profil Fullstack équilibré entre frontend, backend, et compétences complémentaires (DevOps, documentation).",
   position: {
-    top: 140,
+    top: 45,
     left: 10,
   },
 },
@@ -327,7 +335,7 @@ cvAnnotations: CvAnnotation[] = [
   title: 'Centres d\'intérêt',
   text: "Personnalité équilibrée avec des intérêts variés (cuisine, chant, basketball, technologies) témoignant d'une ouverture d'esprit.",
   position: {
-    top: 210,
+    top: 67,
     left: 10,
   },
 },
@@ -383,18 +391,37 @@ cvAnnotations: CvAnnotation[] = [
     /*if (!this.progressService.moduleStatuses$.value.conclusion) {
       this.completeModule();
     }*/
+
+    window.addEventListener('resize', this.handleResize.bind(this));
+  }
+
+  handleResize(): void {
+    if (this.showCvModal) {
+      this.adjustAnnotationPositions();
+    }
   }
 
   ngAfterViewInit(): void {
-    // Utiliser le DialogService au lieu du typewriter manuel
+    // Utiliser le DialogService pour l'intro
     setTimeout(() => {
       this.showIntroDialog();
     }, 500);
+    
+    // Initialiser le graphique radar avec Chart.js
+    setTimeout(() => {
+      this.initCompatibilityChart();
+    }, 1000);
   }
-
+  
+  // Modifier la méthode ngOnDestroy
   ngOnDestroy(): void {
     // Nettoyer les souscriptions pour éviter les fuites de mémoire
     this.subscriptions.forEach((sub) => sub.unsubscribe());
+    
+    // Détruire le graphique Chart.js
+    this.destroyCompatibilityChart();
+
+    window.removeEventListener('resize', this.handleResize.bind(this));
   }
 
   showIntroDialog(): void {
@@ -520,10 +547,29 @@ Environnement recommandé: ${this.compatibilityEnvironments[0].name} (${
   toggleCvModal(): void {
     this.showCvModal = !this.showCvModal;
     this.userDataService.saveResponse('conclusion', 'cv_modal_opened', true);
+    
+    // Si la modal est ouverte, ajuster les positions des annotations
+    if (this.showCvModal) {
+      setTimeout(() => {
+        this.adjustAnnotationPositions();
+      }, 100); // Petit délai pour s'assurer que la modal est rendue
+    }
   }
 
   toggleAnnotations(): void {
+    // Inverser l'état d'affichage des annotations
     this.showAnnotations = !this.showAnnotations;
+    
+    // Sauvegarder l'état si nécessaire
+    this.userDataService.saveResponse('conclusion', 'show_annotations', this.showAnnotations);
+    
+    // Si les annotations sont maintenant visibles, réajuster leur position
+    if (this.showAnnotations) {
+      // Utiliser setTimeout pour s'assurer que le DOM est mis à jour avant l'ajustement
+      setTimeout(() => {
+        this.adjustAnnotationPositions();
+      }, 50);
+    }
   }
 
   // Gestion des recommandations
@@ -597,4 +643,158 @@ Environnement recommandé: ${this.compatibilityEnvironments[0].name} (${
     link.click();
     document.body.removeChild(link);
   }
+
+  initCompatibilityChart(): void {
+    // Enregistrer les composants nécessaires pour Chart.js
+    Chart.register(RadarController, RadialLinearScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
+    
+    // Récupérer les données du graphique depuis les facteurs de compatibilité
+    const labels = this.compatibilityFactors.map(factor => factor.name);
+    const data = this.compatibilityFactors.map(factor => factor.level);
+    
+    // Configurer le graphique
+    const chartData: ChartData = {
+      labels: labels,
+      datasets: [{
+        label: 'Niveau de compatibilité',
+        data: data,
+        backgroundColor: 'rgba(0, 191, 255, 0.2)',
+        borderColor: 'rgba(0, 191, 255, 0.8)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(0, 191, 255, 0.8)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(0, 191, 255, 1)',
+        pointRadius: 5,
+        pointHoverRadius: 7
+      }]
+    };
+    
+    // Options du graphique avec les types corrects
+const chartOptions = {
+  scales: {
+    r: {
+      beginAtZero: true,
+      min: 0,
+      max: 10,
+      ticks: {
+        stepSize: 1,  // Intervalles de 1
+        backdropColor: 'transparent',
+        color: '#00bfff',
+        font: {
+          size: 10,
+          weight: 'bold' as const
+        },
+        showLabelBackdrop: false
+      },
+      grid: {
+        color: 'rgba(0, 191, 255, 0.1)'
+      },
+      angleLines: {
+        color: 'rgba(0, 191, 255, 0.1)'
+      },
+      pointLabels: {
+        color: '#d0d0ff',
+        font: {
+          size: 12
+        }
+      }
+    }
+  },
+  plugins: {
+    legend: {
+      display: false
+    },
+    tooltip: {
+      backgroundColor: 'rgba(30, 30, 60, 0.95)',
+      titleColor: '#d0d0ff',
+      bodyColor: '#a0d8ff',
+      borderColor: 'rgba(0, 191, 255, 0.3)',
+      borderWidth: 1,
+      padding: 15,
+      cornerRadius: 8,
+      displayColors: false,
+      callbacks: {
+        title: function(tooltipItems: any) {
+          return tooltipItems[0].label;
+        },
+        label: function(context: any) {
+          return `Niveau: ${context.raw}/10`;
+        }
+      }
+    }
+  },
+  maintainAspectRatio: false,
+  responsive: true,
+  animation: {
+    duration: 1500,
+    easing: 'easeOutQuart' as const  // Utiliser 'as const' pour type littéral
+  }
+};
+    
+    // Configuration complète
+    const config: ChartConfiguration = {
+      type: 'radar',
+      data: chartData,
+      options: chartOptions
+    };
+    
+    // Créer le graphique
+    const ctx = this.compatibilityChartCanvas.nativeElement.getContext('2d');
+    if (ctx) {
+      this.compatibilityRadarChart = new Chart(ctx, config);
+    }
+  }
+
+updateCompatibilityChart(): void {
+  if (this.compatibilityRadarChart) {
+    const data = this.compatibilityFactors.map(factor => factor.level);
+    this.compatibilityRadarChart.data.datasets[0].data = data;
+    this.compatibilityRadarChart.update();
+  }
+}
+
+destroyCompatibilityChart(): void {
+  if (this.compatibilityRadarChart) {
+    this.compatibilityRadarChart.destroy();
+    this.compatibilityRadarChart = null;
+  }
+}
+
+private positionAnnotations(cvImage: HTMLImageElement, container: HTMLElement): void {
+  const imageWidth = cvImage.offsetWidth;
+  const imageHeight = cvImage.offsetHeight;
+  
+  // Redimensionner le conteneur d'annotations pour qu'il corresponde à l'image
+  container.style.width = `${imageWidth}px`;
+  container.style.height = `${imageHeight}px`;
+  
+  // Sélectionner toutes les annotations
+  const annotationElements = container.querySelectorAll('.cv-note');
+  
+  // Appliquer les positions relatives en pourcentages
+  annotationElements.forEach((elem, index) => {
+    const annotation = this.cvAnnotations[index];
+    if (annotation) {
+      (elem as HTMLElement).style.top = `${annotation.position.top}%`;
+      (elem as HTMLElement).style.left = `${annotation.position.left}%`;
+    }
+  });
+}
+
+adjustAnnotationPositions(): void {
+  const cvImage = document.querySelector('.full-cv-image') as HTMLImageElement;
+  const annotationsContainer = document.querySelector('.cv-annotations') as HTMLElement;
+  
+  if (!cvImage || !annotationsContainer) return;
+  
+  // Attendre que l'image soit chargée pour obtenir ses dimensions réelles
+  if (cvImage.complete) {
+    this.positionAnnotations(cvImage, annotationsContainer);
+  } else {
+    cvImage.onload = () => {
+      this.positionAnnotations(cvImage, annotationsContainer);
+    };
+  }
+}
 }
