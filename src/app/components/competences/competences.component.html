@@ -4,16 +4,22 @@
   <div class="dialog-container" *ngIf="isDialogOpen">
     <div class="d-flex justify-content-end">
       <div class="detective-container">
-        <img class="img" src="img/detective.png" alt="detective">
+        <img class="img" src="img/detective.png" alt="detective" />
       </div>
     </div>
     <div class="dialog-box">
-      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+      <button
+        (click)="closeDialogTypeWriter()"
+        type="button"
+        class="close-button"
+      >
         <i class="bi bi-x-circle fs-3"></i>
       </button>
       <div class="message px-5">
         <!-- Utilisation du message directement depuis le service -->
-        <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
+        <div>
+          {{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -21,11 +27,15 @@
   <div class="section-header">
     <h2 class="section-title">Laboratoire d'analyse: Profil de compétences</h2>
     <div class="lab-status">
-      <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
+      <span *ngIf="isModuleCompleted" class="status-badge completed"
+        >Complété</span
+      >
       <span *ngIf="!isModuleCompleted" class="status-badge">En analyse</span>
-      <span class="time-elapsed">Temps écoulé: {{elapsedTime}}</span>
-      <span class="progress-percentage">Progression totale: {{moduleProgressPercentage}}%</span>
-      
+      <span class="time-elapsed">Temps écoulé: {{ elapsedTime }}</span>
+      <span class="progress-percentage"
+        >Progression totale: {{ moduleProgressPercentage }}%</span
+      >
+
       <!-- Bouton pour afficher les notes -->
       <button class="notes-button" (click)="toggleNotes()">
         <i class="bi bi-journal-text"></i>
@@ -42,105 +52,144 @@
         <h3>Outils d'analyse</h3>
         <div class="scan-status">
           <span class="scan-indicator" [class.active]="isScanning"></span>
-          <span class="scan-text">{{scanningText}}</span>
+          <span class="scan-text">{{ scanningText }}</span>
         </div>
       </div>
-      
+
       <div class="tool-section">
         <h4>Catégories de scan</h4>
         <div class="category-buttons">
-          <button *ngFor="let category of skillCategories" 
-                  class="category-btn" 
-                  [class.active]="selectedCategory === category.id"
-                  (click)="selectCategory(category.id)">
+          <button
+            *ngFor="let category of skillCategories"
+            class="category-btn"
+            [class.active]="selectedCategory === category.id"
+            (click)="selectCategory(category.id)"
+          >
             <i [class]="'bi ' + category.icon"></i>
-            <span>{{category.name}}</span>
-            <span class="completion-indicator" 
-                  [style.width.%]="getCategoryCompletionPercentage(category.id)"></span>
+            <span>{{ category.name }}</span>
+            <span
+              class="completion-indicator"
+              [style.width.%]="getCategoryCompletionPercentage(category.id)"
+            ></span>
           </button>
         </div>
       </div>
-      
+
       <div class="scan-controls">
-        <button class="scan-btn" 
-                (click)="startSkillScan()" 
-                [disabled]="isScanning || isModuleCompleted">
+        <button
+          class="scan-btn"
+          (click)="startSkillScan()"
+          [disabled]="isScanning || isModuleCompleted"
+        >
           <i class="bi bi-radar"></i>
           <span>Scanner</span>
         </button>
-        
+
         <div class="scan-progress" *ngIf="isScanning">
           <div class="progress-bar" [style.width.%]="scanProgress"></div>
         </div>
       </div>
     </div>
-    
+
     <!-- Visualisation des compétences -->
     <div class="skill-visualization">
       <div class="visualization-header">
-        <h3>{{selectedCategory ? getCategoryName(selectedCategory) : 'Sélectionnez une catégorie'}}</h3>
+        <h3>
+          {{
+            selectedCategory
+              ? getCategoryName(selectedCategory)
+              : "Sélectionnez une catégorie"
+          }}
+        </h3>
         <div class="visualization-controls">
           <button class="view-mode-btn active">
             <i class="bi bi-list"></i>
           </button>
         </div>
       </div>
-      
+
       <!-- Vue liste des compétences -->
-      <div class="skills-list" *ngIf=" selectedCategory">
-        <div *ngFor="let skill of getSkillsByCategory(selectedCategory); let i = index"
-             class="skill-list-item"
-             [class.revealed]="skill.discovered"
-             [class.scanning]="scannedSkillIndex === i && isScanning">
+      <div class="skills-list" *ngIf="selectedCategory">
+        <div
+          *ngFor="
+            let skill of getSkillsByCategory(selectedCategory);
+            let i = index
+          "
+          class="skill-list-item"
+          [class.revealed]="skill.discovered"
+          [class.scanning]="scannedSkillIndex === i && isScanning"
+        >
           <div class="skill-list-header">
             <div class="skill-icon">
-              <i [class]="'bi ' + (skill.discovered ? skill.icon : 'bi-question')"></i>
+              <i
+                [class]="
+                  'bi ' + (skill.discovered ? skill.icon : 'bi-question')
+                "
+              ></i>
             </div>
             <div class="skill-info">
-              <h4 class="skill-name">{{skill.discovered ? skill.name : 'Compétence non identifiée'}}</h4>
+              <h4 class="skill-name">
+                {{
+                  skill.discovered ? skill.name : "Compétence non identifiée"
+                }}
+              </h4>
               <div *ngIf="skill.discovered" class="skill-level-text">
-                Niveau: {{skill.level}}/5 - {{getLevelDescription(skill.level)}}
+                Niveau: {{ skill.level }}/5 -
+                {{ getLevelDescription(skill.level) }}
               </div>
             </div>
           </div>
           <div *ngIf="skill.discovered" class="skill-details">
-            <p>{{skill.description}}</p>
-            <div class="skill-projects" *ngIf="skill.projects && skill.projects.length > 0">
+            <p>{{ skill.description }}</p>
+            <div
+              class="skill-projects"
+              *ngIf="skill.projects && skill.projects.length > 0"
+            >
               <h5>Projets associés:</h5>
               <ul>
-                <li *ngFor="let project of skill.projects">{{project}}</li>
+                <li *ngFor="let project of skill.projects">{{ project }}</li>
               </ul>
             </div>
           </div>
           <div *ngIf="!skill.discovered" class="skill-locked">
             <i class="bi bi-lock"></i>
-            <span>Données cryptées. Utilisez le scanner pour révéler cette compétence.</span>
+            <span
+              >Données cryptées. Utilisez le scanner pour révéler cette
+              compétence.</span
+            >
           </div>
         </div>
       </div>
-      
+
       <!-- Message quand aucune catégorie n'est sélectionnée -->
       <div class="no-selection" *ngIf="!selectedCategory">
         <i class="bi bi-arrow-left-circle"></i>
-        <p>Veuillez sélectionner une catégorie de compétences pour commencer l'analyse.</p>
+        <p>
+          Veuillez sélectionner une catégorie de compétences pour commencer
+          l'analyse.
+        </p>
       </div>
     </div>
   </div>
-  
+
   <!-- Résumé des résultats -->
   <div class="results-summary" *ngIf="getDiscoveredSkillsCount() > 0">
     <div class="summary-header">
       <h3>Résumé d'analyse</h3>
       <div class="summary-progress">
         <div class="progress-text">
-          {{getDiscoveredSkillsCount()}} / {{getTotalSkillsCount()}} compétences identifiées
+          {{ getDiscoveredSkillsCount() }} /
+          {{ getTotalSkillsCount() }} compétences identifiées
         </div>
         <div class="progress-container">
-          <div class="progress-bar" [style.width.%]="getOverallCompletionPercentage()"></div>
+          <div
+            class="progress-bar"
+            [style.width.%]="getOverallCompletionPercentage()"
+          ></div>
         </div>
       </div>
     </div>
-    
+
     <div class="top-skills" *ngIf="getTopSkills().length > 0">
       <h4>Compétences clés identifiées</h4>
       <div class="top-skills-list">
@@ -149,33 +198,44 @@
             <i [class]="'bi ' + skill.icon"></i>
           </div>
           <div class="skill-info">
-            <span class="skill-name">{{skill.name}}</span>
+            <span class="skill-name">{{ skill.name }}</span>
             <div class="skill-rating">
-              <span *ngFor="let _ of [].constructor(5); let j = index" 
-                    class="rating-star"
-                    [class.filled]="j < skill.level">★</span>
+              <span
+                *ngFor="let _ of [].constructor(5); let j = index"
+                class="rating-star"
+                [class.filled]="j < skill.level"
+                >★</span
+              >
             </div>
           </div>
         </div>
       </div>
     </div>
-    
+
     <div class="skill-map" *ngIf="getDiscoveredSkillsCount() > 5">
       <h4>Cartographie des compétences</h4>
       <div class="radar-chart">
         <!-- Ici, on pourrait ajouter un composant de chart radar si on avait une bibliothèque de graphiques -->
         <div class="placeholder-chart">
-          <div class="chart-axis" *ngFor="let category of skillCategories; let i = index"
-               [style.--axis-angle]="i * (360 / skillCategories.length)">
-            <div class="axis-label">{{category.name}}</div>
+          <div
+            class="chart-axis"
+            *ngFor="let category of skillCategories; let i = index"
+            [style.--axis-angle]="i * (360 / skillCategories.length)"
+          >
+            <div class="axis-label">{{ category.name }}</div>
           </div>
           <div class="chart-web" *ngFor="let level of [0.2, 0.4, 0.6, 0.8, 1]">
             <div class="web-level" [style.--web-scale]="level"></div>
           </div>
           <div class="chart-area">
-            <div class="area-point" *ngFor="let category of skillCategories; let i = index"
-                 [style.--point-angle]="i * (360 / skillCategories.length)"
-                 [style.--point-distance]="getCategoryAverageLevel(category.id) / 5"></div>
+            <div
+              class="area-point"
+              *ngFor="let category of skillCategories; let i = index"
+              [style.--point-angle]="i * (360 / skillCategories.length)"
+              [style.--point-distance]="
+                getCategoryAverageLevel(category.id) / 5
+              "
+            ></div>
           </div>
         </div>
       </div>

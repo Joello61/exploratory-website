@@ -1,312 +1,412 @@
 <!-- Container principal -->
 <div class="case-file-container">
-    <!-- Dialog Box pour le contexte -->
-    <div class="dialog-container" *ngIf="isDialogOpen">
-      <div class="d-flex justify-content-end">
-        <div class="detective-container">
-          <img class="img" src="img/detective.png" alt="detective">
-        </div>
-      </div>
-      <div class="dialog-box">
-        <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
-          <i class="bi bi-x-circle fs-3"></i>
-        </button>
-        <div class="message px-5">
-          <!-- Utilisation du message directement depuis le service -->
-          <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
-        </div>
+  <!-- Dialog Box pour le contexte -->
+  <div class="dialog-container" *ngIf="isDialogOpen">
+    <div class="d-flex justify-content-end">
+      <div class="detective-container">
+        <img class="img" src="img/detective.png" alt="detective" />
       </div>
     </div>
-    <!-- Titre de la section avec informations de progression -->
-    <div class="section-header">
-      <h2 class="section-title">Dossier d'enquête: Expérience professionnelle</h2>
-      <div class="case-status">Statut :
-        <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
-        <span *ngIf="!isModuleCompleted" class="status-badge">En cours</span>
-      </div>
-    </div>
-  
-    <!-- Classeur de dossiers -->
-    <div class="case-folder">
-      <!-- Onglets des dossiers -->
-      <div class="folder-tabs">
-        <div *ngFor="let job of jobs; let i = index" 
-             class="folder-tab" 
-             [class.active]="selectedJobIndex === i"
-             (click)="selectJob(i)">
-          <div class="tab-label">Dossier {{i + 1}}</div>
-          <div class="confidence-level" *ngIf="jobCompletionStatus[i] > 0">
-            {{jobCompletionStatus[i]}}%
-          </div>
-        </div>
-      </div>
-  
-      <!-- Contenu du dossier sélectionné -->
-      <div class="folder-content" *ngIf="selectedJob">
-        <!-- En-tête du dossier avec info de base -->
-        <div class="folder-header">
-          <div class="folder-title">
-            <h3 class="confidential">CONFIDENTIEL</h3>
-            <h4 class="job-title">{{selectedJob.title}}</h4>
-            <div class="job-company">{{selectedJob.company}}</div>
-            <div class="job-period">{{selectedJob.period}}</div>
-          </div>
-          <div class="folder-stamp" [class.revealed]="isStampRevealed">
-            <div class="stamp-inner">DÉCLASSIFIÉ</div>
-          </div>
-        </div>
-  
-        <!-- Contenu principal - mission et indices -->
-        <div class="folder-body">
-          <!-- Description du job - initialement caché -->
-          <div class="job-description" [class.revealed]="isDescriptionRevealed">
-            <h5>Description de mission:</h5>
-            <p>{{selectedJob.description}}</p>
-          </div>
-  
-          <!-- Indices à découvrir -->
-          <div class="evidence-container">
-            <h5>Indices à examiner:</h5>
-            <div class="evidence-grid">
-              <div *ngFor="let clue of selectedJob.clues; let i = index" 
-                   class="evidence-item" 
-                   [class.discovered]="discoveredClues[selectedJobIndex] && discoveredClues[selectedJobIndex][i]"
-                   (click)="revealClue(i)">
-                <div class="evidence-cover">
-                  <i class="bi bi-lock"></i>
-                </div>
-                <div class="evidence-content">
-                  <div class="evidence-icon">
-                    <i [class]="'bi ' + clue.icon"></i>
-                  </div>
-                  <div class="evidence-text">
-                    <div class="evidence-title">{{clue.title}}</div>
-                    <div class="evidence-detail">{{clue.detail}}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-  
-          <!-- Compétences débloquées -->
-          <div class="skills-section" *ngIf="getDiscoveredSkills().length > 0">
-            <h5>Compétences identifiées:</h5>
-            <div class="skills-tags">
-              <div *ngFor="let skill of getDiscoveredSkills()" class="skill-tag">
-                {{skill}}
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Notes et hypothèses -->
-        <div class="investigation-notes" *ngIf="jobCompletionStatus[selectedJobIndex] >= 50">
-          <h5>Notes d'enquête:</h5>
-          <div class="notes-content">
-            <p>{{selectedJob.notes}}</p>
-          </div>
-        </div>
-  
-        <!-- Conclusions -->
-        <div class="case-conclusion" *ngIf="jobCompletionStatus[selectedJobIndex] === 100">
-          <h5>Conclusions:</h5>
-          <div class="conclusion-content">
-            <p>{{selectedJob.conclusion}}</p>
-          </div>
-          
-          <!-- Achievements débloqués -->
-          <div class="achievements">
-            <div class="achievement-badge">
-              <i class="bi bi-trophy"></i>
-              <span>{{selectedJob.achievement}}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Message de confirmation de complétion du module -->
-    <div class="completion-message" *ngIf="isModuleCompleted">
-      <div class="alert alert-success">
-        <i class="bi bi-check-circle-fill"></i>
-        Module complété ! L'analyse des expériences professionnelles a été réalisée avec succès.
-      </div>
-    </div>
-
-    <!-- Ajouter ce code juste avant la fermeture de la div .case-file-container -->
-
-<!-- Bouton Continuer (visible uniquement quand tous les dossiers sont déclassifiés) -->
-<div class="continue-section" *ngIf="areAllFilesCompleted()">
-  <button class="primary-action action-btn" (click)="openQuizModal()">
-    <i class="bi bi-arrow-right-circle"></i>
-    Continuer l'enquête
-  </button>
-</div>
-
-<!-- Modal Quiz -->
-<div class="modal-overlay" *ngIf="isQuizModalOpen" (click)="closeQuizModal()">
-  <div class="quiz-modal" (click)="$event.stopPropagation()">
-    <div class="quiz-header">
-      <h3>Vérification de l'enquête professionnelle</h3>
-      <button class="close-modal" (click)="closeQuizModal()">
-        <i class="bi bi-x-lg"></i>
+    <div class="dialog-box">
+      <button
+        (click)="closeDialogTypeWriter()"
+        type="button"
+        class="close-button"
+      >
+        <i class="bi bi-x-circle fs-3"></i>
       </button>
+      <div class="message px-5">
+        <!-- Utilisation du message directement depuis le service -->
+        <div>
+          {{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span>
+        </div>
+      </div>
     </div>
-    
-    <div class="quiz-content">
-      <!-- Type de quiz: matching -->
-      <div *ngIf="quizType === 'matching' && !quizCompleted">
-        <div class="quiz-instructions">
-          <p>Associez chaque compétence avec l'expérience professionnelle correspondante:</p>
+  </div>
+  <!-- Titre de la section avec informations de progression -->
+  <div class="section-header">
+    <h2 class="section-title">Dossier d'enquête: Expérience professionnelle</h2>
+    <div class="case-status">
+      Statut :
+      <span *ngIf="isModuleCompleted" class="status-badge completed"
+        >Complété</span
+      >
+      <span *ngIf="!isModuleCompleted" class="status-badge">En cours</span>
+    </div>
+  </div>
+
+  <!-- Classeur de dossiers -->
+  <div class="case-folder">
+    <!-- Onglets des dossiers -->
+    <div class="folder-tabs">
+      <div
+        *ngFor="let job of jobs; let i = index"
+        class="folder-tab"
+        [class.active]="selectedJobIndex === i"
+        (click)="selectJob(i)"
+      >
+        <div class="tab-label">Dossier {{ i + 1 }}</div>
+        <div class="confidence-level" *ngIf="jobCompletionStatus[i] > 0">
+          {{ jobCompletionStatus[i] }}%
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenu du dossier sélectionné -->
+    <div class="folder-content" *ngIf="selectedJob">
+      <!-- En-tête du dossier avec info de base -->
+      <div class="folder-header">
+        <div class="folder-title">
+          <h3 class="confidential">CONFIDENTIEL</h3>
+          <h4 class="job-title">{{ selectedJob.title }}</h4>
+          <div class="job-company">{{ selectedJob.company }}</div>
+          <div class="job-period">{{ selectedJob.period }}</div>
+        </div>
+        <div class="folder-stamp" [class.revealed]="isStampRevealed">
+          <div class="stamp-inner">DÉCLASSIFIÉ</div>
+        </div>
+      </div>
+
+      <!-- Contenu principal - mission et indices -->
+      <div class="folder-body">
+        <!-- Description du job - initialement caché -->
+        <div class="job-description" [class.revealed]="isDescriptionRevealed">
+          <h5>Description de mission:</h5>
+          <p>{{ selectedJob.description }}</p>
         </div>
 
-        <div class="matching-container">
-          <div class="skills-column">
-            <div class="skill-item" 
+        <!-- Indices à découvrir -->
+        <div class="evidence-container">
+          <h5>Indices à examiner:</h5>
+          <div class="evidence-grid">
+            <div
+              *ngFor="let clue of selectedJob.clues; let i = index"
+              class="evidence-item"
+              [class.discovered]="
+                discoveredClues[selectedJobIndex] &&
+                discoveredClues[selectedJobIndex][i]
+              "
+              (click)="revealClue(i)"
+            >
+              <div class="evidence-cover">
+                <i class="bi bi-lock"></i>
+              </div>
+              <div class="evidence-content">
+                <div class="evidence-icon">
+                  <i [class]="'bi ' + clue.icon"></i>
+                </div>
+                <div class="evidence-text">
+                  <div class="evidence-title">{{ clue.title }}</div>
+                  <div class="evidence-detail">{{ clue.detail }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compétences débloquées -->
+        <div class="skills-section" *ngIf="getDiscoveredSkills().length > 0">
+          <h5>Compétences identifiées:</h5>
+          <div class="skills-tags">
+            <div *ngFor="let skill of getDiscoveredSkills()" class="skill-tag">
+              {{ skill }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes et hypothèses -->
+      <div
+        class="investigation-notes"
+        *ngIf="jobCompletionStatus[selectedJobIndex] >= 50"
+      >
+        <h5>Notes d'enquête:</h5>
+        <div class="notes-content">
+          <p>{{ selectedJob.notes }}</p>
+        </div>
+      </div>
+
+      <!-- Conclusions -->
+      <div
+        class="case-conclusion"
+        *ngIf="jobCompletionStatus[selectedJobIndex] === 100"
+      >
+        <h5>Conclusions:</h5>
+        <div class="conclusion-content">
+          <p>{{ selectedJob.conclusion }}</p>
+        </div>
+
+        <!-- Achievements débloqués -->
+        <div class="achievements">
+          <div class="achievement-badge">
+            <i class="bi bi-trophy"></i>
+            <span>{{ selectedJob.achievement }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message de confirmation de complétion du module -->
+  <div class="completion-message" *ngIf="isModuleCompleted">
+    <div class="alert alert-success">
+      <i class="bi bi-check-circle-fill"></i>
+      Module complété ! L'analyse des expériences professionnelles a été
+      réalisée avec succès.
+    </div>
+  </div>
+
+  <!-- Ajouter ce code juste avant la fermeture de la div .case-file-container -->
+
+  <!-- Bouton Continuer (visible uniquement quand tous les dossiers sont déclassifiés) -->
+  <div class="continue-section" *ngIf="areAllFilesCompleted()">
+    <button class="primary-action action-btn" (click)="openQuizModal()">
+      <i class="bi bi-arrow-right-circle"></i>
+      Continuer l'enquête
+    </button>
+  </div>
+
+  <!-- Modal Quiz -->
+  <div class="modal-overlay" *ngIf="isQuizModalOpen" (click)="closeQuizModal()">
+    <div class="quiz-modal" (click)="$event.stopPropagation()">
+      <div class="quiz-header">
+        <h3>Vérification de l'enquête professionnelle</h3>
+        <button class="close-modal" (click)="closeQuizModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="quiz-content">
+        <!-- Type de quiz: matching -->
+        <div *ngIf="quizType === 'matching' && !quizCompleted">
+          <div class="quiz-instructions">
+            <p>
+              Associez chaque compétence avec l'expérience professionnelle
+              correspondante:
+            </p>
+          </div>
+
+          <div class="matching-container">
+            <div class="skills-column">
+              <div
+                class="skill-item"
                 *ngFor="let skill of matchingSkills; let i = index"
                 [class.selected]="selectedSkillIndex === i"
                 [class.matched]="skillMatched[i]"
-                (click)="selectSkill(i)">
-              <div class="skill-item-inner">{{skill}}</div>
+                (click)="selectSkill(i)"
+              >
+                <div class="skill-item-inner">{{ skill }}</div>
+              </div>
             </div>
-          </div>
-          
-          <div class="jobs-column">
-            <div class="job-item" 
+
+            <div class="jobs-column">
+              <div
+                class="job-item"
                 *ngFor="let job of matchingJobs; let i = index"
                 [class.selected]="selectedJobMatchIndex === i"
                 [class.matched]="jobMatched[i]"
                 [class.incorrect]="incorrectMatch === i"
-                (click)="selectJobMatch(i)">
-              <div class="job-item-inner">
-                <span class="job-title-match">{{job.title}}</span>
-                <span class="job-company-match">{{job.company}}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="matching-progress">
-          <div class="progress-text">{{getCorrectMatchesCount()}} / {{matchingSkills.length}} associations correctes</div>
-          <div class="progress-bar">
-            <div class="progress-fill" [style.width.%]="(getCorrectMatchesCount() / matchingSkills.length) * 100"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Type de quiz: chronology -->
-      <div *ngIf="quizType === 'chronology' && !quizCompleted">
-        <div class="quiz-instructions">
-          <p>Remettez les expériences professionnelles dans l'ordre chronologique:</p>
-        </div>
-
-        <div class="chronology-container" cdkDropList (cdkDropListDropped)="dropJob($event)">
-          <div class="job-chronology-item" 
-               *ngFor="let job of chronologyJobs; let i = index"
-               [class.correct-position]="isJobInCorrectPosition(i)"
-               cdkDrag
-               [cdkDragDisabled]="chronologyChecked">
-            <div class="job-chronology-inner">
-              <div class="job-number">{{i + 1}}</div>
-              <div class="job-info">
-                <div class="job-title-chrono">{{job.title}}</div>
-                <div class="job-company-chrono">{{job.company}}</div>
-              </div>
-              <div class="drag-handle">
-                <i class="bi bi-grip-vertical"></i>
-              </div>
-            </div>
-            <!-- Élément de prévisualisation personnalisé pendant le drag -->
-            <div class="custom-drag-preview" *cdkDragPreview>
-              <div class="job-chronology-inner">
-                <div class="job-number">{{i + 1}}</div>
-                <div class="job-info">
-                  <div class="job-title-chrono">{{job.title}}</div>
-                  <div class="job-company-chrono">{{job.company}}</div>
+                (click)="selectJobMatch(i)"
+              >
+                <div class="job-item-inner">
+                  <span class="job-title-match">{{ job.title }}</span>
+                  <span class="job-company-match">{{ job.company }}</span>
                 </div>
               </div>
             </div>
           </div>
+
+          <div class="matching-progress">
+            <div class="progress-text">
+              {{ getCorrectMatchesCount() }} /
+              {{ matchingSkills.length }} associations correctes
+            </div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                [style.width.%]="
+                  (getCorrectMatchesCount() / matchingSkills.length) * 100
+                "
+              ></div>
+            </div>
+          </div>
         </div>
-        
-        <div class="check-order-container" *ngIf="!chronologyChecked">
-          <button class="secondary-action action-btn" (click)="checkChronologyOrder()">
-            Vérifier l'ordre
-          </button>
+
+        <!-- Type de quiz: chronology -->
+        <div *ngIf="quizType === 'chronology' && !quizCompleted">
+          <div class="quiz-instructions">
+            <p>
+              Remettez les expériences professionnelles dans l'ordre
+              chronologique:
+            </p>
+          </div>
+
+          <div
+            class="chronology-container"
+            cdkDropList
+            (cdkDropListDropped)="dropJob($event)"
+          >
+            <div
+              class="job-chronology-item"
+              *ngFor="let job of chronologyJobs; let i = index"
+              [class.correct-position]="isJobInCorrectPosition(i)"
+              cdkDrag
+              [cdkDragDisabled]="chronologyChecked"
+            >
+              <div class="job-chronology-inner">
+                <div class="job-number">{{ i + 1 }}</div>
+                <div class="job-info">
+                  <div class="job-title-chrono">{{ job.title }}</div>
+                  <div class="job-company-chrono">{{ job.company }}</div>
+                </div>
+                <div class="drag-handle">
+                  <i class="bi bi-grip-vertical"></i>
+                </div>
+              </div>
+              <!-- Élément de prévisualisation personnalisé pendant le drag -->
+              <div class="custom-drag-preview" *cdkDragPreview>
+                <div class="job-chronology-inner">
+                  <div class="job-number">{{ i + 1 }}</div>
+                  <div class="job-info">
+                    <div class="job-title-chrono">{{ job.title }}</div>
+                    <div class="job-company-chrono">{{ job.company }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="check-order-container" *ngIf="!chronologyChecked">
+            <button
+              class="secondary-action action-btn"
+              (click)="checkChronologyOrder()"
+            >
+              Vérifier l'ordre
+            </button>
+          </div>
+
+          <div class="chronology-feedback" *ngIf="chronologyChecked">
+            <div
+              class="feedback-message"
+              [class.correct]="isChronologyCorrect"
+              [class.incorrect]="!isChronologyCorrect"
+            >
+              <i
+                class="bi"
+                [ngClass]="
+                  isChronologyCorrect ? 'bi-check-circle' : 'bi-x-circle'
+                "
+              ></i>
+              <span>{{
+                isChronologyCorrect
+                  ? "Ordre chronologique correct !"
+                  : "L'ordre n'est pas correct. Réessayez."
+              }}</span>
+            </div>
+          </div>
         </div>
-        
-        <div class="chronology-feedback" *ngIf="chronologyChecked">
-          <div class="feedback-message" [class.correct]="isChronologyCorrect" [class.incorrect]="!isChronologyCorrect">
-            <i class="bi" [ngClass]="isChronologyCorrect ? 'bi-check-circle' : 'bi-x-circle'"></i>
-            <span>{{isChronologyCorrect ? 'Ordre chronologique correct !' : 'L\'ordre n\'est pas correct. Réessayez.'}}</span>
+
+        <!-- Résultats du quiz -->
+        <div class="quiz-results" *ngIf="quizCompleted">
+          <h4>Analyse des résultats</h4>
+
+          <div class="results-score">
+            <div class="score-circle">
+              <div class="score-value">{{ quizScore }}%</div>
+            </div>
+            <div class="score-label">Score final</div>
+          </div>
+
+          <div class="results-message">
+            <p *ngIf="quizPassed">
+              Félicitations ! Vous avez bien compris le parcours professionnel
+              du sujet.
+            </p>
+            <p *ngIf="!quizPassed">
+              Vous devriez revoir certains éléments du dossier professionnel.
+            </p>
+          </div>
+
+          <div class="results-details">
+            <div class="detail-item" *ngIf="quizType === 'matching'">
+              <span class="detail-label">Associations correctes:</span>
+              <span class="detail-value"
+                >{{ getCorrectMatchesCount() }} /
+                {{ matchingSkills.length }}</span
+              >
+            </div>
+            <div class="detail-item" *ngIf="quizType === 'chronology'">
+              <span class="detail-label">Ordre chronologique:</span>
+              <span class="detail-value">{{
+                isChronologyCorrect ? "Correct" : "Incorrect"
+              }}</span>
+            </div>
           </div>
         </div>
       </div>
-      
-      <!-- Résultats du quiz -->
-      <div class="quiz-results" *ngIf="quizCompleted">
-        <h4>Analyse des résultats</h4>
-        
-        <div class="results-score">
-          <div class="score-circle">
-            <div class="score-value">{{quizScore}}%</div>
-          </div>
-          <div class="score-label">Score final</div>
-        </div>
-        
-        <div class="results-message">
-          <p *ngIf="quizPassed">Félicitations ! Vous avez bien compris le parcours professionnel du sujet.</p>
-          <p *ngIf="!quizPassed">Vous devriez revoir certains éléments du dossier professionnel.</p>
-        </div>
-        
-        <div class="results-details">
-          <div class="detail-item" *ngIf="quizType === 'matching'">
-            <span class="detail-label">Associations correctes:</span>
-            <span class="detail-value">{{getCorrectMatchesCount()}} / {{matchingSkills.length}}</span>
-          </div>
-          <div class="detail-item" *ngIf="quizType === 'chronology'">
-            <span class="detail-label">Ordre chronologique:</span>
-            <span class="detail-value">{{isChronologyCorrect ? 'Correct' : 'Incorrect'}}</span>
-          </div>
-        </div>
+
+      <div class="quiz-footer">
+        <!-- Boutons pour le quiz de matching -->
+        <button
+          *ngIf="
+            quizType === 'matching' &&
+            selectedSkillIndex !== null &&
+            selectedJobMatchIndex !== null &&
+            !skillMatched[selectedSkillIndex] &&
+            !jobMatched[selectedJobMatchIndex]
+          "
+          class="secondary-action action-btn"
+          (click)="checkMatch()"
+        >
+          Vérifier l'association
+        </button>
+
+        <!-- Boutons pour le quiz de chronologie après vérification -->
+        <button
+          *ngIf="
+            quizType === 'chronology' &&
+            chronologyChecked &&
+            !isChronologyCorrect
+          "
+          class="secondary-action action-btn"
+          (click)="resetChronology()"
+        >
+          Réessayer
+        </button>
+
+        <!-- Bouton pour passer au quiz suivant -->
+        <button
+          *ngIf="
+            (quizType === 'matching' && allSkillsMatched()) ||
+            (quizType === 'chronology' && isChronologyCorrect)
+          "
+          class="primary-action action-btn"
+          (click)="goToNextQuiz()"
+        >
+          {{
+            quizIndex < quizTypes.length - 1
+              ? "Quiz suivant"
+              : "Voir les résultats"
+          }}
+        </button>
+
+        <!-- Boutons pour les résultats -->
+        <button
+          *ngIf="quizCompleted && quizPassed"
+          class="primary-action action-btn"
+          (click)="navigateToNextPage()"
+        >
+          Continuer l'enquête
+        </button>
+
+        <button
+          *ngIf="quizCompleted && !quizPassed"
+          class="secondary-action action-btn"
+          (click)="restartQuiz()"
+        >
+          Réessayer
+        </button>
       </div>
-    </div>
-    
-    <div class="quiz-footer">
-      <!-- Boutons pour le quiz de matching -->
-      <button *ngIf="quizType === 'matching' && selectedSkillIndex !== null && selectedJobMatchIndex !== null && !skillMatched[selectedSkillIndex] && !jobMatched[selectedJobMatchIndex]"
-              class="secondary-action action-btn"
-              (click)="checkMatch()">
-        Vérifier l'association
-      </button>
-      
-      <!-- Boutons pour le quiz de chronologie après vérification -->
-      <button *ngIf="quizType === 'chronology' && chronologyChecked && !isChronologyCorrect"
-              class="secondary-action action-btn"
-              (click)="resetChronology()">
-        Réessayer
-      </button>
-      
-      <!-- Bouton pour passer au quiz suivant -->
-      <button *ngIf="(quizType === 'matching' && allSkillsMatched()) || (quizType === 'chronology' && isChronologyCorrect)"
-              class="primary-action action-btn"
-              (click)="goToNextQuiz()">
-        {{quizIndex < quizTypes.length - 1 ? 'Quiz suivant' : 'Voir les résultats'}}
-      </button>
-      
-      <!-- Boutons pour les résultats -->
-      <button *ngIf="quizCompleted && quizPassed"
-              class="primary-action action-btn"
-              (click)="navigateToNextPage()">
-        Continuer l'enquête
-      </button>
-      
-      <button *ngIf="quizCompleted && !quizPassed"
-              class="secondary-action action-btn"
-              (click)="restartQuiz()">
-        Réessayer
-      </button>
     </div>
   </div>
 </div>
-  </div>

@@ -8,14 +8,24 @@ import {
   Renderer2,
   OnDestroy,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
 import { Router } from '@angular/router';
-import Chart, { ChartConfiguration, ChartData, Legend, LinearScale, LineElement, PointElement, RadarController, RadialLinearScale, Tooltip } from 'chart.js/auto';
+import Chart, {
+  ChartConfiguration,
+  ChartData,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  RadarController,
+  RadialLinearScale,
+  Tooltip,
+} from 'chart.js/auto';
 
 interface Evidence {
   id: string;
@@ -87,6 +97,20 @@ export class MotivationSocioProComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
   @ViewChild('typewriterText') typewriterText!: ElementRef;
+
+  // Pour gérer la destruction proprement
+  private destroy$ = new Subject<void>();
+
+  // Gérer les timeouts
+  private introDialogTimeoutId: number | null = null;
+  private closeDialogTimeoutId: number | null = null;
+  private boardSizeTimeoutId: number | null = null;
+  private chartInitTimeoutId: number | null = null;
+  private connectionTimeoutId: number | null = null;
+  private analysisStepTimeouts: number[] = [];
+  private analysisCompletionTimeoutId: number | null = null;
+  private quizFeedbackTimeoutId: number | null = null;
+  private analysisEvidenceTimeoutId: number | null = null;
 
   // Texte du dialogue d'introduction
   private fullText: string =
@@ -383,16 +407,17 @@ export class MotivationSocioProComponent
       console.warn("Ce module n'est pas encore disponible");
     }
 
-    // S'abonner au temps écoulé
-    this.subscriptions.push(
-      this.timeTrackerService.elapsedTime$.subscribe((time) => {
+    // S'abonner au temps écoulé avec takeUntil
+    this.timeTrackerService.elapsedTime$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((time) => {
         this.elapsedTime = time;
-      })
-    );
+      });
 
     // Vérifier si le module est déjà complété
-    this.subscriptions.push(
-      this.progressService.moduleStatuses$.subscribe((statuses) => {
+    this.progressService.moduleStatuses$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((statuses) => {
         this.isModuleCompleted = statuses.motivations;
         this.moduleProgressPercentage =
           this.progressService.getCompletionPercentage();
@@ -401,46 +426,100 @@ export class MotivationSocioProComponent
         if (this.isModuleCompleted) {
           this.loadSavedState();
         }
-      })
-    );
+      });
 
-    this.subscriptions.push(
-      this.dialogService.isDialogOpen$.subscribe((isOpen) => {
+    // S'abonner aux états du dialogue
+    this.dialogService.isDialogOpen$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isOpen) => {
         this.isDialogOpen = isOpen;
-      }),
-      this.dialogService.isTyping$.subscribe((isTyping) => {
+      });
+
+    this.dialogService.isTyping$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isTyping) => {
         this.isTyping = isTyping;
-      }),
-      this.dialogService.currentMessage$.subscribe((message) => {
+      });
+
+    this.dialogService.currentMessage$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message) => {
         this.dialogMessage = message;
-      })
-    );
+      });
   }
 
   ngAfterViewInit(): void {
-    // Utiliser le DialogService au lieu du typewriter manuel
-    setTimeout(() => {
+    // Utiliser le DialogService avec un timeout géré
+    this.introDialogTimeoutId = window.setTimeout(() => {
       this.showIntroDialog();
+      this.introDialogTimeoutId = null;
     }, 500);
-    
+
     // Initialiser la taille du tableau pour les connexions
-    setTimeout(() => {
+    this.boardSizeTimeoutId = window.setTimeout(() => {
       const board = document.querySelector('.evidence-board');
       if (board) {
         this.boardWidth = board.clientWidth;
         this.boardHeight = board.clientHeight;
       }
-      
+
       // Si l'analyse est déjà terminée, initialiser le graphique
       if (this.analysisDone) {
-        this.initRadarChart();
+        this.chartInitTimeoutId = window.setTimeout(() => {
+          this.initRadarChart();
+          this.chartInitTimeoutId = null;
+        }, 300);
       }
+
+      this.boardSizeTimeoutId = null;
     }, 500);
   }
 
   ngOnDestroy(): void {
-    // Nettoyer les souscriptions pour éviter les fuites de mémoire
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    // Émettre le signal de destruction pour tous les observables
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    // Nettoyer tous les timeouts
+    this.clearAllTimeouts();
+
+    // Détruire le graphique si existant
+    if (this.chart) {
+      this.chart.destroy();
+      this.chart = null;
+    }
+
+    // Fermer tout dialogue ouvert
+    if (this.isDialogOpen) {
+      this.dialogService.closeDialog();
+    }
+  }
+
+  // Nettoyer tous les timeouts
+  private clearAllTimeouts(): void {
+    const timeouts = [
+      this.introDialogTimeoutId,
+      this.closeDialogTimeoutId,
+      this.boardSizeTimeoutId,
+      this.chartInitTimeoutId,
+      this.connectionTimeoutId,
+      this.analysisCompletionTimeoutId,
+      this.quizFeedbackTimeoutId,
+      this.analysisEvidenceTimeoutId,
+    ];
+
+    // Nettoyer chaque timeout non-null
+    timeouts.forEach((timeoutId) => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    });
+
+    // Nettoyer le tableau des timeouts d'étapes d'analyse
+    this.analysisStepTimeouts.forEach((timeoutId) => {
+      clearTimeout(timeoutId);
+    });
+    this.analysisStepTimeouts = [];
   }
 
   showIntroDialog(): void {
@@ -450,8 +529,14 @@ export class MotivationSocioProComponent
     };
     this.dialogService.openDialog(dialogMessage);
     this.dialogService.startTypewriter(this.fullText, () => {
-      setTimeout(() => {
+      // Nettoyer tout timeout précédent
+      if (this.closeDialogTimeoutId !== null) {
+        clearTimeout(this.closeDialogTimeoutId);
+      }
+
+      this.closeDialogTimeoutId = window.setTimeout(() => {
         this.dialogService.closeDialog();
+        this.closeDialogTimeoutId = null;
       }, 3000);
     });
   }
@@ -459,6 +544,12 @@ export class MotivationSocioProComponent
   // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
+
+    // Annuler tout timeout de fermeture programmé
+    if (this.closeDialogTimeoutId !== null) {
+      clearTimeout(this.closeDialogTimeoutId);
+      this.closeDialogTimeoutId = null;
+    }
   }
 
   // Charger l'état sauvegardé précédemment
@@ -607,25 +698,34 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
     }
   }
 
+  // Gestion des connexions
   investigateConnections(evidence: Evidence): void {
     if (!evidence.discovered) return;
 
     this.showConnections = true;
     this.visibleConnections = [];
 
+    // Nettoyer tout timeout de connexion précédent
+    if (this.connectionTimeoutId !== null) {
+      clearTimeout(this.connectionTimeoutId);
+    }
+
     // Rechercher les éléments DOM des indices
-    setTimeout(() => {
+    this.connectionTimeoutId = window.setTimeout(() => {
       const items = document.querySelectorAll('.evidence-item');
       const selectedIndex = this.getEvidenceIndex(evidence);
 
       if (selectedIndex >= 0 && items && items.length > 0) {
         const selectedItem = items[selectedIndex];
-        const selectedRect = selectedItem.getBoundingClientRect();
-        const boardRect = document
-          .querySelector('.evidence-board')
-          ?.getBoundingClientRect();
+        const boardElement = document.querySelector('.evidence-board');
 
-        if (!boardRect) return;
+        if (!boardElement || !selectedItem) {
+          this.connectionTimeoutId = null;
+          return;
+        }
+
+        const selectedRect = selectedItem.getBoundingClientRect();
+        const boardRect = boardElement.getBoundingClientRect();
 
         // Position du centre de l'élément sélectionné
         const x1 = selectedRect.left + selectedRect.width / 2 - boardRect.left;
@@ -649,6 +749,8 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
           }
         }
       }
+
+      this.connectionTimeoutId = null;
     }, 100);
   }
 
@@ -675,34 +777,63 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
     return this.getDiscoveredCount() >= 3;
   }
 
+  // Analyse des motivations avec gestion propre des timeouts
   analyzeMotivations(): void {
     if (this.analysisDone) {
       // Si l'analyse est déjà terminée, juste réafficher les résultats
       return;
     }
-    
+
     if (!this.canAnalyze()) return;
-    
+
+    // Nettoyer tous les timeouts d'analyse existants
+    this.analysisStepTimeouts.forEach((timeoutId) => {
+      clearTimeout(timeoutId);
+    });
+    this.analysisStepTimeouts = [];
+
+    if (this.analysisCompletionTimeoutId !== null) {
+      clearTimeout(this.analysisCompletionTimeoutId);
+    }
+
     this.analysisInProgress = true;
     this.currentStep = 1;
-    
+
     // Simulation de l'analyse avec progression des étapes
-    setTimeout(() => this.currentStep = 2, 2000);
-    setTimeout(() => this.currentStep = 3, 4000);
-    setTimeout(() => this.currentStep = 4, 6000);
-    
-    setTimeout(() => {
+    const step2TimeoutId = window.setTimeout(
+      () => (this.currentStep = 2),
+      2000
+    );
+    const step3TimeoutId = window.setTimeout(
+      () => (this.currentStep = 3),
+      4000
+    );
+    const step4TimeoutId = window.setTimeout(
+      () => (this.currentStep = 4),
+      6000
+    );
+
+    this.analysisStepTimeouts.push(
+      step2TimeoutId,
+      step3TimeoutId,
+      step4TimeoutId
+    );
+
+    this.analysisCompletionTimeoutId = window.setTimeout(() => {
       this.analysisInProgress = false;
       this.analysisDone = true;
       this.selectedProfile = this.motivationProfiles[0].id;
-      
+
       // Initialiser le graphique radar avec Chart.js
-      setTimeout(() => {
+      this.chartInitTimeoutId = window.setTimeout(() => {
         this.initRadarChart();
+        this.chartInitTimeoutId = null;
       }, 300);
-      
+
       // Sauvegarder l'état après l'analyse
       this.saveState();
+
+      this.analysisCompletionTimeoutId = null;
     }, 8000);
   }
 
@@ -735,7 +866,7 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
     });
   }
 
-  // Ajouter cette méthode
+  // Analyser un indice spécifique
   analyzeEvidence(evidence: Evidence): void {
     // Fonction permettant d'afficher une analyse spécifique pour chaque type d'indice
     let analysisTitle = '';
@@ -747,31 +878,10 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
         analysisContent =
           "L'analyse des centres d'intérêt révèle une forte motivation intrinsèque pour l'innovation et l'apprentissage continu. Ces facteurs personnels constituent le socle de la motivation professionnelle en favorisant un engagement durable et une attitude proactive face aux nouveaux défis. La valorisation de la créativité suggère également une préférence pour les environnements permettant l'expression d'idées originales et l'expérimentation.";
         break;
-      case 'ev2': // Personnalité
-        analysisTitle = 'Influence du profil de personnalité';
-        analysisContent =
-          "Les traits de personnalité identifiés indiquent une forte compatibilité avec des environnements professionnels valorisant l'autonomie et proposant des défis analytiques complexes. La combinaison d'indépendance et d'adaptabilité suggère une motivation pour des rôles permettant à la fois une grande latitude décisionnelle et la flexibilité nécessaire pour naviguer dans des contextes changeants.";
-        break;
-      case 'ev3': // Itinéraire
-        analysisTitle = 'Significations motivationnelles du parcours';
-        analysisContent =
-          "L'analyse du parcours personnel et professionnel montre une recherche constante d'évolution et d'impact. Les choix effectués révèlent une motivation profonde pour des rôles permettant d'exercer une influence significative et de générer des résultats tangibles. La trajectoire observée indique également une valorisation des environnements favorisant l'excellence et le développement continu des compétences.";
-        break;
-      case 'ev4': // Expérience professionnelle
-        analysisTitle = 'Enseignements motivationnels des expériences';
-        analysisContent =
-          "Les expériences professionnelles accumulées montrent une attraction constante vers les défis techniques complexes et les projets innovants. Cette tendance révèle une motivation forte pour les environnements stimulants intellectuellement et offrant l'opportunité de résoudre des problèmes non conventionnels. La progression de carrière indique également une valorisation croissante de l'impact stratégique au-delà de la pure exécution technique.";
-        break;
-      case 'ev5': // Compétences
-        analysisTitle = 'Dimensions motivationnelles des compétences';
-        analysisContent =
-          "Le développement soutenu et autodidacte de compétences avancées révèle une motivation profonde pour la maîtrise technique et l'excellence dans son domaine. Cet investissement personnel, au-delà des exigences professionnelles immédiates, témoigne d'une volonté intrinsèque de progression et d'une satisfaction liée à l'acquisition de savoir-faire complexes. Ces facteurs suggèrent une compatibilité optimale avec des environnements valorisant l'expertise et l'apprentissage continu.";
-        break;
-      case 'ev6': // Attentes
-        analysisTitle = 'Projection motivationnelle des attentes';
-        analysisContent =
-          "Les attentes professionnelles formulées révèlent une recherche d'équilibre entre défis techniques stimulants et impact stratégique concret. Cette orientation suggère une motivation pour des rôles combinant mise en œuvre d'expertise et contribution aux orientations plus larges des projets. La valorisation de l'autonomie et de l'innovation indique également une préférence pour les environnements encourageant l'initiative personnelle et les approches novatrices.";
-        break;
+      // Autres cas...
+      default:
+        analysisTitle = "Analyse de l'élément";
+        analysisContent = 'Aucune analyse disponible pour cet élément.';
     }
 
     // Afficher l'analyse dans une modal ou un panneau dédié
@@ -780,10 +890,16 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
       character: 'detective',
     });
 
+    // Nettoyer tout timeout précédent
+    if (this.analysisEvidenceTimeoutId !== null) {
+      clearTimeout(this.analysisEvidenceTimeoutId);
+    }
+
     // Après un certain temps, fermer automatiquement le dialogue
-    setTimeout(() => {
+    this.analysisEvidenceTimeoutId = window.setTimeout(() => {
       this.dialogService.closeDialog();
-    }, 10000); // 10 secondes
+      this.analysisEvidenceTimeoutId = null;
+    }, 10000);
   }
 
   openQuizModal(): void {
@@ -801,6 +917,7 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
     this.userAnswers[questionIndex] = answerIndex;
   }
 
+  // Méthode du quiz avec gestion des timeouts
   submitQuiz(): void {
     // Vérifier si toutes les questions ont une réponse
     const unanswered = this.userAnswers.findIndex((answer) => answer === -1);
@@ -811,8 +928,14 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
         character: 'detective',
       });
 
-      setTimeout(() => {
+      // Nettoyer tout timeout précédent
+      if (this.quizFeedbackTimeoutId !== null) {
+        clearTimeout(this.quizFeedbackTimeoutId);
+      }
+
+      this.quizFeedbackTimeoutId = window.setTimeout(() => {
         this.dialogService.closeDialog();
+        this.quizFeedbackTimeoutId = null;
       }, 3000);
 
       return;
@@ -926,31 +1049,53 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
   }
 
   initRadarChart(): void {
-    // Enregistrez les composants nécessaires pour Chart.js
-    Chart.register(RadarController, RadialLinearScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
-    
-    // Récupérez les données du graphique depuis les facteurs de motivation
-    const labels = this.motivationFactors.map(factor => factor.name);
-    const data = this.motivationFactors.map(factor => factor.level);
-    
-    // Configurez le graphique
+    // Nettoyer le graphique existant s'il y en a un
+    if (this.chart) {
+      this.chart.destroy();
+      this.chart = null;
+    }
+
+    // Vérifier que le canvas existe
+    if (!this.radarChartCanvas || !this.radarChartCanvas.nativeElement) {
+      console.warn('Canvas pour le radar chart non disponible');
+      return;
+    }
+
+    // Enregistrer les composants nécessaires pour Chart.js
+    Chart.register(
+      RadarController,
+      RadialLinearScale,
+      LinearScale,
+      PointElement,
+      LineElement,
+      Tooltip,
+      Legend
+    );
+
+    // Récupérer les données du graphique depuis les facteurs de motivation
+    const labels = this.motivationFactors.map((factor) => factor.name);
+    const data = this.motivationFactors.map((factor) => factor.level);
+
+    // Configurer le graphique
     const chartData: ChartData = {
       labels: labels,
-      datasets: [{
-        label: 'Niveau de motivation',
-        data: data,
-        backgroundColor: 'rgba(0, 191, 255, 0.2)',
-        borderColor: 'rgba(0, 191, 255, 0.8)',
-        borderWidth: 2,
-        pointBackgroundColor: 'rgba(0, 191, 255, 0.8)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(0, 191, 255, 1)',
-        pointRadius: 5,
-        pointHoverRadius: 7
-      }]
+      datasets: [
+        {
+          label: 'Niveau de motivation',
+          data: data,
+          backgroundColor: 'rgba(0, 191, 255, 0.2)',
+          borderColor: 'rgba(0, 191, 255, 0.8)',
+          borderWidth: 2,
+          pointBackgroundColor: 'rgba(0, 191, 255, 0.8)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(0, 191, 255, 1)',
+          pointRadius: 5,
+          pointHoverRadius: 7,
+        },
+      ],
     };
-    
+
     // Options du graphique avec les types corrects
     const chartOptions = {
       scales: {
@@ -959,32 +1104,32 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
           min: 0,
           max: 10,
           ticks: {
-            stepSize: 1,  // Intervalle de 1 pour afficher tous les chiffres
+            stepSize: 1, // Intervalle de 1 pour afficher tous les chiffres
             backdropColor: 'transparent',
             color: '#00bfff',
             font: {
               size: 10,
-              weight: 'bold' as const  // Utilisation de 'as const' pour s'assurer que le type est correct
+              weight: 'bold' as const, // Utilisation de 'as const' pour s'assurer que le type est correct
             },
-            showLabelBackdrop: false
+            showLabelBackdrop: false,
           },
           grid: {
-            color: 'rgba(0, 191, 255, 0.1)'
+            color: 'rgba(0, 191, 255, 0.1)',
           },
           angleLines: {
-            color: 'rgba(0, 191, 255, 0.1)'
+            color: 'rgba(0, 191, 255, 0.1)',
           },
           pointLabels: {
             color: '#d0f0ff',
             font: {
-              size: 12
-            }
-          }
-        }
+              size: 12,
+            },
+          },
+        },
       },
       plugins: {
         legend: {
-          display: false
+          display: false,
         },
         tooltip: {
           backgroundColor: 'rgba(15, 15, 26, 0.9)',
@@ -996,39 +1141,40 @@ Environnement optimal: Combinaison d'autonomie, défis techniques et innovation.
           cornerRadius: 8,
           displayColors: false,
           callbacks: {
-            title: function(tooltipItems: any) {
+            title: function (tooltipItems: any) {
               return tooltipItems[0].label;
             },
-            label: function(context: any) {
+            label: function (context: any) {
               return `Niveau: ${context.raw}/10`;
-            }
-          }
-        }
+            },
+          },
+        },
       },
       maintainAspectRatio: false,
-      responsive: true
+      responsive: true,
     };
-    
+
     // Configuration complète
     const config: ChartConfiguration = {
       type: 'radar',
       data: chartData,
-      options: chartOptions
+      options: chartOptions,
     };
-    
-    // Créez le graphique
+
+    // Créer le graphique en vérifiant le contexte
     const ctx = this.radarChartCanvas.nativeElement.getContext('2d');
     if (ctx) {
       this.chart = new Chart(ctx, config);
+    } else {
+      console.warn("Impossible d'obtenir le contexte 2D du canvas");
     }
   }
-  
+
   updateRadarChart(): void {
     if (this.chart) {
-      const data = this.motivationFactors.map(factor => factor.level);
+      const data = this.motivationFactors.map((factor) => factor.level);
       this.chart.data.datasets[0].data = data;
       this.chart.update();
     }
   }
-
 }

@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   // Clés de stockage localStorage
@@ -12,15 +12,16 @@ export class AuthService {
 
   // BehaviorSubjects pour la réactivité
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
-  public isAuthenticated$: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
-  
+  public isAuthenticated$: Observable<boolean> =
+    this.isAuthenticatedSubject.asObservable();
+
   private agentIdSubject = new BehaviorSubject<string>('');
   public agentId$: Observable<string> = this.agentIdSubject.asObservable();
 
   // Propriétés pour la visualisation de l'authentification
   public isAuthenticating: boolean = false;
   public isScanning: boolean = false;
-  public scannerText: string = 'En attente d\'authentification...';
+  public scannerText: string = "En attente d'authentification...";
 
   constructor(private router: Router) {
     this.checkAuthStatus();
@@ -32,7 +33,7 @@ export class AuthService {
   private checkAuthStatus(): void {
     const authStatus = localStorage.getItem(this.AUTH_STATUS);
     const agentId = localStorage.getItem(this.AGENT_ID);
-    
+
     if (authStatus === 'true' && agentId) {
       this.isAuthenticatedSubject.next(true);
       this.agentIdSubject.next(agentId);
@@ -56,19 +57,19 @@ export class AuthService {
         // Pour la démo, tout code est accepté si >= 4 caractères
         if (accessCode.length >= 4) {
           this.scannerText = 'Authentification réussie!';
-          
+
           // Stocker les informations d'authentification
           localStorage.setItem(this.AUTH_STATUS, 'true');
           localStorage.setItem(this.AGENT_ID, agentId);
-          
+
           // Mettre à jour les observables
           this.isAuthenticatedSubject.next(true);
           this.agentIdSubject.next(agentId);
-          
+
           // Résoudre la promesse avec succès
           resolve(true);
         } else {
-          this.scannerText = 'Erreur d\'authentification. Réessayez.';
+          this.scannerText = "Erreur d'authentification. Réessayez.";
           resolve(false);
         }
 
@@ -85,10 +86,10 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.AUTH_STATUS);
     localStorage.removeItem(this.AGENT_ID);
-    
+
     this.isAuthenticatedSubject.next(false);
     this.agentIdSubject.next('');
-    
+
     // Rediriger vers la page d'accueil
     this.router.navigate(['/']);
   }

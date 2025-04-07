@@ -4,15 +4,21 @@
   <div class="dialog-container" *ngIf="isDialogOpen">
     <div class="d-flex justify-content-end">
       <div class="detective-container">
-        <img class="img" src="img/detective.png" alt="detective">
+        <img class="img" src="img/detective.png" alt="detective" />
       </div>
     </div>
     <div class="dialog-box">
-      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+      <button
+        (click)="closeDialogTypeWriter()"
+        type="button"
+        class="close-button"
+      >
         <i class="bi bi-x-circle fs-3"></i>
       </button>
       <div class="message px-5">
-        <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
+        <div>
+          {{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -32,17 +38,19 @@
   <div class="psych-folder">
     <!-- Onglets du dossier -->
     <div class="folder-tabs">
-      <div *ngFor="let tab of profileTabs" 
-           class="folder-tab" 
-           [class.active]="activeTab === tab.id"
-           (click)="setActiveTab(tab.id)">
+      <div
+        *ngFor="let tab of profileTabs"
+        class="folder-tab"
+        [class.active]="activeTab === tab.id"
+        (click)="setActiveTab(tab.id)"
+      >
         <div class="tab-icon">
           <i [class]="'bi ' + tab.icon"></i>
         </div>
-        <div class="tab-label">{{tab.name}}</div>
+        <div class="tab-label">{{ tab.name }}</div>
       </div>
     </div>
-    
+
     <!-- Contenu du dossier -->
     <div class="folder-content">
       <!-- Module d'investigation -->
@@ -53,56 +61,80 @@
             Investigation psychologique
           </h3>
           <div class="investigation-status">
-            <div class="status-text">Insights découverts: {{insightsDiscovered}}/{{totalInsights}}</div>
+            <div class="status-text">
+              Insights découverts: {{ insightsDiscovered }}/{{ totalInsights }}
+            </div>
             <div class="progress-container">
-              <div class="progress-bar" [style.width.%]="getInvestigationProgress()"></div>
+              <div
+                class="progress-bar"
+                [style.width.%]="getInvestigationProgress()"
+              ></div>
             </div>
           </div>
         </div>
-        
+
         <div class="investigation-content">
           <div class="scenario-container" *ngIf="currentScenario">
             <div class="scenario-card">
               <div class="scenario-header">
-                <div class="scenario-badge">Scénario {{currentScenarioIndex + 1}}/{{scenarios.length}}</div>
-                <h4 class="scenario-title">{{currentScenario.title}}</h4>
+                <div class="scenario-badge">
+                  Scénario {{ currentScenarioIndex + 1 }}/{{ scenarios.length }}
+                </div>
+                <h4 class="scenario-title">{{ currentScenario.title }}</h4>
               </div>
-              
+
               <div class="scenario-body">
-                <p class="scenario-description">{{currentScenario.description}}</p>
-                
+                <p class="scenario-description">
+                  {{ currentScenario.description }}
+                </p>
+
                 <div class="investigation-actions">
                   <h5>Choisissez une approche d'investigation:</h5>
-                  
+
                   <div class="response-options">
-                    <div *ngFor="let response of currentScenario.responses; let i = index" 
-                         class="response-option"
-                         [class.selected]="selectedResponse === i"
-                         (click)="selectResponse(i)">
-                      <div class="response-letter">{{getResponseLetter(i)}}</div>
-                      <div class="response-text">{{response.text}}</div>
+                    <div
+                      *ngFor="
+                        let response of currentScenario.responses;
+                        let i = index
+                      "
+                      class="response-option"
+                      [class.selected]="selectedResponse === i"
+                      (click)="selectResponse(i)"
+                    >
+                      <div class="response-letter">
+                        {{ getResponseLetter(i) }}
+                      </div>
+                      <div class="response-text">{{ response.text }}</div>
                     </div>
                   </div>
-                  
+
                   <div class="action-buttons">
-                    <button class="action-btn" 
-                            [disabled]="selectedResponse === null"
-                            (click)="exploreResponse()">
+                    <button
+                      class="action-btn"
+                      [disabled]="selectedResponse === null"
+                      (click)="exploreResponse()"
+                    >
                       <i class="bi bi-eye-fill me-2"></i>
                       Explorer cette approche
                     </button>
-                    
+
                     <div class="nav-buttons">
-                      <button class="nav-btn" 
-                              [disabled]="currentScenarioIndex === 0"
-                              (click)="previousScenario()">
+                      <button
+                        class="nav-btn"
+                        [disabled]="currentScenarioIndex === 0"
+                        (click)="previousScenario()"
+                      >
                         <i class="bi bi-arrow-left"></i>
                         Précédent
                       </button>
-                      
-                      <button class="nav-btn" 
-                              [disabled]="currentScenarioIndex === scenarios.length - 1"
-                              (click)="nextScenario()">
+
+                      <button
+                        class="nav-btn"
+                        [disabled]="
+                          currentScenarioIndex === scenarios.length - 1
+                        "
+                        (click)="nextScenario()"
+                      >
                         Suivant
                         <i class="bi bi-arrow-right"></i>
                       </button>
@@ -111,32 +143,40 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="insights-panel">
               <h4 class="insights-title">
                 <i class="bi bi-lightbulb me-2"></i>
                 Insights découverts
               </h4>
-              
+
               <div class="insights-list">
                 <div class="insight-category">
                   <h5>Traits de personnalité</h5>
                   <div class="trait-progress-container">
-                    <div class="trait-progress-bar" [style.width.%]="getTraitsDiscoveredPercentage()"></div>
-                    <span class="trait-progress-text">{{getTraitsDiscoveredPercentage()}}%</span>
+                    <div
+                      class="trait-progress-bar"
+                      [style.width.%]="getTraitsDiscoveredPercentage()"
+                    ></div>
+                    <span class="trait-progress-text"
+                      >{{ getTraitsDiscoveredPercentage() }}%</span
+                    >
                   </div>
-                  
+
                   <div class="traits-grid">
-                    <div *ngFor="let trait of personalityTraits" class="trait-item"
-                         [class.discovered]="trait.discovered">
+                    <div
+                      *ngFor="let trait of personalityTraits"
+                      class="trait-item"
+                      [class.discovered]="trait.discovered"
+                    >
                       <div class="trait-icon">
                         <i [class]="'bi ' + trait.icon"></i>
                       </div>
-                      <div class="trait-name">{{trait.name}}</div>
+                      <div class="trait-name">{{ trait.name }}</div>
                     </div>
                   </div>
                 </div>
-                
+
                 <div class="insight-category">
                   <h5>Autres insights</h5>
                   <div class="other-insights-grid">
@@ -145,52 +185,77 @@
                         <i class="bi bi-people"></i>
                       </div>
                       <div class="counter-text">
-                        <span class="counter-value">{{getCollaborationDiscoveredCount()}}/{{collaborationAspects.length}}</span>
-                        <span class="counter-label">Aspects de collaboration</span>
+                        <span class="counter-value"
+                          >{{ getCollaborationDiscoveredCount() }}/{{
+                            collaborationAspects.length
+                          }}</span
+                        >
+                        <span class="counter-label"
+                          >Aspects de collaboration</span
+                        >
                       </div>
                     </div>
-                    
+
                     <div class="insight-counter">
                       <div class="counter-icon">
                         <i class="bi bi-gear"></i>
                       </div>
                       <div class="counter-text">
-                        <span class="counter-value">{{getProcessDiscoveredCount()}}/{{workProcesses.length}}</span>
+                        <span class="counter-value"
+                          >{{ getProcessDiscoveredCount() }}/{{
+                            workProcesses.length
+                          }}</span
+                        >
                         <span class="counter-label">Processus de travail</span>
                       </div>
                     </div>
-                    
+
                     <div class="insight-counter">
                       <div class="counter-icon">
                         <i class="bi bi-stars"></i>
                       </div>
                       <div class="counter-text">
-                        <span class="counter-value">{{getMotivationDiscoveredCount()}}/{{motivationFactors.length}}</span>
-                        <span class="counter-label">Facteurs de motivation</span>
+                        <span class="counter-value"
+                          >{{ getMotivationDiscoveredCount() }}/{{
+                            motivationFactors.length
+                          }}</span
+                        >
+                        <span class="counter-label"
+                          >Facteurs de motivation</span
+                        >
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              
-              <div class="quiz-section" *ngIf="isQuizAvailable() && !isModuleCompleted()">
+
+              <div
+                class="quiz-section"
+                *ngIf="isQuizAvailable() && !isModuleCompleted()"
+              >
                 <h4>
                   <i class="bi bi-check-circle me-2"></i>
                   Évaluation finale
                 </h4>
-                <p>Vous avez collecté suffisamment d'informations pour tenter de valider votre compréhension du profil psychologique.</p>
+                <p>
+                  Vous avez collecté suffisamment d'informations pour tenter de
+                  valider votre compréhension du profil psychologique.
+                </p>
                 <button class="quiz-btn" (click)="startQuiz()">
                   <i class="bi bi-clipboard-check me-2"></i>
                   Commencer l'évaluation
                 </button>
               </div>
-              
+
               <div class="complete-section" *ngIf="isModuleCompleted()">
                 <div class="complete-badge">
                   <i class="bi bi-trophy"></i>
                   Module complété
                 </div>
-                <p>Vous avez réussi l'évaluation et avez une compréhension complète du profil psychologique du sujet.</p>
+                <p>
+                  Vous avez réussi l'évaluation et avez une compréhension
+                  complète du profil psychologique du sujet.
+                </p>
                 <button class="continue-btn" (click)="continueToNextModule()">
                   <i class="bi bi-arrow-right-circle me-2"></i>
                   Continuer au module suivant
@@ -200,20 +265,20 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Profil de personnalité -->
       <div class="personality-profile" *ngIf="activeTab === 'profile'">
         <div class="profile-content" *ngIf="insightsDiscovered > 0">
           <div class="profile-card">
             <div class="summary-header">
               <h3>Profil psychologique</h3>
-              <div class="profile-date">Analyse du {{getCurrentDate()}}</div>
+              <div class="profile-date">Analyse du {{ getCurrentDate() }}</div>
             </div>
-            
+
             <div class="summary-content" *ngIf="canShowSummary()">
-              <p class="summary-text">{{getPersonalitySummary()}}</p>
+              <p class="summary-text">{{ getPersonalitySummary() }}</p>
             </div>
-            
+
             <div class="locked-content" *ngIf="!canShowSummary()">
               <div class="locked-icon">
                 <i class="bi bi-lock"></i>
@@ -221,43 +286,60 @@
               <p>Continuez l'investigation pour débloquer cette analyse.</p>
             </div>
           </div>
-          
+
           <div class="traits-card">
             <h3>Traits de personnalité</h3>
-            
+
             <div class="traits-grid">
-              <div *ngFor="let trait of personalityTraits" class="trait-profile-card" [class.discovered]="trait.discovered">
+              <div
+                *ngFor="let trait of personalityTraits"
+                class="trait-profile-card"
+                [class.discovered]="trait.discovered"
+              >
                 <div class="trait-header">
-                  <div class="trait-icon" [style.background]="getTraitColor(trait.id)">
+                  <div
+                    class="trait-icon"
+                    [style.background]="getTraitColor(trait.id)"
+                  >
                     <i [class]="'bi ' + trait.icon"></i>
                   </div>
                   <div class="trait-title">
-                    <h4>{{trait.name}}</h4>
+                    <h4>{{ trait.name }}</h4>
                     <div class="trait-score" *ngIf="trait.discovered">
-                      <div class="score-value">{{getTraitScore(trait.id)}}</div>
+                      <div class="score-value">
+                        {{ getTraitScore(trait.id) }}
+                      </div>
                       <div class="score-bar">
-                        <div class="score-fill" [style.width.%]="(getTraitScore(trait.id)/maxTraitScore)*100" [style.background]="getTraitColor(trait.id)"></div>
+                        <div
+                          class="score-fill"
+                          [style.width.%]="
+                            (getTraitScore(trait.id) / maxTraitScore) * 100
+                          "
+                          [style.background]="getTraitColor(trait.id)"
+                        ></div>
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <div class="trait-body" *ngIf="trait.discovered">
-                  <p class="trait-description">{{trait.description}}</p>
-                  
+                  <p class="trait-description">{{ trait.description }}</p>
+
                   <div class="trait-manifestations">
                     <h5>Manifestations</h5>
                     <ul>
-                      <li *ngFor="let manifestation of trait.manifestations">{{manifestation}}</li>
+                      <li *ngFor="let manifestation of trait.manifestations">
+                        {{ manifestation }}
+                      </li>
                     </ul>
                   </div>
-                  
+
                   <div class="trait-impact">
                     <h5>Impact professionnel</h5>
-                    <p>{{trait.workImpact}}</p>
+                    <p>{{ trait.workImpact }}</p>
                   </div>
                 </div>
-                
+
                 <div class="locked-overlay" *ngIf="!trait.discovered">
                   <div class="lock-icon">
                     <i class="bi bi-lock-fill"></i>
@@ -268,81 +350,97 @@
             </div>
           </div>
         </div>
-        
+
         <div class="profile-locked" *ngIf="insightsDiscovered === 0">
           <div class="locked-icon">
             <i class="bi bi-lock"></i>
           </div>
           <h3>Profil non accessible</h3>
-          <p>Vous devez d'abord explorer quelques scénarios d'investigation pour débloquer le profil de personnalité.</p>
+          <p>
+            Vous devez d'abord explorer quelques scénarios d'investigation pour
+            débloquer le profil de personnalité.
+          </p>
           <button class="take-test-btn" (click)="setActiveTab('investigation')">
             Commencer l'investigation
             <i class="bi bi-arrow-right"></i>
           </button>
         </div>
       </div>
-      
+
       <!-- Style de travail -->
       <div class="work-style" *ngIf="activeTab === 'style'">
         <div class="style-content" *ngIf="insightsDiscovered > 0">
           <div class="style-header">
             <h3>Style de travail et communication</h3>
           </div>
-          
+
           <div class="style-sections">
             <div class="style-section">
               <div class="section-inner-header">
                 <i class="bi bi-chat-dots"></i>
                 <h4>Mode de communication</h4>
               </div>
-              
+
               <div class="communication-style">
                 <div class="comm-diagram">
                   <div class="comm-scale">
                     <div class="scale-label left">Direct</div>
                     <div class="scale-line">
-                      <div class="scale-marker" [style.left.%]="getCommunicationStyle().directness"></div>
+                      <div
+                        class="scale-marker"
+                        [style.left.%]="getCommunicationStyle().directness"
+                      ></div>
                     </div>
                     <div class="scale-label right">Diplomate</div>
                   </div>
-                  
+
                   <div class="comm-scale">
                     <div class="scale-label left">Factuel</div>
                     <div class="scale-line">
-                      <div class="scale-marker" [style.left.%]="getCommunicationStyle().factual"></div>
+                      <div
+                        class="scale-marker"
+                        [style.left.%]="getCommunicationStyle().factual"
+                      ></div>
                     </div>
                     <div class="scale-label right">Émotionnel</div>
                   </div>
-                  
+
                   <div class="comm-scale">
                     <div class="scale-label left">Concis</div>
                     <div class="scale-line">
-                      <div class="scale-marker" [style.left.%]="getCommunicationStyle().conciseness"></div>
+                      <div
+                        class="scale-marker"
+                        [style.left.%]="getCommunicationStyle().conciseness"
+                      ></div>
                     </div>
                     <div class="scale-label right">Détaillé</div>
                   </div>
                 </div>
-                
+
                 <div class="comm-summary">
-                  <p>{{getCommunicationSummary()}}</p>
+                  <p>{{ getCommunicationSummary() }}</p>
                 </div>
               </div>
             </div>
-            
+
             <div class="style-section">
               <div class="section-inner-header">
                 <i class="bi bi-people"></i>
                 <h4>Collaboration & Dynamique d'équipe</h4>
               </div>
-              
+
               <div class="collaboration-style">
                 <div class="collab-grid">
-                  <div *ngFor="let aspect of collaborationAspects" class="collab-aspect" [class.discovered]="aspect.discovered">
+                  <div
+                    *ngFor="let aspect of collaborationAspects"
+                    class="collab-aspect"
+                    [class.discovered]="aspect.discovered"
+                  >
                     <div class="aspect-header">
                       <i [class]="'bi ' + aspect.icon"></i>
-                      <h5>{{aspect.name}}</h5>
+                      <h5>{{ aspect.name }}</h5>
                     </div>
-                    <p *ngIf="aspect.discovered">{{aspect.description}}</p>
+                    <p *ngIf="aspect.discovered">{{ aspect.description }}</p>
                     <div class="locked-overlay" *ngIf="!aspect.discovered">
                       <div class="lock-icon">
                         <i class="bi bi-lock-fill"></i>
@@ -353,25 +451,34 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="style-section">
               <div class="section-inner-header">
                 <i class="bi bi-gear"></i>
                 <h4>Processus de travail</h4>
               </div>
-              
+
               <div class="work-process">
                 <div class="process-diagram">
-                  <div class="process-item" *ngFor="let process of workProcesses; let i = index" [class.discovered]="process.discovered">
+                  <div
+                    class="process-item"
+                    *ngFor="let process of workProcesses; let i = index"
+                    [class.discovered]="process.discovered"
+                  >
                     <div class="process-icon">
                       <i [class]="'bi ' + process.icon"></i>
                     </div>
-                    <div class="process-arrow" *ngIf="i < workProcesses.length - 1">
+                    <div
+                      class="process-arrow"
+                      *ngIf="i < workProcesses.length - 1"
+                    >
                       <i class="bi bi-arrow-right"></i>
                     </div>
                     <div class="process-details">
-                      <h5>{{process.name}}</h5>
-                      <p *ngIf="process.discovered">{{process.description}}</p>
+                      <h5>{{ process.name }}</h5>
+                      <p *ngIf="process.discovered">
+                        {{ process.description }}
+                      </p>
                       <div class="locked-overlay" *ngIf="!process.discovered">
                         <div class="lock-icon">
                           <i class="bi bi-lock-fill"></i>
@@ -385,42 +492,49 @@
             </div>
           </div>
         </div>
-        
+
         <div class="style-locked" *ngIf="insightsDiscovered === 0">
           <div class="locked-icon">
             <i class="bi bi-lock"></i>
           </div>
           <h3>Style de travail non accessible</h3>
-          <p>Vous devez d'abord explorer quelques scénarios d'investigation pour débloquer l'analyse du style de travail.</p>
+          <p>
+            Vous devez d'abord explorer quelques scénarios d'investigation pour
+            débloquer l'analyse du style de travail.
+          </p>
           <button class="take-test-btn" (click)="setActiveTab('investigation')">
             Commencer l'investigation
             <i class="bi bi-arrow-right"></i>
           </button>
         </div>
       </div>
-      
+
       <!-- Motivations & Valeurs -->
       <div class="motivations" *ngIf="activeTab === 'values'">
         <div class="values-content" *ngIf="insightsDiscovered > 0">
           <div class="values-header">
             <h3>Motivations et valeurs professionnelles</h3>
           </div>
-          
+
           <div class="values-body">
             <div class="values-card">
               <div class="card-title">
                 <i class="bi bi-stars"></i>
                 <h4>Facteurs de motivation</h4>
               </div>
-              
+
               <div class="motivation-factors">
-                <div *ngFor="let factor of motivationFactors" class="motivation-factor" [class.discovered]="factor.discovered">
+                <div
+                  *ngFor="let factor of motivationFactors"
+                  class="motivation-factor"
+                  [class.discovered]="factor.discovered"
+                >
                   <div class="factor-icon">
                     <i [class]="'bi ' + factor.icon"></i>
                   </div>
                   <div class="factor-content">
-                    <h5>{{factor.name}}</h5>
-                    <p *ngIf="factor.discovered">{{factor.description}}</p>
+                    <h5>{{ factor.name }}</h5>
+                    <p *ngIf="factor.discovered">{{ factor.description }}</p>
                     <div class="locked-overlay" *ngIf="!factor.discovered">
                       <div class="lock-icon">
                         <i class="bi bi-lock-fill"></i>
@@ -431,55 +545,73 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="values-card">
               <div class="card-title">
                 <i class="bi bi-award"></i>
                 <h4>Valeurs professionnelles</h4>
               </div>
-              
+
               <div class="core-values">
                 <div class="values-cloud">
-                  <div *ngFor="let value of coreValues; let i = index" 
-                       class="value-tag"
-                       [class.discovered]="value.discovered"
-                       [style.fontSize.px]="value.discovered ? getValueFontSize(value.importance) : 14"
-                       [style.opacity]="value.discovered ? 1 : 0.4">
-                    {{value.name}}
+                  <div
+                    *ngFor="let value of coreValues; let i = index"
+                    class="value-tag"
+                    [class.discovered]="value.discovered"
+                    [style.fontSize.px]="
+                      value.discovered ? getValueFontSize(value.importance) : 14
+                    "
+                    [style.opacity]="value.discovered ? 1 : 0.4"
+                  >
+                    {{ value.name }}
                     <i class="bi bi-lock-fill" *ngIf="!value.discovered"></i>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div class="values-insights">
               <div class="insight-card">
                 <div class="insight-header">
                   <i class="bi bi-check-circle"></i>
                   <h4>Préférences professionnelles</h4>
                 </div>
-                
+
                 <div class="preferences-list">
-                  <div *ngFor="let pref of workPreferences" 
-                       class="preference-item" 
-                       [class.preferred]="pref.preferred"
-                       [class.discovered]="pref.discovered">
-                    <i [class]="pref.preferred ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'" *ngIf="pref.discovered"></i>
+                  <div
+                    *ngFor="let pref of workPreferences"
+                    class="preference-item"
+                    [class.preferred]="pref.preferred"
+                    [class.discovered]="pref.discovered"
+                  >
+                    <i
+                      [class]="
+                        pref.preferred
+                          ? 'bi bi-check-circle-fill'
+                          : 'bi bi-x-circle-fill'
+                      "
+                      *ngIf="pref.discovered"
+                    ></i>
                     <i class="bi bi-lock-fill" *ngIf="!pref.discovered"></i>
-                    <span [class.blurred]="!pref.discovered">{{pref.text}}</span>
+                    <span [class.blurred]="!pref.discovered">{{
+                      pref.text
+                    }}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="values-locked" *ngIf="insightsDiscovered === 0">
           <div class="locked-icon">
             <i class="bi bi-lock"></i>
           </div>
           <h3>Motivations non accessibles</h3>
-          <p>Vous devez d'abord explorer quelques scénarios d'investigation pour débloquer l'analyse des motivations et valeurs.</p>
+          <p>
+            Vous devez d'abord explorer quelques scénarios d'investigation pour
+            débloquer l'analyse des motivations et valeurs.
+          </p>
           <button class="take-test-btn" (click)="setActiveTab('investigation')">
             Commencer l'investigation
             <i class="bi bi-arrow-right"></i>
@@ -488,7 +620,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Modal du Quiz -->
   <div class="quiz-modal-overlay" *ngIf="showQuizModal">
     <div class="quiz-modal">
@@ -501,81 +633,127 @@
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
-      
-      <div class="quiz-modal-body" *ngIf="quizStarted && !quizPassed && currentQuizQuestion < quizQuestions.length">
+
+      <div
+        class="quiz-modal-body"
+        *ngIf="
+          quizStarted &&
+          !quizPassed &&
+          currentQuizQuestion < quizQuestions.length
+        "
+      >
         <div class="quiz-progress">
-          <div class="quiz-progress-text">Question {{currentQuizQuestion + 1}}/{{quizQuestions.length}}</div>
+          <div class="quiz-progress-text">
+            Question {{ currentQuizQuestion + 1 }}/{{ quizQuestions.length }}
+          </div>
           <div class="quiz-progress-bar-container">
-            <div class="quiz-progress-bar" [style.width.%]="((currentQuizQuestion + 1) / quizQuestions.length) * 100"></div>
+            <div
+              class="quiz-progress-bar"
+              [style.width.%]="
+                ((currentQuizQuestion + 1) / quizQuestions.length) * 100
+              "
+            ></div>
           </div>
         </div>
-        
+
         <div class="quiz-question">
-          <p>{{quizQuestions[currentQuizQuestion].question}}</p>
+          <p>{{ quizQuestions[currentQuizQuestion].question }}</p>
         </div>
-        
+
         <div class="quiz-options">
-          <div *ngFor="let option of quizQuestions[currentQuizQuestion].options; let i = index"
-               class="quiz-option"
-               [class.selected]="selectedAnswer === i"
-               (click)="selectQuizAnswer(i)">
-            <div class="option-marker">{{getResponseLetter(i)}}</div>
-            <div class="option-text">{{option}}</div>
+          <div
+            *ngFor="
+              let option of quizQuestions[currentQuizQuestion].options;
+              let i = index
+            "
+            class="quiz-option"
+            [class.selected]="selectedAnswer === i"
+            (click)="selectQuizAnswer(i)"
+          >
+            <div class="option-marker">{{ getResponseLetter(i) }}</div>
+            <div class="option-text">{{ option }}</div>
           </div>
         </div>
-        
-        <button class="quiz-submit-btn" [disabled]="selectedAnswer === null" (click)="submitQuizAnswer()">
+
+        <button
+          class="quiz-submit-btn"
+          [disabled]="selectedAnswer === null"
+          (click)="submitQuizAnswer()"
+        >
           <i class="bi bi-check-circle me-2"></i>
           Valider ma réponse
         </button>
       </div>
-      
-      <div class="quiz-modal-body quiz-results" *ngIf="quizStarted && (quizPassed || currentQuizQuestion >= quizQuestions.length)">
-        <div class="quiz-result-icon" [class.success]="quizPassed" [class.failure]="!quizPassed">
+
+      <div
+        class="quiz-modal-body quiz-results"
+        *ngIf="
+          quizStarted &&
+          (quizPassed || currentQuizQuestion >= quizQuestions.length)
+        "
+      >
+        <div
+          class="quiz-result-icon"
+          [class.success]="quizPassed"
+          [class.failure]="!quizPassed"
+        >
           <i [class]="quizPassed ? 'bi bi-trophy' : 'bi bi-x-circle'"></i>
         </div>
-        
+
         <h4 class="quiz-result-title">
-          {{quizPassed ? 'Félicitations !' : 'Évaluation non validée'}}
+          {{ quizPassed ? "Félicitations !" : "Évaluation non validée" }}
         </h4>
-        
+
         <p class="quiz-result-message">
-          {{quizPassed ? 
-            'Vous avez correctement analysé le profil psychologique du sujet. Vous êtes maintenant prêt à passer au module suivant.' : 
-            'Votre compréhension du profil psychologique nécessite un approfondissement. Explorez davantage les scénarios d\'investigation et réessayez.'}}
+          {{
+            quizPassed
+              ? "Vous avez correctement analysé le profil psychologique du sujet. Vous êtes maintenant prêt à passer au module suivant."
+              : "Votre compréhension du profil psychologique nécessite un approfondissement. Explorez davantage les scénarios d'investigation et réessayez."
+          }}
         </p>
-        
+
         <div class="quiz-score">
           <div class="score-label">Votre score:</div>
-          <div class="score-value">{{quizScore}}/{{quizQuestions.length}}</div>
+          <div class="score-value">
+            {{ quizScore }}/{{ quizQuestions.length }}
+          </div>
         </div>
-        
+
         <button class="quiz-close-btn-large" (click)="closeQuizModal()">
           <i class="bi bi-arrow-left-circle me-2"></i>
           Retourner à l'investigation
         </button>
-        
-        <button class="quiz-continue-btn" *ngIf="quizPassed" (click)="continueToNextModule()">
+
+        <button
+          class="quiz-continue-btn"
+          *ngIf="quizPassed"
+          (click)="continueToNextModule()"
+        >
           <i class="bi bi-arrow-right-circle me-2"></i>
           Continuer au module suivant
         </button>
       </div>
-      
+
       <div class="quiz-modal-body quiz-intro" *ngIf="quizStarted === false">
         <div class="quiz-intro-icon">
           <i class="bi bi-clipboard-check"></i>
         </div>
-        
+
         <h4 class="quiz-intro-title">Évaluation de votre analyse</h4>
-        
+
         <p class="quiz-intro-text">
-          Vous allez répondre à {{quizQuestions.length}} questions portant sur le profil psychologique que vous avez découvert à travers votre investigation. Cette évaluation permettra de valider votre compréhension des traits de personnalité, du style de travail et des motivations du sujet.
+          Vous allez répondre à {{ quizQuestions.length }} questions portant sur
+          le profil psychologique que vous avez découvert à travers votre
+          investigation. Cette évaluation permettra de valider votre
+          compréhension des traits de personnalité, du style de travail et des
+          motivations du sujet.
         </p>
-        
+
         <p class="quiz-intro-instructions">
-          Pour réussir l'évaluation, vous devrez obtenir au moins {{getPassScore()}}/{{quizQuestions.length}} réponses correctes.
+          Pour réussir l'évaluation, vous devrez obtenir au moins
+          {{ getPassScore() }}/{{ quizQuestions.length }} réponses correctes.
         </p>
-        
+
         <button class="quiz-start-btn" (click)="quizStarted = true">
           <i class="bi bi-play-circle me-2"></i>
           Commencer l'évaluation

@@ -60,9 +60,17 @@
 }
 
 @keyframes blink {
-  0%, 40% { opacity: 1; }
-  50%, 90% { opacity: 0; }
-  100% { opacity: 1; }
+  0%,
+  40% {
+    opacity: 1;
+  }
+  50%,
+  90% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .img {
@@ -129,7 +137,8 @@
   background: linear-gradient(to right, #00bfff, #33ccff);
 }
 
-.time-elapsed, .progress-percentage {
+.time-elapsed,
+.progress-percentage {
   color: #a0d8ff;
   font-size: 0.9rem;
 }
@@ -169,7 +178,7 @@
 }
 
 .folder-tab::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -210,7 +219,11 @@
 /* Contenu du dossier */
 .folder-content {
   padding: 25px;
-  background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(15, 15, 26, 0.8));
+  background: linear-gradient(
+    135deg,
+    rgba(26, 26, 46, 0.8),
+    rgba(15, 15, 26, 0.8)
+  );
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -458,7 +471,6 @@
   box-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
 }
 
-
 /* Notes d'enquête */
 .investigation-notes {
   margin-top: 30px;
@@ -556,27 +568,31 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { 
+  from {
     opacity: 0;
     transform: translateY(20px);
   }
-  to { 
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
 @keyframes scaleIn {
-  from { 
+  from {
     opacity: 0;
     transform: scale(0.8);
   }
-  to { 
+  to {
     opacity: 1;
     transform: scale(1);
   }
@@ -590,48 +606,48 @@
     gap: 10px;
     padding: 15px;
   }
-  
+
   .folder-header {
     flex-direction: column;
   }
-  
+
   .folder-title {
     max-width: 100%;
     margin-bottom: 20px;
   }
-  
+
   .folder-stamp {
     align-self: flex-end;
   }
-  
+
   .evidence-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .case-file-container {
     padding: 20px 10px;
   }
-  
+
   .folder-tabs {
     padding: 0 10px;
   }
-  
+
   .folder-tab {
     padding: 12px 15px;
     min-width: 100px;
   }
-  
+
   .dialog-box {
     font-size: 16px;
     height: auto;
     min-height: 150px;
   }
-  
+
   .img {
     width: 60px;
     height: 60px;
   }
-  
+
   .case-status {
     flex-direction: column;
     align-items: flex-start;
@@ -644,19 +660,19 @@
     min-width: 90px;
     font-size: 0.8rem;
   }
-  
+
   .section-title {
     font-size: 1.5rem;
   }
-  
+
   .folder-content {
     padding: 15px;
   }
-  
+
   .job-title {
     font-size: 1.3rem;
   }
-  
+
   .evidence-item {
     height: auto;
     min-height: 100px;
@@ -728,8 +744,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .quiz-modal {
@@ -747,8 +767,14 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .quiz-header {
@@ -827,14 +853,16 @@
   opacity: 0.8;
 }
 
-.skills-column, .jobs-column {
+.skills-column,
+.jobs-column {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.skill-item, .job-item {
+.skill-item,
+.job-item {
   padding: 12px;
   border-radius: 8px;
   background: rgba(26, 26, 46, 0.5);
@@ -845,7 +873,8 @@
   position: relative;
 }
 
-.skill-item:hover, .job-item:hover {
+.skill-item:hover,
+.job-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 191, 255, 0.2);
   border-color: rgba(0, 191, 255, 0.3);
@@ -867,7 +896,8 @@
   z-index: 10;
 }
 
-.skill-item.matched, .job-item.matched {
+.skill-item.matched,
+.job-item.matched {
   background: rgba(46, 174, 52, 0.1);
   border-color: rgba(46, 174, 52, 0.3);
   cursor: default;
@@ -885,18 +915,35 @@
 
 /* Animation de pulsation pour les correspondances réussies */
 @keyframes successPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); background-color: rgba(0, 128, 0, 0.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    background-color: rgba(0, 128, 0, 0.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Animation de secousse pour les erreurs */
 @keyframes errorShake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .skill-item-inner {
@@ -960,8 +1007,13 @@
 }
 
 @keyframes completeSection {
-  0% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(20px); }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 }
 
 .skill-item-inner {
@@ -1100,8 +1152,14 @@
 }
 
 @keyframes feedbackAppear {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .feedback-message {
@@ -1136,8 +1194,14 @@
 }
 
 @keyframes resultsAppear {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .quiz-results h4 {
@@ -1267,7 +1331,8 @@
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.chronology-container.cdk-drop-list-dragging .job-chronology-item:not(.cdk-drag-placeholder) {
+.chronology-container.cdk-drop-list-dragging
+  .job-chronology-item:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -1292,21 +1357,21 @@
     width: 95%;
     max-height: 95vh;
   }
-  
+
   .matching-container {
     flex-direction: column;
   }
-  
+
   .quiz-content {
     padding: 15px;
     max-height: 70vh;
   }
-  
+
   .quiz-footer {
     flex-direction: column;
     padding: 15px;
   }
-  
+
   .quiz-footer button {
     width: 100%;
   }
@@ -1317,12 +1382,12 @@
     padding: 10px;
     gap: 10px;
   }
-  
+
   .score-circle {
     width: 80px;
     height: 80px;
   }
-  
+
   .score-value {
     font-size: 1.3rem;
   }

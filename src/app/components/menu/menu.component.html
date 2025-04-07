@@ -1,253 +1,267 @@
 <!-- Container principal -->
 <div class="home-container">
-    <!-- Dialog Box pour le contexte -->
-    <div class="dialog-container" *ngIf="isDialogOpen">
-      <div class="d-flex justify-content-end">
-        <div class="detective-container">
-          <img class="img" src="img/detective.png" alt="detective">
-        </div>
-      </div>
-      <div class="dialog-box">
-        <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
-          <i class="bi bi-x-circle fs-3"></i>
-        </button>
-        <div class="message px-5">
-          <!-- Utilisation du message directement depuis le service -->
-          <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
-        </div>
+  <!-- Dialog Box pour le contexte -->
+  <div class="dialog-container" *ngIf="isDialogOpen">
+    <div class="d-flex justify-content-end">
+      <div class="detective-container">
+        <img class="img" src="img/detective.png" alt="detective" />
       </div>
     </div>
-    <!-- En-tête avec titre et statut -->
-    <div class="header-section">
-      <div class="logo-container">
-        <div class="logo-glow"></div>
-        <h1 class="main-title">ENQUÊTE<span class="highlight">MYSTÈRE</span></h1>
-      </div>
-      <div class="status-container">
-        <div class="status-label">État du dossier:</div>
-        <div class="status-badge" [class.completed]="completionPercentage >= 100">
-          {{ completionPercentage >= 100 ? 'Complété' : 'En cours' }}
+    <div class="dialog-box">
+      <button
+        (click)="closeDialogTypeWriter()"
+        type="button"
+        class="close-button"
+      >
+        <i class="bi bi-x-circle fs-3"></i>
+      </button>
+      <div class="message px-5">
+        <!-- Utilisation du message directement depuis le service -->
+        <div>
+          {{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span>
         </div>
-      </div>
-    </div>
-  
-    <!-- Grille des modules d'enquête -->
-    <div class="investigation-grid">
-      <!-- Intro et contexte -->
-      <div
-        class="grid-item grid-intro"
-        [ngClass]="getModuleClasses('home')"
-        (click)="navigateTo('/home', 'home')">
-        <div class="module-number">{{ getModuleIndex("home") }}</div>
-        <div class="lock-overlay" *ngIf="!isModuleAvailable('home')">
-          <i class="bi bi-lock-fill"></i>
-          <span>Complétez les modules précédents pour débloquer</span>
-        </div>
-        <div class="completion-indicator" *ngIf="moduleStatuses.home">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="item-icon">
-          <i class="bi bi-house-door"></i>
-        </div>
-        <div class="item-content">
-          <h3>Accueil</h3>
-          <p>Introduction et contexte de l'enquête</p>
-        </div>
-        <div class="pulse-animation" *ngIf="!moduleStatuses.home"></div>
-      </div>
-  
-      <!-- Itinéraire personnel -->
-      <div
-        class="grid-item"
-        [ngClass]="getModuleClasses('itineraire')"
-        (click)="navigateTo('/itineraire', 'itineraire')">
-        <div class="module-number">{{ getModuleIndex("itineraire") }}</div>
-        <div class="lock-overlay" *ngIf="!isModuleAvailable('itineraire')">
-          <i class="bi bi-lock-fill"></i>
-          <span>Complétez les modules précédents pour débloquer</span>
-        </div>
-        <div class="completion-indicator" *ngIf="moduleStatuses.itineraire">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="item-icon">
-          <i class="bi bi-signpost-split"></i>
-        </div>
-        <div class="item-content">
-          <h3>Itinéraire</h3>
-          <p>Parcours personnel et professionnel</p>
-        </div>
-        <div class="pulse-animation" *ngIf="!moduleStatuses.itineraire"></div>
-      </div>
-  
-      <!-- Expérience professionnelle -->
-      <div
-        class="grid-item"
-        [ngClass]="getModuleClasses('experience')"
-        (click)="navigateTo('/experience', 'experience')">
-        <div class="module-number">{{ getModuleIndex("experience") }}</div>
-        <div class="lock-overlay" *ngIf="!isModuleAvailable('experience')">
-          <i class="bi bi-lock-fill"></i>
-          <span>Complétez les modules précédents pour débloquer</span>
-        </div>
-        <div class="completion-indicator" *ngIf="moduleStatuses.experience">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="item-icon">
-          <i class="bi bi-briefcase"></i>
-        </div>
-        <div class="item-content">
-          <h3>Expérience Pro</h3>
-          <p>Analyse des compétences et expériences</p>
-        </div>
-        <div class="pulse-animation" *ngIf="!moduleStatuses.experience"></div>
-      </div>
-  
-      <!-- Attentes -->
-      <div
-        class="grid-item"
-        [ngClass]="getModuleClasses('attentes')"
-        (click)="navigateTo('/attentes', 'attentes')">
-        <div class="module-number">{{ getModuleIndex("attentes") }}</div>
-        <div class="lock-overlay" *ngIf="!isModuleAvailable('attentes')">
-          <i class="bi bi-lock-fill"></i>
-          <span>Complétez les modules précédents pour débloquer</span>
-        </div>
-        <div class="completion-indicator" *ngIf="moduleStatuses.attentes">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="item-icon">
-          <i class="bi bi-graph-up-arrow"></i>
-        </div>
-        <div class="item-content">
-          <h3>Attentes</h3>
-          <p>Objectifs et projections professionnelles</p>
-        </div>
-        <div class="pulse-animation" *ngIf="!moduleStatuses.attentes"></div>
-      </div>
-  
-      <!-- Personnalité -->
-      <div
-        class="grid-item"
-        [ngClass]="getModuleClasses('personnalite')"
-        (click)="navigateTo('/personnalite', 'personnalite')">
-        <div class="module-number">{{ getModuleIndex("personnalite") }}</div>
-        <div class="lock-overlay" *ngIf="!isModuleAvailable('personnalite')">
-          <i class="bi bi-lock-fill"></i>
-          <span>Complétez les modules précédents pour débloquer</span>
-        </div>
-        <div class="completion-indicator" *ngIf="moduleStatuses.personnalite">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="item-icon">
-          <i class="bi bi-compass"></i>
-        </div>
-        <div class="item-content">
-          <h3>Personnalité</h3>
-          <p>Les différents traits de caractère et comportement</p>
-        </div>
-        <div class="pulse-animation" *ngIf="!moduleStatuses.personnalite"></div>
-      </div>
-  
-      <!-- Centres d'intérêt -->
-      <div
-        class="grid-item"
-        [ngClass]="getModuleClasses('centres')"
-        (click)="navigateTo('/centres', 'centres')">
-        <div class="module-number">{{ getModuleIndex("centres") }}</div>
-        <div class="lock-overlay" *ngIf="!isModuleAvailable('centres')">
-          <i class="bi bi-lock-fill"></i>
-          <span>Complétez les modules précédents pour débloquer</span>
-        </div>
-        <div class="completion-indicator" *ngIf="moduleStatuses.centres">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="item-icon">
-          <i class="bi bi-stars"></i>
-        </div>
-        <div class="item-content">
-          <h3>Centres d'intérêt</h3>
-          <p>Activités et passions personnelles</p>
-        </div>
-        <div class="pulse-animation" *ngIf="!moduleStatuses.centres"></div>
-      </div>
-  
-      <!-- Motivation Socio-Pro -->
-      <div
-        class="grid-item"
-        [ngClass]="getModuleClasses('motivations')"
-        (click)="navigateTo('/motivations', 'motivations')">
-        <div class="module-number">{{ getModuleIndex("motivations") }}</div>
-        <div class="lock-overlay" *ngIf="!isModuleAvailable('motivations')">
-          <i class="bi bi-lock-fill"></i>
-          <span>Complétez les modules précédents pour débloquer</span>
-        </div>
-        <div class="completion-indicator" *ngIf="moduleStatuses.motivations">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="item-icon">
-          <i class="bi bi-puzzle"></i>
-        </div>
-        <div class="item-content">
-          <h3>Motivation</h3>
-          <p>Analyse des motivations socio-professionnelles</p>
-        </div>
-        <div class="pulse-animation" *ngIf="!moduleStatuses.motivations"></div>
-      </div>
-  
-      <!-- Conclusion - verrouillée jusqu'à ce que tous les modules soient complétés -->
-      <div
-        class="grid-item grid-conclusion"
-        [ngClass]="getModuleClasses('conclusion')"
-        (click)="navigateTo('/conclusion', 'conclusion')">
-        <div class="module-number">{{ getModuleIndex("conclusion") }}</div>
-        <div class="lock-overlay" *ngIf="!isModuleAvailable('conclusion')">
-          <i class="bi bi-lock-fill"></i>
-          <span>Complétez tous les modules pour débloquer</span>
-        </div>
-        <div class="completion-indicator" *ngIf="moduleStatuses.conclusion">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="item-icon">
-          <i class="bi bi-file-earmark-text"></i>
-        </div>
-        <div class="item-content">
-          <h3>Conclusion</h3>
-          <p>Synthèse et recommandations finales</p>
-        </div>
-        <div
-          class="special-glow"
-          *ngIf="allModulesCompleted() && !moduleStatuses.conclusion"
-        ></div>
-      </div>
-    </div>
-  
-    <!-- Statistiques d'enquête -->
-    <div class="investigation-stats">
-      <div class="stat-item">
-        <div class="stat-icon">
-          <i class="bi bi-clipboard-check"></i>
-        </div>
-        <div class="stat-value">{{ completionPercentage }}%</div>
-        <div class="stat-label">Progression</div>
-        <div class="progress-track">
-          <div class="progress-fill" [style.width.%]="completionPercentage"></div>
-        </div>
-      </div>
-  
-      <div class="stat-item">
-        <div class="stat-icon">
-          <i class="bi bi-clock-history"></i>
-        </div>
-        <div class="stat-value">{{ timeSpent }}</div>
-        <div class="stat-label">Temps passé</div>
-      </div>
-  
-      <div class="stat-item">
-        <div class="stat-icon">
-          <i class="bi bi-folder-check"></i>
-        </div>
-        <div class="stat-value">{{ modulesCompleted }}/{{ totalModules }}</div>
-        <div class="stat-label">Modules terminés</div>
       </div>
     </div>
   </div>
+  <!-- En-tête avec titre et statut -->
+  <div class="header-section">
+    <div class="logo-container">
+      <div class="logo-glow"></div>
+      <h1 class="main-title">ENQUÊTE<span class="highlight">MYSTÈRE</span></h1>
+    </div>
+    <div class="status-container">
+      <div class="status-label">État du dossier:</div>
+      <div class="status-badge" [class.completed]="completionPercentage >= 100">
+        {{ completionPercentage >= 100 ? "Complété" : "En cours" }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Grille des modules d'enquête -->
+  <div class="investigation-grid">
+    <!-- Intro et contexte -->
+    <div
+      class="grid-item grid-intro"
+      [ngClass]="getModuleClasses('home')"
+      (click)="navigateTo('/home', 'home')"
+    >
+      <div class="module-number">{{ getModuleIndex("home") }}</div>
+      <div class="lock-overlay" *ngIf="!isModuleAvailable('home')">
+        <i class="bi bi-lock-fill"></i>
+        <span>Complétez les modules précédents pour débloquer</span>
+      </div>
+      <div class="completion-indicator" *ngIf="moduleStatuses.home">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="item-icon">
+        <i class="bi bi-house-door"></i>
+      </div>
+      <div class="item-content">
+        <h3>Accueil</h3>
+        <p>Introduction et contexte de l'enquête</p>
+      </div>
+      <div class="pulse-animation" *ngIf="!moduleStatuses.home"></div>
+    </div>
+
+    <!-- Itinéraire personnel -->
+    <div
+      class="grid-item"
+      [ngClass]="getModuleClasses('itineraire')"
+      (click)="navigateTo('/itineraire', 'itineraire')"
+    >
+      <div class="module-number">{{ getModuleIndex("itineraire") }}</div>
+      <div class="lock-overlay" *ngIf="!isModuleAvailable('itineraire')">
+        <i class="bi bi-lock-fill"></i>
+        <span>Complétez les modules précédents pour débloquer</span>
+      </div>
+      <div class="completion-indicator" *ngIf="moduleStatuses.itineraire">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="item-icon">
+        <i class="bi bi-signpost-split"></i>
+      </div>
+      <div class="item-content">
+        <h3>Itinéraire</h3>
+        <p>Parcours personnel et professionnel</p>
+      </div>
+      <div class="pulse-animation" *ngIf="!moduleStatuses.itineraire"></div>
+    </div>
+
+    <!-- Expérience professionnelle -->
+    <div
+      class="grid-item"
+      [ngClass]="getModuleClasses('experience')"
+      (click)="navigateTo('/experience', 'experience')"
+    >
+      <div class="module-number">{{ getModuleIndex("experience") }}</div>
+      <div class="lock-overlay" *ngIf="!isModuleAvailable('experience')">
+        <i class="bi bi-lock-fill"></i>
+        <span>Complétez les modules précédents pour débloquer</span>
+      </div>
+      <div class="completion-indicator" *ngIf="moduleStatuses.experience">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="item-icon">
+        <i class="bi bi-briefcase"></i>
+      </div>
+      <div class="item-content">
+        <h3>Expérience Pro</h3>
+        <p>Analyse des compétences et expériences</p>
+      </div>
+      <div class="pulse-animation" *ngIf="!moduleStatuses.experience"></div>
+    </div>
+
+    <!-- Attentes -->
+    <div
+      class="grid-item"
+      [ngClass]="getModuleClasses('attentes')"
+      (click)="navigateTo('/attentes', 'attentes')"
+    >
+      <div class="module-number">{{ getModuleIndex("attentes") }}</div>
+      <div class="lock-overlay" *ngIf="!isModuleAvailable('attentes')">
+        <i class="bi bi-lock-fill"></i>
+        <span>Complétez les modules précédents pour débloquer</span>
+      </div>
+      <div class="completion-indicator" *ngIf="moduleStatuses.attentes">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="item-icon">
+        <i class="bi bi-graph-up-arrow"></i>
+      </div>
+      <div class="item-content">
+        <h3>Attentes</h3>
+        <p>Objectifs et projections professionnelles</p>
+      </div>
+      <div class="pulse-animation" *ngIf="!moduleStatuses.attentes"></div>
+    </div>
+
+    <!-- Personnalité -->
+    <div
+      class="grid-item"
+      [ngClass]="getModuleClasses('personnalite')"
+      (click)="navigateTo('/personnalite', 'personnalite')"
+    >
+      <div class="module-number">{{ getModuleIndex("personnalite") }}</div>
+      <div class="lock-overlay" *ngIf="!isModuleAvailable('personnalite')">
+        <i class="bi bi-lock-fill"></i>
+        <span>Complétez les modules précédents pour débloquer</span>
+      </div>
+      <div class="completion-indicator" *ngIf="moduleStatuses.personnalite">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="item-icon">
+        <i class="bi bi-compass"></i>
+      </div>
+      <div class="item-content">
+        <h3>Personnalité</h3>
+        <p>Les différents traits de caractère et comportement</p>
+      </div>
+      <div class="pulse-animation" *ngIf="!moduleStatuses.personnalite"></div>
+    </div>
+
+    <!-- Centres d'intérêt -->
+    <div
+      class="grid-item"
+      [ngClass]="getModuleClasses('centres')"
+      (click)="navigateTo('/centres', 'centres')"
+    >
+      <div class="module-number">{{ getModuleIndex("centres") }}</div>
+      <div class="lock-overlay" *ngIf="!isModuleAvailable('centres')">
+        <i class="bi bi-lock-fill"></i>
+        <span>Complétez les modules précédents pour débloquer</span>
+      </div>
+      <div class="completion-indicator" *ngIf="moduleStatuses.centres">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="item-icon">
+        <i class="bi bi-stars"></i>
+      </div>
+      <div class="item-content">
+        <h3>Centres d'intérêt</h3>
+        <p>Activités et passions personnelles</p>
+      </div>
+      <div class="pulse-animation" *ngIf="!moduleStatuses.centres"></div>
+    </div>
+
+    <!-- Motivation Socio-Pro -->
+    <div
+      class="grid-item"
+      [ngClass]="getModuleClasses('motivations')"
+      (click)="navigateTo('/motivations', 'motivations')"
+    >
+      <div class="module-number">{{ getModuleIndex("motivations") }}</div>
+      <div class="lock-overlay" *ngIf="!isModuleAvailable('motivations')">
+        <i class="bi bi-lock-fill"></i>
+        <span>Complétez les modules précédents pour débloquer</span>
+      </div>
+      <div class="completion-indicator" *ngIf="moduleStatuses.motivations">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="item-icon">
+        <i class="bi bi-puzzle"></i>
+      </div>
+      <div class="item-content">
+        <h3>Motivation</h3>
+        <p>Analyse des motivations socio-professionnelles</p>
+      </div>
+      <div class="pulse-animation" *ngIf="!moduleStatuses.motivations"></div>
+    </div>
+
+    <!-- Conclusion - verrouillée jusqu'à ce que tous les modules soient complétés -->
+    <div
+      class="grid-item grid-conclusion"
+      [ngClass]="getModuleClasses('conclusion')"
+      (click)="navigateTo('/conclusion', 'conclusion')"
+    >
+      <div class="module-number">{{ getModuleIndex("conclusion") }}</div>
+      <div class="lock-overlay" *ngIf="!isModuleAvailable('conclusion')">
+        <i class="bi bi-lock-fill"></i>
+        <span>Complétez tous les modules pour débloquer</span>
+      </div>
+      <div class="completion-indicator" *ngIf="moduleStatuses.conclusion">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="item-icon">
+        <i class="bi bi-file-earmark-text"></i>
+      </div>
+      <div class="item-content">
+        <h3>Conclusion</h3>
+        <p>Synthèse et recommandations finales</p>
+      </div>
+      <div
+        class="special-glow"
+        *ngIf="allModulesCompleted() && !moduleStatuses.conclusion"
+      ></div>
+    </div>
+  </div>
+
+  <!-- Statistiques d'enquête -->
+  <div class="investigation-stats">
+    <div class="stat-item">
+      <div class="stat-icon">
+        <i class="bi bi-clipboard-check"></i>
+      </div>
+      <div class="stat-value">{{ completionPercentage }}%</div>
+      <div class="stat-label">Progression</div>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="completionPercentage"></div>
+      </div>
+    </div>
+
+    <div class="stat-item">
+      <div class="stat-icon">
+        <i class="bi bi-clock-history"></i>
+      </div>
+      <div class="stat-value">{{ timeSpent }}</div>
+      <div class="stat-label">Temps passé</div>
+    </div>
+
+    <div class="stat-item">
+      <div class="stat-icon">
+        <i class="bi bi-folder-check"></i>
+      </div>
+      <div class="stat-value">{{ modulesCompleted }}/{{ totalModules }}</div>
+      <div class="stat-label">Modules terminés</div>
+    </div>
+  </div>
+</div>

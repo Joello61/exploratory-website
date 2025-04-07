@@ -7,10 +7,9 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { ProgressService } from '../../services/progress.service';
-import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
 import {
   DragDropModule,
@@ -50,6 +49,20 @@ export class ExperienceProComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
   @ViewChild('typewriterText') typewriterText!: ElementRef;
+
+  // Pour gérer la destruction du composant
+  private destroy$ = new Subject<void>();
+
+  // Gérer les timeouts
+  private introDialogTimeoutId: number | null = null;
+  private closeDialogTimeoutId: number | null = null;
+  private folderAnimationTimeoutId: number | null = null;
+  private folderAnimationCleanupTimeoutId: number | null = null;
+  private showDescriptionTimeoutId: number | null = null;
+  private showStampTimeoutId: number | null = null;
+  private clueDiscoveryTimeoutId: number | null = null;
+  private incorrectMatchTimeoutId: number | null = null;
+  private quizTransitionTimeoutId: number | null = null;
 
   // Texte du dialogue d'introduction
   private fullText: string =
@@ -109,7 +122,7 @@ export class ExperienceProComponent
         {
           title: 'Frontend Vue.js',
           detail:
-            "Développement du frontend en Vue.js avec une interface utilisateur intuitive pour manipuler des objets 3D et visualiser des analyses",
+            'Développement du frontend en Vue.js avec une interface utilisateur intuitive pour manipuler des objets 3D et visualiser des analyses',
           icon: 'bi-window',
           skill: 'Vue.js',
         },
@@ -138,7 +151,7 @@ export class ExperienceProComponent
       notes:
         "Cette expérience en cours permet au candidat de combiner ses connaissances théoriques avec une application pratique dans un contexte professionnel. L'accent sur les technologies 3D et le développement fullstack enrichit considérablement son profil technique.",
       conclusion:
-        "Cette alternance permet au candidat de développer des compétences avancées en intégration 3D et développement fullstack, tout en renforçant sa maîtrise des méthodologies DevOps et de la documentation technique, éléments essentiels pour un développeur fullstack moderne.",
+        'Cette alternance permet au candidat de développer des compétences avancées en intégration 3D et développement fullstack, tout en renforçant sa maîtrise des méthodologies DevOps et de la documentation technique, éléments essentiels pour un développeur fullstack moderne.',
       achievement: 'Développeur Fullstack 3D',
     },
     {
@@ -151,21 +164,21 @@ export class ExperienceProComponent
         {
           title: 'Analyse de Données',
           detail:
-            "Analyse et traitement de données pour extraire des informations pertinentes et faciliter la prise de décision",
+            'Analyse et traitement de données pour extraire des informations pertinentes et faciliter la prise de décision',
           icon: 'bi-graph-up',
           skill: 'Analyse de Données',
         },
         {
           title: 'Développement Web',
           detail:
-            "Développement et maintenance de sites web pour divers clients, en utilisant différentes technologies web",
+            'Développement et maintenance de sites web pour divers clients, en utilisant différentes technologies web',
           icon: 'bi-code-slash',
           skill: 'Développement Web',
         },
         {
           title: 'Gestion Bases de Données',
           detail:
-            "Administration et optimisation de bases de données pour assurer des performances optimales et la sécurité des données",
+            'Administration et optimisation de bases de données pour assurer des performances optimales et la sécurité des données',
           icon: 'bi-database',
           skill: 'Bases de Données',
         },
@@ -179,7 +192,7 @@ export class ExperienceProComponent
         {
           title: 'Gestion de Projets',
           detail:
-            "Coordination et suivi de divers projets informatiques, en assurant le respect des délais et des objectifs",
+            'Coordination et suivi de divers projets informatiques, en assurant le respect des délais et des objectifs',
           icon: 'bi-kanban',
           skill: 'Gestion de Projets',
         },
@@ -194,7 +207,7 @@ export class ExperienceProComponent
       notes:
         "Cette expérience a permis au candidat de développer une polyvalence technique et des compétences en communication client importantes. La diversité des missions a contribué à renforcer sa capacité d'adaptation et sa vision globale des problématiques informatiques.",
       conclusion:
-        "Ce stage a constitué une expérience professionnelle enrichissante pour le candidat, lui permettant de découvrir différentes facettes du métier de consultant informatique et de développer des compétences transversales précieuses pour sa future carrière de développeur fullstack.",
+        'Ce stage a constitué une expérience professionnelle enrichissante pour le candidat, lui permettant de découvrir différentes facettes du métier de consultant informatique et de développer des compétences transversales précieuses pour sa future carrière de développeur fullstack.',
       achievement: 'Polyvalence Technique',
     },
     {
@@ -221,7 +234,7 @@ export class ExperienceProComponent
         {
           title: 'Maintenance',
           detail:
-            "Correction de bugs et amélioration des fonctionnalités existantes sur des applications en production",
+            'Correction de bugs et amélioration des fonctionnalités existantes sur des applications en production',
           icon: 'bi-wrench',
           skill: 'Maintenance Applicative',
         },
@@ -235,7 +248,7 @@ export class ExperienceProComponent
         {
           title: 'Tests',
           detail:
-            "Mise en place et exécution de tests unitaires et fonctionnels pour assurer la qualité des développements",
+            'Mise en place et exécution de tests unitaires et fonctionnels pour assurer la qualité des développements',
           icon: 'bi-check-circle',
           skill: 'Tests',
         },
@@ -248,7 +261,7 @@ export class ExperienceProComponent
         'Tests',
       ],
       notes:
-        "Ce premier stage a constitué une introduction pratique au monde professionnel du développement web pour le candidat. Il a pu mettre en application les connaissances théoriques acquises durant sa formation et découvrir les réalités du développement en entreprise.",
+        'Ce premier stage a constitué une introduction pratique au monde professionnel du développement web pour le candidat. Il a pu mettre en application les connaissances théoriques acquises durant sa formation et découvrir les réalités du développement en entreprise.',
       conclusion:
         "Cette expérience initiale a permis au candidat de se familiariser avec le cycle de développement complet d'une application web, depuis la conception jusqu'aux tests, en passant par l'intégration d'API et l'optimisation des performances. Elle a posé les bases de sa carrière de développeur fullstack.",
       achievement: 'Fondamentaux du Développement Web',
@@ -308,7 +321,7 @@ export class ExperienceProComponent
       conclusion:
         "Cette solide formation académique, complétée par l'alternance en cours, constitue une base théorique et technique robuste pour le candidat. Elle lui permet d'aborder le développement fullstack avec à la fois des connaissances théoriques approfondies et une expérience pratique en constante évolution.",
       achievement: 'Fondements Théoriques Solides',
-    }
+    },
   ];
 
   // Données pour le quiz de matching (compétences/jobs)
@@ -377,12 +390,12 @@ export class ExperienceProComponent
     // Vérifier si le module est disponible
     if (!this.progressService.isModuleAvailable('experience')) {
       console.warn("Ce module n'est pas encore disponible");
-      // Logique de redirection à implémenter si nécessaire
     }
 
-    // Vérifier si le module est déjà complété
-    this.subscriptions.push(
-      this.progressService.moduleStatuses$.subscribe((statuses) => {
+    // Vérifier si le module est déjà complété avec takeUntil
+    this.progressService.moduleStatuses$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((statuses) => {
         this.isModuleCompleted = statuses.experience;
         this.moduleProgressPercentage =
           this.progressService.getCompletionPercentage();
@@ -393,26 +406,33 @@ export class ExperienceProComponent
         } else {
           this.initializeExperienceData();
         }
-      })
-    );
+      });
 
-    this.subscriptions.push(
-      this.dialogService.isDialogOpen$.subscribe((isOpen) => {
+    // S'abonner aux états du dialogue
+    this.dialogService.isDialogOpen$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isOpen) => {
         this.isDialogOpen = isOpen;
-      }),
-      this.dialogService.isTyping$.subscribe((isTyping) => {
+      });
+
+    this.dialogService.isTyping$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isTyping) => {
         this.isTyping = isTyping;
-      }),
-      this.dialogService.currentMessage$.subscribe((message) => {
+      });
+
+    this.dialogService.currentMessage$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message) => {
         this.dialogMessage = message;
-      })
-    );
+      });
   }
 
   ngAfterViewInit(): void {
     // Utiliser le DialogService au lieu du typewriter manuel
-    setTimeout(() => {
+    this.introDialogTimeoutId = window.setTimeout(() => {
       this.showIntroDialog();
+      this.introDialogTimeoutId = null;
     }, 500);
 
     // Animation pour l'apparition progressive des éléments
@@ -427,8 +447,40 @@ export class ExperienceProComponent
   }
 
   ngOnDestroy(): void {
-    // Nettoyer les souscriptions pour éviter les fuites de mémoire
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    // Émettre le signal de destruction pour tous les observables
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    // Nettoyer tous les timeouts
+    this.clearAllTimeouts();
+
+    // Fermer tout dialogue ouvert
+    if (this.isDialogOpen) {
+      this.dialogService.closeDialog();
+    }
+  }
+
+  // Nettoyer tous les timeouts
+  private clearAllTimeouts(): void {
+    // Liste de tous les timeouts à nettoyer
+    const timeouts = [
+      this.introDialogTimeoutId,
+      this.closeDialogTimeoutId,
+      this.folderAnimationTimeoutId,
+      this.folderAnimationCleanupTimeoutId,
+      this.showDescriptionTimeoutId,
+      this.showStampTimeoutId,
+      this.clueDiscoveryTimeoutId,
+      this.incorrectMatchTimeoutId,
+      this.quizTransitionTimeoutId,
+    ];
+
+    // Nettoyer chaque timeout non-null
+    timeouts.forEach((timeoutId) => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    });
   }
 
   showIntroDialog(): void {
@@ -438,8 +490,9 @@ export class ExperienceProComponent
     };
     this.dialogService.openDialog(dialogMessage);
     this.dialogService.startTypewriter(this.fullText, () => {
-      setTimeout(() => {
-        this.dialogService.closeDialog()
+      this.closeDialogTimeoutId = window.setTimeout(() => {
+        this.dialogService.closeDialog();
+        this.closeDialogTimeoutId = null;
       }, 3000);
     });
   }
@@ -447,6 +500,12 @@ export class ExperienceProComponent
   // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
+
+    // Annuler tout timeout de fermeture programmé
+    if (this.closeDialogTimeoutId !== null) {
+      clearTimeout(this.closeDialogTimeoutId);
+      this.closeDialogTimeoutId = null;
+    }
   }
 
   // Charger l'état sauvegardé précédemment
@@ -662,15 +721,25 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
     );
 
     // Animation pour le changement de dossier
-    setTimeout(() => {
-      document
-        .querySelector('.folder-content')
-        ?.classList.add('folder-change-animation');
-      setTimeout(() => {
-        document
-          .querySelector('.folder-content')
-          ?.classList.remove('folder-change-animation');
-      }, 500);
+    // Nettoyer les timeouts précédents si existants
+    if (this.folderAnimationTimeoutId !== null) {
+      clearTimeout(this.folderAnimationTimeoutId);
+    }
+    if (this.folderAnimationCleanupTimeoutId !== null) {
+      clearTimeout(this.folderAnimationCleanupTimeoutId);
+    }
+
+    this.folderAnimationTimeoutId = window.setTimeout(() => {
+      const folderContent = document.querySelector('.folder-content');
+      if (folderContent) {
+        folderContent.classList.add('folder-change-animation');
+
+        this.folderAnimationCleanupTimeoutId = window.setTimeout(() => {
+          folderContent.classList.remove('folder-change-animation');
+          this.folderAnimationCleanupTimeoutId = null;
+        }, 500);
+      }
+      this.folderAnimationTimeoutId = null;
     }, 10);
   }
 
@@ -683,10 +752,12 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
       this.discoveredClues[this.selectedJobIndex][clueIndex] = true;
 
       // Animation pour la découverte
-      setTimeout(() => {
-        const clueElement =
-          document.querySelectorAll('.evidence-item')[clueIndex];
-        clueElement?.classList.add('discovered');
+      this.clueDiscoveryTimeoutId = window.setTimeout(() => {
+        const clueElements = document.querySelectorAll('.evidence-item');
+        if (clueElements && clueElements.length > clueIndex) {
+          clueElements[clueIndex].classList.add('discovered');
+        }
+        this.clueDiscoveryTimeoutId = null;
       }, 100);
 
       // Mettre à jour le pourcentage de complétion
@@ -694,15 +765,17 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
 
       // Révéler la description après quelques indices
       if (this.getDiscoveredClueCount() >= 2 && !this.isDescriptionRevealed) {
-        setTimeout(() => {
+        this.showDescriptionTimeoutId = window.setTimeout(() => {
           this.isDescriptionRevealed = true;
+          this.showDescriptionTimeoutId = null;
         }, 500);
       }
 
       // Révéler le tampon quand tout est découvert
       if (this.jobCompletionStatus[this.selectedJobIndex] === 100) {
-        setTimeout(() => {
+        this.showStampTimeoutId = window.setTimeout(() => {
           this.isStampRevealed = true;
+          this.showStampTimeoutId = null;
         }, 1000);
       }
 
@@ -801,13 +874,21 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
   initializeChronologyQuiz(): void {
     // Créer les objets pour le quiz de chronologie
     this.originalChronology = [
-      { title: 'Stagiaire Développeur Web', company: 'Megasoft Sarl', order: 0 },
+      {
+        title: 'Stagiaire Développeur Web',
+        company: 'Megasoft Sarl',
+        order: 0,
+      },
       {
         title: 'Stagiaire Consultant Informatique',
         company: 'SKOOVEL Sarl',
         order: 1,
       },
-      { title: 'Alternant Développeur Fullstack', company: 'ANG Tech', order: 2 },
+      {
+        title: 'Alternant Développeur Fullstack',
+        company: 'ANG Tech',
+        order: 2,
+      },
       {
         title: 'Futur Développeur Fullstack Senior',
         company: 'À déterminer',
@@ -836,7 +917,7 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
     if (this.skillMatched[index]) return;
     this.selectedSkillIndex = index;
     this.incorrectMatch = null;
-    
+
     // Si un job est déjà sélectionné, vérifier automatiquement l'association
     if (this.selectedJobMatchIndex !== null) {
       this.checkMatch();
@@ -848,7 +929,7 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
     if (this.jobMatched[index]) return;
     this.selectedJobMatchIndex = index;
     this.incorrectMatch = null;
-    
+
     // Si une compétence est déjà sélectionnée, vérifier automatiquement l'association
     if (this.selectedSkillIndex !== null) {
       this.checkMatch();
@@ -859,47 +940,60 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
   checkMatch(): void {
     if (this.selectedSkillIndex === null || this.selectedJobMatchIndex === null)
       return;
-  
+
     const skill = this.selectedSkillIndex;
     const job = this.selectedJobMatchIndex;
-  
+
     // Vérifier si cette compétence est associée à ce job
     const isCorrect =
       this.matchingJobs[job].correctSkillIndices.includes(skill);
-  
+
     if (isCorrect) {
       // Marquer comme associé
       this.skillMatched[skill] = true;
       this.skillToJobMapping[skill] = job;
-  
+
       // Vérifier si toutes les compétences pour ce job sont associées
       const allJobSkillsMatched = this.matchingJobs[
         job
       ].correctSkillIndices.every(
         (skillIndex) => this.skillMatched[skillIndex]
       );
-  
+
       if (allJobSkillsMatched) {
         this.jobMatched[job] = true;
       }
-  
+
       // Réinitialiser la sélection
       this.selectedSkillIndex = null;
       this.selectedJobMatchIndex = null;
-  
+
       // Vérifier si toutes les associations sont faites
       if (this.allSkillsMatched()) {
-        setTimeout(() => {
+        // Nettoyer le timeout précédent si existant
+        if (this.quizTransitionTimeoutId !== null) {
+          clearTimeout(this.quizTransitionTimeoutId);
+        }
+
+        this.quizTransitionTimeoutId = window.setTimeout(() => {
           this.goToNextQuiz();
+          this.quizTransitionTimeoutId = null;
         }, 1000);
       }
     } else {
       // Indiquer une erreur
       this.incorrectMatch = job;
-      setTimeout(() => {
+
+      // Nettoyer le timeout précédent si existant
+      if (this.incorrectMatchTimeoutId !== null) {
+        clearTimeout(this.incorrectMatchTimeoutId);
+      }
+
+      this.incorrectMatchTimeoutId = window.setTimeout(() => {
         this.incorrectMatch = null;
         this.selectedSkillIndex = null;
         this.selectedJobMatchIndex = null;
+        this.incorrectMatchTimeoutId = null;
       }, 800); // Délai plus court pour une meilleure expérience utilisateur
     }
   }
@@ -942,8 +1036,14 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
     );
 
     if (this.isChronologyCorrect) {
-      setTimeout(() => {
+      // Nettoyer le timeout précédent si existant
+      if (this.quizTransitionTimeoutId !== null) {
+        clearTimeout(this.quizTransitionTimeoutId);
+      }
+
+      this.quizTransitionTimeoutId = window.setTimeout(() => {
         this.goToNextQuiz();
+        this.quizTransitionTimeoutId = null;
       }, 1000);
     }
   }

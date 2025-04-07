@@ -4,24 +4,33 @@
   <div class="dialog-container" *ngIf="isDialogOpen">
     <div class="d-flex justify-content-end">
       <div class="detective-container">
-        <img class="img" src="img/detective.png" alt="detective">
+        <img class="img" src="img/detective.png" alt="detective" />
       </div>
     </div>
     <div class="dialog-box">
-      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+      <button
+        (click)="closeDialogTypeWriter()"
+        type="button"
+        class="close-button"
+      >
         <i class="bi bi-x-circle fs-3"></i>
       </button>
       <div class="message px-5">
         <!-- Utilisation du message directement depuis le service -->
-        <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
+        <div>
+          {{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span>
+        </div>
       </div>
     </div>
   </div>
   <!-- Titre de la section avec informations de progression -->
   <div class="section-header">
     <h2 class="section-title">Investigation personnelle: Centres d'intérêt</h2>
-    <div class="investigation-status">Statut : 
-      <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
+    <div class="investigation-status">
+      Statut :
+      <span *ngIf="isModuleCompleted" class="status-badge completed"
+        >Complété</span
+      >
       <span *ngIf="!isModuleCompleted" class="status-badge">En analyse</span>
     </div>
   </div>
@@ -31,7 +40,11 @@
     <!-- Photo de profil entourée d'indices -->
     <div class="suspect-profile">
       <div class="polaroid-container">
-        <div class="polaroid" [class.flipped]="isPhotoFlipped" (click)="flipPhoto()">
+        <div
+          class="polaroid"
+          [class.flipped]="isPhotoFlipped"
+          (click)="flipPhoto()"
+        >
           <div class="polaroid-front">
             <div class="photo-placeholder">
               <i class="bi bi-person-badge"></i>
@@ -41,21 +54,30 @@
           <div class="polaroid-back">
             <div class="profile-notes">
               <h4>Notes d'enquête</h4>
-              <p>Le suspect démontre des centres d'intérêt variés qui révèlent une personnalité à multiple facettes et une curiosité intellectuelle prononcée.</p>
-              <p>Les activités identifiées pourraient expliquer certaines compétences développées dans le cadre professionnel.</p>
+              <p>
+                Le suspect démontre des centres d'intérêt variés qui révèlent
+                une personnalité à multiple facettes et une curiosité
+                intellectuelle prononcée.
+              </p>
+              <p>
+                Les activités identifiées pourraient expliquer certaines
+                compétences développées dans le cadre professionnel.
+              </p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <!-- Indices autour de la photo -->
       <div class="evidence-pins">
-        <div *ngFor="let evidence of evidenceItems; let i = index" 
-             class="evidence-pin" 
-             [class.discovered]="evidence.discovered"
-             [style.--pin-angle]="(i * (360 / evidenceItems.length)) + 'deg'"
-             [style.--pin-distance]="getPinDistance(i) + 'px'"
-             (click)="discoverEvidence(i)">
+        <div
+          *ngFor="let evidence of evidenceItems; let i = index"
+          class="evidence-pin"
+          [class.discovered]="evidence.discovered"
+          [style.--pin-angle]="i * (360 / evidenceItems.length) + 'deg'"
+          [style.--pin-distance]="getPinDistance(i) + 'px'"
+          (click)="discoverEvidence(i)"
+        >
           <div class="pin-connector" [class.active]="evidence.discovered"></div>
           <div class="pin-content">
             <i [class]="'bi ' + evidence.icon"></i>
@@ -63,28 +85,36 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Plateau d'enquête - Avec les catégories d'intérêts -->
     <div class="investigation-categories">
       <div class="categories-header">
         <h3>Catégories d'intérêt identifiées</h3>
         <div class="discovery-progress">
-          <span>{{getDiscoveredCount()}} / {{evidenceItems.length}} indices découverts</span>
+          <span
+            >{{ getDiscoveredCount() }} / {{ evidenceItems.length }} indices
+            découverts</span
+          >
           <div class="progress-bar-container">
-            <div class="progress-bar" [style.width.%]="getDiscoveredPercentage()"></div>
+            <div
+              class="progress-bar"
+              [style.width.%]="getDiscoveredPercentage()"
+            ></div>
           </div>
         </div>
       </div>
-      
+
       <div class="categories-grid">
-        <div *ngFor="let category of interestCategories" 
-             class="category-card" 
-             [class.unlocked]="isCategoryUnlocked(category.id)"
-             (click)="selectCategory(category.id)">
+        <div
+          *ngFor="let category of interestCategories"
+          class="category-card"
+          [class.unlocked]="isCategoryUnlocked(category.id)"
+          (click)="selectCategory(category.id)"
+        >
           <div class="category-icon">
             <i [class]="'bi ' + category.icon"></i>
           </div>
-          <div class="category-title">{{category.name}}</div>
+          <div class="category-title">{{ category.name }}</div>
           <div class="lock-indicator" *ngIf="!isCategoryUnlocked(category.id)">
             <i class="bi bi-lock"></i>
           </div>
@@ -92,88 +122,119 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Fenêtre d'analyse détaillée -->
   <div class="analysis-window" *ngIf="selectedCategory">
     <div class="window-header">
       <div class="header-title">
         <i [class]="'bi ' + getSelectedCategoryIcon()"></i>
-        <h3>{{getSelectedCategoryName()}}</h3>
+        <h3>{{ getSelectedCategoryName() }}</h3>
       </div>
       <button class="close-btn" (click)="closeAnalysisWindow()">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
-    
+
     <div class="window-content">
       <div class="interests-gallery">
-        <div *ngFor="let interest of getInterestsByCategory()" 
-             class="interest-item" 
-             [class.discovered]="isInterestDiscovered(interest.id)"
-             [class.hidden]="!showUndiscoveredInterests && !isInterestDiscovered(interest.id)">
+        <div
+          *ngFor="let interest of getInterestsByCategory()"
+          class="interest-item"
+          [class.discovered]="isInterestDiscovered(interest.id)"
+          [class.hidden]="
+            !showUndiscoveredInterests && !isInterestDiscovered(interest.id)
+          "
+        >
           <div class="interest-header">
             <div class="interest-icon">
               <i [class]="'bi ' + interest.icon"></i>
             </div>
-            <h4>{{interest.name}}</h4>
-            <div class="interest-status" *ngIf="!isInterestDiscovered(interest.id)">
+            <h4>{{ interest.name }}</h4>
+            <div
+              class="interest-status"
+              *ngIf="!isInterestDiscovered(interest.id)"
+            >
               <i class="bi bi-lock"></i>
             </div>
           </div>
-          
-          <div class="interest-content" *ngIf="isInterestDiscovered(interest.id)">
+
+          <div
+            class="interest-content"
+            *ngIf="isInterestDiscovered(interest.id)"
+          >
             <div class="interest-description">
-              <p>{{interest.description}}</p>
+              <p>{{ interest.description }}</p>
             </div>
-            
+
             <div class="interest-details">
               <div class="detail-item" *ngIf="interest.since">
                 <i class="bi bi-calendar-check"></i>
-                <span>Depuis {{interest.since}}</span>
+                <span>Depuis {{ interest.since }}</span>
               </div>
               <div class="detail-item" *ngIf="interest.frequency">
                 <i class="bi bi-clock"></i>
-                <span>{{interest.frequency}}</span>
+                <span>{{ interest.frequency }}</span>
               </div>
-              <div class="detail-item" *ngIf="interest.skillsRelated && interest.skillsRelated.length > 0">
+              <div
+                class="detail-item"
+                *ngIf="
+                  interest.skillsRelated && interest.skillsRelated.length > 0
+                "
+              >
                 <i class="bi bi-link-45deg"></i>
-                <span>Compétences liées: {{interest.skillsRelated.join(', ')}}</span>
+                <span
+                  >Compétences liées:
+                  {{ interest.skillsRelated.join(", ") }}</span
+                >
               </div>
             </div>
-            
-            <div class="interest-gallery" *ngIf="interest.relatedImages && interest.relatedImages.length > 0">
+
+            <div
+              class="interest-gallery"
+              *ngIf="
+                interest.relatedImages && interest.relatedImages.length > 0
+              "
+            >
               <div class="gallery-title">
                 <i class="bi bi-images"></i>
                 <span>En images</span>
               </div>
               <div class="images-container">
-                <div *ngFor="let image of interest.relatedImages" class="image-item">
+                <div
+                  *ngFor="let image of interest.relatedImages"
+                  class="image-item"
+                >
                   <div class="image-placeholder">
                     <i class="bi bi-image"></i>
-                    <span>{{image.caption}}</span>
+                    <span>{{ image.caption }}</span>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div class="interest-highlight" *ngIf="interest.highlight">
               <i class="bi bi-stars"></i>
               <div class="highlight-content">
                 <h5>Fait intéressant</h5>
-                <p>{{interest.highlight}}</p>
+                <p>{{ interest.highlight }}</p>
               </div>
             </div>
           </div>
-          
-          <div class="interest-locked-content" *ngIf="!isInterestDiscovered(interest.id)">
-            <p>Information cryptée. Trouvez plus d'indices pour débloquer ce contenu.</p>
+
+          <div
+            class="interest-locked-content"
+            *ngIf="!isInterestDiscovered(interest.id)"
+          >
+            <p>
+              Information cryptée. Trouvez plus d'indices pour débloquer ce
+              contenu.
+            </p>
           </div>
         </div>
       </div>
     </div>
-    
   </div>
-  
+
   <!-- Modal de découverte d'indice -->
   <div class="evidence-modal" *ngIf="showEvidenceModal">
     <div class="modal-content">
@@ -185,23 +246,42 @@
       </div>
       <div class="modal-body">
         <div class="evidence-icon">
-          <i [class]="'bi ' + (currentEvidence ? currentEvidence.icon : 'bi-question')"></i>
+          <i
+            [class]="
+              'bi ' + (currentEvidence ? currentEvidence.icon : 'bi-question')
+            "
+          ></i>
         </div>
         <div class="evidence-details">
-          <h5>{{currentEvidence ? currentEvidence.name : 'Indice'}}</h5>
-          <p>{{currentEvidence ? currentEvidence.description : 'Description de l\'indice'}}</p>
-          <div class="evidence-unlocks" *ngIf="currentEvidence && currentEvidence.unlocksInterests && currentEvidence.unlocksInterests.length > 0">
+          <h5>{{ currentEvidence ? currentEvidence.name : "Indice" }}</h5>
+          <p>
+            {{
+              currentEvidence
+                ? currentEvidence.description
+                : "Description de l'indice"
+            }}
+          </p>
+          <div
+            class="evidence-unlocks"
+            *ngIf="
+              currentEvidence &&
+              currentEvidence.unlocksInterests &&
+              currentEvidence.unlocksInterests.length > 0
+            "
+          >
             <h6>Centres d'intérêt débloqués:</h6>
             <ul>
               <li *ngFor="let interestId of currentEvidence.unlocksInterests">
-                {{getInterestName(interestId)}}
+                {{ getInterestName(interestId) }}
               </li>
             </ul>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="continue-btn" (click)="closeEvidenceModal()">Continuer l'enquête</button>
+        <button class="continue-btn" (click)="closeEvidenceModal()">
+          Continuer l'enquête
+        </button>
       </div>
     </div>
   </div>
@@ -210,118 +290,170 @@
   <div class="completion-message" *ngIf="isModuleCompleted">
     <div class="alert alert-success">
       <i class="bi bi-check-circle-fill"></i>
-      Module complété ! L'enquête sur les centres d'intérêt du sujet a été menée avec succès.
+      Module complété ! L'enquête sur les centres d'intérêt du sujet a été menée
+      avec succès.
     </div>
   </div>
 
   <!-- Ajouter le bouton "Continuer" après le message de complétion du module -->
-<div class="completion-message" *ngIf="isModuleCompleted">
-  <div class="alert alert-success">
-    <i class="bi bi-check-circle-fill"></i>
-    Module complété ! L'enquête sur les centres d'intérêt du sujet a été menée avec succès.
-  </div>
-</div>
-
-<!-- Ajouter le bouton continuer -->
-<div class="continue-module-section" *ngIf="getDiscoveredCount() >= (evidenceItems.length * 0.75) || isModuleCompleted">
-  <button class="continue-module-btn" (click)="startQuiz()">
-    <i class="bi bi-arrow-right-circle me-2"></i>
-    Continuer vers le module suivant
-  </button>
-</div>
-
-<!-- Modal du Quiz -->
-<div class="quiz-modal-overlay" *ngIf="showQuizModal">
-  <div class="quiz-modal">
-    <div class="quiz-modal-header">
-      <h3>
-        <i class="bi bi-clipboard-check me-2"></i>
-        Évaluation finale: Centres d'intérêt
-      </h3>
-      <button class="quiz-close-btn" (click)="closeQuizModal()">
-        <i class="bi bi-x-lg"></i>
-      </button>
-    </div>
-    
-    <div class="quiz-modal-body" *ngIf="quizStarted && !quizPassed && currentQuizQuestion < quizQuestions.length">
-      <div class="quiz-progress">
-        <div class="quiz-progress-text">Question {{currentQuizQuestion + 1}}/{{quizQuestions.length}}</div>
-        <div class="quiz-progress-bar-container">
-          <div class="quiz-progress-bar" [style.width.%]="((currentQuizQuestion + 1) / quizQuestions.length) * 100"></div>
-        </div>
-      </div>
-      
-      <div class="quiz-question">
-        <p>{{quizQuestions[currentQuizQuestion].question}}</p>
-      </div>
-      
-      <div class="quiz-options">
-        <div *ngFor="let option of quizQuestions[currentQuizQuestion].options; let i = index"
-             class="quiz-option"
-             [class.selected]="selectedAnswer === i"
-             (click)="selectQuizAnswer(i)">
-          <div class="option-marker">{{getResponseLetter(i)}}</div>
-          <div class="option-text">{{option}}</div>
-        </div>
-      </div>
-      
-      <button class="quiz-submit-btn" [disabled]="selectedAnswer === null" (click)="submitQuizAnswer()">
-        <i class="bi bi-check-circle me-2"></i>
-        Valider ma réponse
-      </button>
-    </div>
-    
-    <div class="quiz-modal-body quiz-results" *ngIf="quizStarted && (quizPassed || currentQuizQuestion >= quizQuestions.length)">
-      <div class="quiz-result-icon" [class.success]="quizPassed" [class.failure]="!quizPassed">
-        <i [class]="quizPassed ? 'bi bi-trophy' : 'bi bi-x-circle'"></i>
-      </div>
-      
-      <h4 class="quiz-result-title">
-        {{quizPassed ? 'Félicitations !' : 'Évaluation non validée'}}
-      </h4>
-      
-      <p class="quiz-result-message">
-        {{quizPassed ? 
-          'Vous avez correctement analysé les centres d\'intérêt du sujet. Vous êtes maintenant prêt à passer au module suivant.' : 
-          'Votre compréhension des centres d\'intérêt du sujet nécessite un approfondissement. Continuez à explorer les indices et réessayez.'}}
-      </p>
-      
-      <div class="quiz-score">
-        <div class="score-label">Votre score:</div>
-        <div class="score-value">{{quizScore}}/{{quizQuestions.length}}</div>
-      </div>
-      
-      <button class="quiz-close-btn-large" (click)="closeQuizModal()">
-        <i class="bi bi-arrow-left-circle me-2"></i>
-        Retourner à l'investigation
-      </button>
-      
-      <button class="quiz-continue-btn" *ngIf="quizPassed" (click)="continueToNextModule()">
-        <i class="bi bi-arrow-right-circle me-2"></i>
-        Continuer au module suivant
-      </button>
-    </div>
-    
-    <div class="quiz-modal-body quiz-intro" *ngIf="quizStarted === false">
-      <div class="quiz-intro-icon">
-        <i class="bi bi-clipboard-check"></i>
-      </div>
-      
-      <h4 class="quiz-intro-title">Évaluation de votre analyse</h4>
-      
-      <p class="quiz-intro-text">
-        Vous allez répondre à {{quizQuestions.length}} questions portant sur les centres d'intérêt que vous avez découverts à travers votre investigation. Cette évaluation permettra de valider votre compréhension du profil personnel du sujet.
-      </p>
-      
-      <p class="quiz-intro-instructions">
-        Pour réussir l'évaluation, vous devrez obtenir au moins {{getPassScore()}}/{{quizQuestions.length}} réponses correctes.
-      </p>
-      
-      <button class="quiz-start-btn" (click)="quizStarted = true">
-        <i class="bi bi-play-circle me-2"></i>
-        Commencer l'évaluation
-      </button>
+  <div class="completion-message" *ngIf="isModuleCompleted">
+    <div class="alert alert-success">
+      <i class="bi bi-check-circle-fill"></i>
+      Module complété ! L'enquête sur les centres d'intérêt du sujet a été menée
+      avec succès.
     </div>
   </div>
-</div>
+
+  <!-- Ajouter le bouton continuer -->
+  <div
+    class="continue-module-section"
+    *ngIf="
+      getDiscoveredCount() >= evidenceItems.length * 0.75 || isModuleCompleted
+    "
+  >
+    <button class="continue-module-btn" (click)="startQuiz()">
+      <i class="bi bi-arrow-right-circle me-2"></i>
+      Continuer vers le module suivant
+    </button>
+  </div>
+
+  <!-- Modal du Quiz -->
+  <div class="quiz-modal-overlay" *ngIf="showQuizModal">
+    <div class="quiz-modal">
+      <div class="quiz-modal-header">
+        <h3>
+          <i class="bi bi-clipboard-check me-2"></i>
+          Évaluation finale: Centres d'intérêt
+        </h3>
+        <button class="quiz-close-btn" (click)="closeQuizModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div
+        class="quiz-modal-body"
+        *ngIf="
+          quizStarted &&
+          !quizPassed &&
+          currentQuizQuestion < quizQuestions.length
+        "
+      >
+        <div class="quiz-progress">
+          <div class="quiz-progress-text">
+            Question {{ currentQuizQuestion + 1 }}/{{ quizQuestions.length }}
+          </div>
+          <div class="quiz-progress-bar-container">
+            <div
+              class="quiz-progress-bar"
+              [style.width.%]="
+                ((currentQuizQuestion + 1) / quizQuestions.length) * 100
+              "
+            ></div>
+          </div>
+        </div>
+
+        <div class="quiz-question">
+          <p>{{ quizQuestions[currentQuizQuestion].question }}</p>
+        </div>
+
+        <div class="quiz-options">
+          <div
+            *ngFor="
+              let option of quizQuestions[currentQuizQuestion].options;
+              let i = index
+            "
+            class="quiz-option"
+            [class.selected]="selectedAnswer === i"
+            (click)="selectQuizAnswer(i)"
+          >
+            <div class="option-marker">{{ getResponseLetter(i) }}</div>
+            <div class="option-text">{{ option }}</div>
+          </div>
+        </div>
+
+        <button
+          class="quiz-submit-btn"
+          [disabled]="selectedAnswer === null"
+          (click)="submitQuizAnswer()"
+        >
+          <i class="bi bi-check-circle me-2"></i>
+          Valider ma réponse
+        </button>
+      </div>
+
+      <div
+        class="quiz-modal-body quiz-results"
+        *ngIf="
+          quizStarted &&
+          (quizPassed || currentQuizQuestion >= quizQuestions.length)
+        "
+      >
+        <div
+          class="quiz-result-icon"
+          [class.success]="quizPassed"
+          [class.failure]="!quizPassed"
+        >
+          <i [class]="quizPassed ? 'bi bi-trophy' : 'bi bi-x-circle'"></i>
+        </div>
+
+        <h4 class="quiz-result-title">
+          {{ quizPassed ? "Félicitations !" : "Évaluation non validée" }}
+        </h4>
+
+        <p class="quiz-result-message">
+          {{
+            quizPassed
+              ? "Vous avez correctement analysé les centres d'intérêt du sujet. Vous êtes maintenant prêt à passer au module suivant."
+              : "Votre compréhension des centres d'intérêt du sujet nécessite un approfondissement. Continuez à explorer les indices et réessayez."
+          }}
+        </p>
+
+        <div class="quiz-score">
+          <div class="score-label">Votre score:</div>
+          <div class="score-value">
+            {{ quizScore }}/{{ quizQuestions.length }}
+          </div>
+        </div>
+
+        <button class="quiz-close-btn-large" (click)="closeQuizModal()">
+          <i class="bi bi-arrow-left-circle me-2"></i>
+          Retourner à l'investigation
+        </button>
+
+        <button
+          class="quiz-continue-btn"
+          *ngIf="quizPassed"
+          (click)="continueToNextModule()"
+        >
+          <i class="bi bi-arrow-right-circle me-2"></i>
+          Continuer au module suivant
+        </button>
+      </div>
+
+      <div class="quiz-modal-body quiz-intro" *ngIf="quizStarted === false">
+        <div class="quiz-intro-icon">
+          <i class="bi bi-clipboard-check"></i>
+        </div>
+
+        <h4 class="quiz-intro-title">Évaluation de votre analyse</h4>
+
+        <p class="quiz-intro-text">
+          Vous allez répondre à {{ quizQuestions.length }} questions portant sur
+          les centres d'intérêt que vous avez découverts à travers votre
+          investigation. Cette évaluation permettra de valider votre
+          compréhension du profil personnel du sujet.
+        </p>
+
+        <p class="quiz-intro-instructions">
+          Pour réussir l'évaluation, vous devrez obtenir au moins
+          {{ getPassScore() }}/{{ quizQuestions.length }} réponses correctes.
+        </p>
+
+        <button class="quiz-start-btn" (click)="quizStarted = true">
+          <i class="bi bi-play-circle me-2"></i>
+          Commencer l'évaluation
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

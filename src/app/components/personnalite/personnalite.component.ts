@@ -8,7 +8,7 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
@@ -93,6 +93,15 @@ interface QuizQuestion {
 })
 export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;
+
+  // Pour gérer la destruction proprement
+  private destroy$ = new Subject<void>();
+
+  // Gérer les timeouts
+  private introDialogTimeoutId: number | null = null;
+  private closeDialogTimeoutId: number | null = null;
+  private quizEnableTimeoutId: number | null = null;
+  private navigationTimeoutId: number | null = null;
 
   // Identifiant du module
   private readonly MODULE_ID = 'personnalite';
@@ -550,30 +559,62 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.enableFinalQuiz();
     }
 
-    // Souscrire au dialogue
-    this.subscriptions.push(
-      this.dialogService.isDialogOpen$.subscribe((isOpen) => {
+    // Souscrire au dialogue avec takeUntil
+    this.dialogService.isDialogOpen$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isOpen) => {
         this.isDialogOpen = isOpen;
-      }),
-      this.dialogService.isTyping$.subscribe((isTyping) => {
+      });
+
+    this.dialogService.isTyping$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isTyping) => {
         this.isTyping = isTyping;
-      }),
-      this.dialogService.currentMessage$.subscribe((message) => {
+      });
+
+    this.dialogService.currentMessage$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message) => {
         this.dialogMessage = message;
-      })
-    );
+      });
   }
 
   ngAfterViewInit(): void {
-    // Afficher le dialogue d'introduction
-    setTimeout(() => {
+    // Afficher le dialogue d'introduction avec un timeout géré
+    this.introDialogTimeoutId = window.setTimeout(() => {
       this.showIntroDialog();
+      this.introDialogTimeoutId = null;
     }, 500);
   }
 
   ngOnDestroy(): void {
-    // Nettoyer les souscriptions
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    // Émettre le signal de destruction pour tous les observables
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    // Nettoyer tous les timeouts
+    this.clearAllTimeouts();
+
+    // Fermer tout dialogue ouvert
+    if (this.isDialogOpen) {
+      this.dialogService.closeDialog();
+    }
+  }
+
+  // Nettoyer tous les timeouts
+  private clearAllTimeouts(): void {
+    const timeouts = [
+      this.introDialogTimeoutId,
+      this.closeDialogTimeoutId,
+      this.quizEnableTimeoutId,
+      this.navigationTimeoutId,
+    ];
+
+    timeouts.forEach((timeoutId) => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    });
   }
 
   // Charger les progrès précédents
@@ -670,55 +711,8 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateInsightsDiscovered();
   }
 
-  updateInsightsCount(): void {
-    let count = 0;
+  // Mettre à jour le nombre d'insights découverts - version améliorée
 
-    // Compter tous les éléments découverts
-    this.personalityTraits.forEach((trait) => {
-      if (trait.discovered) count++;
-    });
-
-    this.collaborationAspects.forEach((aspect) => {
-      if (aspect.discovered) count++;
-    });
-
-    this.workProcesses.forEach((process) => {
-      if (process.discovered) count++;
-    });
-
-    this.motivationFactors.forEach((factor) => {
-      if (factor.discovered) count++;
-    });
-
-    this.coreValues.forEach((value) => {
-      if (value.discovered) count++;
-    });
-
-    this.workPreferences.forEach((pref) => {
-      if (pref.discovered) count++;
-    });
-
-    this.insightsDiscovered = count;
-
-    // Mettre à jour la progression globale sans déclencher d'autres actions
-    this.investigationProgress = Math.min(
-      Math.round((this.insightsDiscovered / this.totalInsights) * 100),
-      this.maxInvestigationProgress
-    );
-
-    // Sauvegarder la progression
-    this.userDataService.saveResponse(
-      this.MODULE_ID,
-      'investigation_progress',
-      this.investigationProgress
-    );
-
-    // Activer le quiz si nécessaire
-    if (this.investigationProgress >= 70) {
-      this.enableFinalQuiz();
-    }
-  }
-  // Mettre à jour le nombre d'insights découverts
   updateInsightsDiscovered(): void {
     // Éviter la récursion
     if (this.isUpdatingInsights) {
@@ -769,18 +763,6 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.investigationProgress
     );
 
-    if (this.investigationProgress >= 70) {
-      this.enableFinalQuiz();
-    }
-
-    // Si tous les insights sont découverts, activer forcément le quiz
-    if (this.insightsDiscovered >= this.totalInsights) {
-      this.enableFinalQuiz();
-    }
-
-    // SUPPRESSION de la condition qui créait la boucle infinie
-    // Ne plus appeler revealAllTraits() ici
-
     // Vérifier si le quiz peut être activé (à 70% de progression)
     if (this.investigationProgress >= 70 && !this.isQuizAvailable()) {
       this.enableFinalQuiz();
@@ -788,6 +770,56 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.isUpdatingInsights = false;
+  }
+
+  // Version alternative plus simple pour éviter les boucles
+  updateInsightsCount(): void {
+    let count = 0;
+
+    // Compter tous les éléments découverts
+    this.personalityTraits.forEach((trait) => {
+      if (trait.discovered) count++;
+    });
+
+    this.collaborationAspects.forEach((aspect) => {
+      if (aspect.discovered) count++;
+    });
+
+    this.workProcesses.forEach((process) => {
+      if (process.discovered) count++;
+    });
+
+    this.motivationFactors.forEach((factor) => {
+      if (factor.discovered) count++;
+    });
+
+    this.coreValues.forEach((value) => {
+      if (value.discovered) count++;
+    });
+
+    this.workPreferences.forEach((pref) => {
+      if (pref.discovered) count++;
+    });
+
+    this.insightsDiscovered = count;
+
+    // Mettre à jour la progression globale sans déclencher d'autres actions
+    this.investigationProgress = Math.min(
+      Math.round((this.insightsDiscovered / this.totalInsights) * 100),
+      this.maxInvestigationProgress
+    );
+
+    // Sauvegarder la progression
+    this.userDataService.saveResponse(
+      this.MODULE_ID,
+      'investigation_progress',
+      this.investigationProgress
+    );
+
+    // Activer le quiz si nécessaire
+    if (this.investigationProgress >= 70) {
+      this.enableFinalQuiz();
+    }
   }
 
   // Ajouter cette méthode pour notifier l'utilisateur
@@ -873,8 +905,14 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     };
     this.dialogService.openDialog(dialogMessage);
     this.dialogService.startTypewriter(this.fullText, () => {
-      setTimeout(() => {
+      // Nettoyer tout timeout précédent
+      if (this.closeDialogTimeoutId !== null) {
+        clearTimeout(this.closeDialogTimeoutId);
+      }
+
+      this.closeDialogTimeoutId = window.setTimeout(() => {
         this.dialogService.closeDialog();
+        this.closeDialogTimeoutId = null;
       }, 3000);
     });
   }
@@ -882,6 +920,12 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
+
+    // Annuler tout timeout de fermeture programmé
+    if (this.closeDialogTimeoutId !== null) {
+      clearTimeout(this.closeDialogTimeoutId);
+      this.closeDialogTimeoutId = null;
+    }
   }
 
   // Changement d'onglet
@@ -1078,9 +1122,10 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     // Mettre à jour le nombre d'insights découverts
-    this.updateInsightsDiscovered();
+    this.updateInsightsCount();
   }
 
+  // Afficher un message lorsque l'investigation est suffisamment avancée
   // Afficher un message lorsque l'investigation est suffisamment avancée
   showCompleteInvestigationMessage(): void {
     const message =
@@ -1094,9 +1139,15 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dialogService.openDialog(dialogMessage);
     this.dialogService.startTypewriter(message);
 
+    // Nettoyer tout timeout précédent
+    if (this.quizEnableTimeoutId !== null) {
+      clearTimeout(this.quizEnableTimeoutId);
+    }
+
     // Offrir la possibilité de passer le quiz final
-    setTimeout(() => {
+    this.quizEnableTimeoutId = window.setTimeout(() => {
       this.enableFinalQuiz();
+      this.quizEnableTimeoutId = null;
     }, 5000);
   }
 
@@ -1104,13 +1155,6 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   enableFinalQuiz(): void {
     // Sauvegarder explicitement comme une valeur booléenne
     this.userDataService.saveResponse(this.MODULE_ID, 'quiz_available', true);
-
-    // Forcer la mise à jour en vérifiant à nouveau la disponibilité
-    const checkSaved = this.userDataService.getResponse(
-      this.MODULE_ID,
-      'quiz_available'
-    );
-    console.log('Quiz disponibilité sauvegardée:', checkSaved);
   }
 
   // Démarrer le quiz final
@@ -1431,7 +1475,6 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Fonction pour continuer au module suivant
   continueToNextModule(): void {
-    console.log(this.isModuleCompleted);
     if (this.isModuleCompleted()) {
       // Vérifier que toutes les données sont bien sauvegardées
       this.userDataService.saveResponse(
@@ -1455,13 +1498,23 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.dialogService.openDialog(dialogMessage);
       this.dialogService.startTypewriter(message);
 
+      // Nettoyer tout timeout précédent
+      if (this.navigationTimeoutId !== null) {
+        clearTimeout(this.navigationTimeoutId);
+      }
+
       // Rediriger vers le prochain module après un court délai
-      setTimeout(() => {
-        // Navigation au module suivant - à adapter selon votre système de routing
-        this.router.navigate(['/centres']);
+      this.navigationTimeoutId = window.setTimeout(() => {
+        // Nettoyer les ressources avant la navigation
+        this.clearAllTimeouts();
 
         // Fermeture du dialogue
         this.dialogService.closeDialog();
+
+        // Navigation au module suivant
+        this.router.navigate(['/centres']);
+
+        this.navigationTimeoutId = null;
       }, 5000);
     } else {
       // Si le module n'est pas complété, informer l'utilisateur
@@ -1477,6 +1530,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.dialogService.startTypewriter(message);
     }
   }
+
   getCollaborationDiscoveredCount(): number {
     let count = 0;
     for (const aspect of this.collaborationAspects) {

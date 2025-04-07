@@ -2,8 +2,13 @@
 <div id="sound-modal" class="modal">
   <div class="modal-content">
     <h2>🎵 Activez le son pour une immersion complète</h2>
-    <p>Ce site utilise des effets sonores pour améliorer votre expérience. Cliquez sur le bouton ci-dessous pour activer le son.</p>
-    <button id="enable-sound-btn" class="enable-sound-btn">Activer le son</button>
+    <p>
+      Ce site utilise des effets sonores pour améliorer votre expérience.
+      Cliquez sur le bouton ci-dessous pour activer le son.
+    </p>
+    <button id="enable-sound-btn" class="enable-sound-btn">
+      Activer le son
+    </button>
   </div>
 </div>
 
@@ -13,8 +18,10 @@
 <!-- Barre de progression -->
 <div *ngIf="isAuthenticated" class="progress-bar-container">
   <div class="progress-info">
-    <span class="progress-percentage">{{completionPercentage}}% complété</span>
-    <span class="elapsed-time">Temps: {{elapsedTime}}</span>
+    <span class="progress-percentage"
+      >{{ completionPercentage }}% complété</span
+    >
+    <span class="elapsed-time">Temps: {{ elapsedTime }}</span>
   </div>
   <div class="progress-track">
     <div class="progress-fill" [style.width.%]="completionPercentage"></div>
@@ -23,51 +30,114 @@
 
 <!-- Barre de navigation avec état des modules -->
 <div *ngIf="isAuthenticated" class="d-flex mt-4 justify-content-center gap-3">
-  <a class="btn" 
-     [ngClass]="{'btn-primary': true, 'btn-disabled': !isModuleAvailable('home')}" 
-     routerLink="/">Accueil</a>
-  
-  <a class="btn" 
-     [ngClass]="{'btn-primary': isModuleAvailable('itineraire'), 'btn-secondary': !isModuleAvailable('itineraire'), 'btn-disabled': !isModuleAvailable('itineraire')}"
-     routerLink="/itineraire">Itinéraire</a>
-  
-  <a class="btn" 
-     [ngClass]="{'btn-primary': isModuleAvailable('experience'), 'btn-secondary': !isModuleAvailable('experience'), 'btn-disabled': !isModuleAvailable('experience')}"
-     routerLink="/experience">Expérience</a>
-  
-  <a class="btn" 
-     [ngClass]="{'btn-primary': isModuleAvailable('attentes'), 'btn-secondary': !isModuleAvailable('attentes'), 'btn-disabled': !isModuleAvailable('attentes')}"
-     routerLink="/attentes">Attentes</a>
-  
-  <a class="btn" 
-     [ngClass]="{'btn-primary': isModuleAvailable('personnalite'), 'btn-secondary': !isModuleAvailable('personnalite'), 'btn-disabled': !isModuleAvailable('personnalite')}"
-     routerLink="/personnalite">Personnalité</a>
-  
-  <a class="btn" 
-     [ngClass]="{'btn-primary': isModuleAvailable('centres'), 'btn-secondary': !isModuleAvailable('centres'), 'btn-disabled': !isModuleAvailable('centres')}"
-     routerLink="/centres">Centres d'intérêt</a>
-  
-  <a class="btn" 
-     [ngClass]="{'btn-primary': isModuleAvailable('motivations'), 'btn-secondary': !isModuleAvailable('motivations'), 'btn-disabled': !isModuleAvailable('motivations')}"
-     routerLink="/motivations">Motivations</a>
-  
-  <a class="btn" 
-     [ngClass]="{'btn-primary': isModuleAvailable('conclusion'), 'btn-secondary': !isModuleAvailable('conclusion'), 'btn-disabled': !isModuleAvailable('conclusion')}"
-     routerLink="/conclusion">Conclusion</a>
+  <a
+    class="btn"
+    [ngClass]="{
+      'btn-primary': true,
+      'btn-disabled': !isModuleAvailable('home')
+    }"
+    routerLink="/"
+    >Accueil</a
+  >
+
+  <a
+    class="btn"
+    [ngClass]="{
+      'btn-primary': isModuleAvailable('itineraire'),
+      'btn-secondary': !isModuleAvailable('itineraire'),
+      'btn-disabled': !isModuleAvailable('itineraire')
+    }"
+    routerLink="/itineraire"
+    >Itinéraire</a
+  >
+
+  <a
+    class="btn"
+    [ngClass]="{
+      'btn-primary': isModuleAvailable('experience'),
+      'btn-secondary': !isModuleAvailable('experience'),
+      'btn-disabled': !isModuleAvailable('experience')
+    }"
+    routerLink="/experience"
+    >Expérience</a
+  >
+
+  <a
+    class="btn"
+    [ngClass]="{
+      'btn-primary': isModuleAvailable('attentes'),
+      'btn-secondary': !isModuleAvailable('attentes'),
+      'btn-disabled': !isModuleAvailable('attentes')
+    }"
+    routerLink="/attentes"
+    >Attentes</a
+  >
+
+  <a
+    class="btn"
+    [ngClass]="{
+      'btn-primary': isModuleAvailable('personnalite'),
+      'btn-secondary': !isModuleAvailable('personnalite'),
+      'btn-disabled': !isModuleAvailable('personnalite')
+    }"
+    routerLink="/personnalite"
+    >Personnalité</a
+  >
+
+  <a
+    class="btn"
+    [ngClass]="{
+      'btn-primary': isModuleAvailable('centres'),
+      'btn-secondary': !isModuleAvailable('centres'),
+      'btn-disabled': !isModuleAvailable('centres')
+    }"
+    routerLink="/centres"
+    >Centres d'intérêt</a
+  >
+
+  <a
+    class="btn"
+    [ngClass]="{
+      'btn-primary': isModuleAvailable('motivations'),
+      'btn-secondary': !isModuleAvailable('motivations'),
+      'btn-disabled': !isModuleAvailable('motivations')
+    }"
+    routerLink="/motivations"
+    >Motivations</a
+  >
+
+  <a
+    class="btn"
+    [ngClass]="{
+      'btn-primary': isModuleAvailable('conclusion'),
+      'btn-secondary': !isModuleAvailable('conclusion'),
+      'btn-disabled': !isModuleAvailable('conclusion')
+    }"
+    routerLink="/conclusion"
+    >Conclusion</a
+  >
 </div>
 
 <!-- Boutons utilitaires -->
 <div *ngIf="isAuthenticated" class="utility-buttons">
-  <button class="utility-btn export-btn" (click)="exportData()" title="Exporter vos données">
+  <button
+    class="utility-btn export-btn"
+    (click)="exportData()"
+    title="Exporter vos données"
+  >
     <i class="bi bi-download"></i>
   </button>
-  
+
   <label class="utility-btn import-btn" title="Importer vos données">
     <i class="bi bi-upload"></i>
-    <input type="file" hidden accept=".json" (change)="importData($event)">
+    <input type="file" hidden accept=".json" (change)="importData($event)" />
   </label>
-  
-  <button class="utility-btn reset-btn" (click)="resetApplication()" title="Réinitialiser l'enquête">
+
+  <button
+    class="utility-btn reset-btn"
+    (click)="resetApplication()"
+    title="Réinitialiser l'enquête"
+  >
     <i class="bi bi-arrow-counterclockwise"></i>
   </button>
 </div>
@@ -83,18 +153,27 @@
   <div class="notes-content">
     <!-- Notes récupérées depuis le NoteService -->
     <div *ngIf="notes.length === 0" class="no-notes">
-      <p>Aucune note pour le moment. Complétez des modules pour générer des notes automatiques.</p>
+      <p>
+        Aucune note pour le moment. Complétez des modules pour générer des notes
+        automatiques.
+      </p>
     </div>
-    
+
     <div *ngFor="let note of notes" class="note-item">
-      <div class="note-text">{{note.content}}</div>
-      <div class="note-date">{{note.timestamp | date:'dd/MM/yyyy HH:mm'}}</div>
+      <div class="note-text">{{ note.content }}</div>
+      <div class="note-date">
+        {{ note.timestamp | date : "dd/MM/yyyy HH:mm" }}
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Bouton pour afficher/masquer les notes -->
-<button *ngIf="isAuthenticated" class="toggle-notes-btn" (click)="toggleNotes()">
+<button
+  *ngIf="isAuthenticated"
+  class="toggle-notes-btn"
+  (click)="toggleNotes()"
+>
   <i
     class="bi"
     [ngClass]="showNotes ? 'bi-chevron-down' : 'bi-journal-text'"
@@ -104,8 +183,13 @@
 
 <!-- Bouton pour activer/désactiver le son -->
 <button class="toggle-sound-btn" (click)="toggleSound()">
-  <i class="bi" [ngClass]="soundService.isSoundEnabled ? 'bi-volume-up' : 'bi-volume-mute'"></i>
-  <span>{{ soundService.isSoundEnabled ? 'Désactiver le son' : 'Activer le son' }}</span>
+  <i
+    class="bi"
+    [ngClass]="soundService.isSoundEnabled ? 'bi-volume-up' : 'bi-volume-mute'"
+  ></i>
+  <span>{{
+    soundService.isSoundEnabled ? "Désactiver le son" : "Activer le son"
+  }}</span>
 </button>
 
 <!-- Le contenu principal des pages -->

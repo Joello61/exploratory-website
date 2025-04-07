@@ -60,9 +60,17 @@
 }
 
 @keyframes blink {
-  0%, 40% { opacity: 1; }
-  50%, 90% { opacity: 0; }
-  100% { opacity: 1; }
+  0%,
+  40% {
+    opacity: 1;
+  }
+  50%,
+  90% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .img {
@@ -186,7 +194,11 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(15, 15, 30, 0.2), rgba(15, 15, 30, 0.5));
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 15, 30, 0.2),
+    rgba(15, 15, 30, 0.5)
+  );
 }
 
 /* Section Timeline */
@@ -455,8 +467,14 @@
 }
 
 @keyframes bar-pulse {
-  0% { filter: brightness(1); box-shadow: 0 0 10px rgba(0, 191, 255, 0.3); }
-  100% { filter: brightness(1.2); box-shadow: 0 0 15px rgba(0, 191, 255, 0.5); }
+  0% {
+    filter: brightness(1);
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+  }
+  100% {
+    filter: brightness(1.2);
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+  }
 }
 
 .indicators-grid {
@@ -568,15 +586,30 @@
 
 /* Animations */
 @keyframes pulse {
-  0% { transform: scale(0.95); opacity: 0.5; }
-  50% { transform: scale(1.05); opacity: 0.8; }
-  100% { transform: scale(0.95); opacity: 0.5; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 /* Effet de brillance pour les éléments interactifs */
@@ -586,13 +619,17 @@
 }
 
 .glow-effect::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(0, 191, 255, 0.4) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(0, 191, 255, 0.4) 0%,
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.3s ease;
   transform: rotate(45deg);
@@ -607,13 +644,18 @@
 .map-section::before,
 .timeline-section::before,
 .stats-section::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, rgba(0, 191, 255, 0) 0%, rgba(0, 191, 255, 1) 50%, rgba(0, 191, 255, 0) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 191, 255, 0) 0%,
+    rgba(0, 191, 255, 1) 50%,
+    rgba(0, 191, 255, 0) 100%
+  );
   opacity: 0.7;
 }
 
@@ -629,8 +671,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Effet d'apparition progressive des éléments */
@@ -652,7 +698,11 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(0, 191, 255, 0.5) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(0, 191, 255, 0.5) 0%,
+    transparent 70%
+  );
   opacity: 0;
   z-index: 50;
   pointer-events: none;
@@ -663,9 +713,17 @@
 }
 
 @keyframes discovery-pulse {
-  0% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 0.8; }
-  100% { opacity: 0; transform: scale(2); }
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
 }
 
 /* Timeline item discovery animation */
@@ -674,12 +732,19 @@
 }
 
 @keyframes reveal {
-  0% { filter: blur(3px); opacity: 0.7; }
-  100% { filter: blur(0); opacity: 1; }
+  0% {
+    filter: blur(3px);
+    opacity: 0.7;
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+  }
 }
 
 /* Styles pour la carte Leaflet */
-#map, .map {
+#map,
+.map {
   width: 100%;
   height: 400px;
   z-index: 1;
@@ -693,11 +758,11 @@
   .stats-container {
     grid-template-columns: 1fr;
   }
-  
+
   .map-container {
     height: 300px;
   }
-  
+
   .location-info {
     width: 250px;
   }
@@ -707,34 +772,34 @@
   .timeline-line {
     left: 30px;
   }
-  
+
   .timeline-item,
   .timeline-item.timeline-right {
     width: calc(100% - 60px);
     margin-left: 60px;
   }
-  
+
   .timeline-item .timeline-dot,
   .timeline-item.timeline-right .timeline-dot {
     left: -40px;
     right: auto;
   }
-  
+
   .timeline-item .timeline-marker,
   .timeline-item.timeline-right .timeline-marker {
     left: 20px;
     right: auto;
   }
-  
+
   .indicators-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .actions-section {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .action-btn {
     width: 100%;
     max-width: 300px;
@@ -748,57 +813,57 @@
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .location-info {
     width: 100%;
     bottom: 0;
     right: 0;
     border-radius: 10px 10px 0 0;
   }
-  
+
   .map-container {
     height: 250px;
   }
-  
+
   .timeline-item,
   .timeline-item.timeline-right {
     width: calc(100% - 40px);
     margin-left: 40px;
   }
-  
+
   .timeline-dot {
     width: 15px;
     height: 15px;
   }
-  
+
   .timeline-line {
     left: 20px;
   }
-  
+
   .timeline-item .timeline-dot,
   .timeline-item.timeline-right .timeline-dot {
     left: -30px;
   }
-  
+
   .section-icon {
     width: 30px;
     height: 30px;
     font-size: 1rem;
   }
-  
+
   .subsection-title {
     font-size: 1.2rem;
   }
-  
+
   .skill-badge {
     font-size: 0.7rem;
     padding: 3px 8px;
   }
-  
+
   .indicator-value {
     font-size: 1.5rem;
   }
-  
+
   .indicator-label {
     font-size: 0.8rem;
   }
@@ -918,13 +983,13 @@
     color: black;
     padding: 20px;
   }
-  
+
   .dialog-container,
   .actions-section,
   .action-button {
     display: none;
   }
-  
+
   .section-header,
   .map-section,
   .timeline-section,
@@ -934,28 +999,28 @@
     margin-bottom: 20px;
     page-break-inside: avoid;
   }
-  
+
   .map-image {
     filter: grayscale(100%);
   }
-  
+
   .timeline-line {
     background: rgba(0, 0, 0, 0.2);
   }
-  
+
   .timeline-dot {
     background: #333;
     box-shadow: none;
   }
-  
+
   .indicator-trend.up {
     color: #0095cc;
   }
-  
+
   .indicator-trend.down {
     color: #ff6666;
   }
-  
+
   .chart-bar {
     background: linear-gradient(to top, #0095cc, #00bfff);
   }
@@ -984,8 +1049,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .quiz-modal {
@@ -1003,8 +1072,14 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .quiz-header {
@@ -1162,8 +1237,14 @@
 }
 
 @keyframes feedbackAppear {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .feedback-message {
@@ -1197,8 +1278,14 @@
 }
 
 @keyframes resultsAppear {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .quiz-results h4 {
@@ -1281,40 +1368,40 @@
     width: 95%;
     max-height: 95vh;
   }
-  
+
   .quiz-content {
     padding: 15px;
   }
-  
+
   .option {
     padding: 12px;
     gap: 10px;
   }
-  
+
   .option-marker {
     width: 30px;
     height: 30px;
     font-size: 0.8rem;
   }
-  
+
   .option-text {
     font-size: 0.9rem;
   }
-  
+
   .quiz-footer {
     flex-direction: column;
     padding: 15px;
   }
-  
+
   .quiz-footer button {
     width: 100%;
   }
-  
+
   .score-circle {
     width: 80px;
     height: 80px;
   }
-  
+
   .score-value {
     font-size: 1.3rem;
   }

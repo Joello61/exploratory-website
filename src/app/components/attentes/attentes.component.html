@@ -4,26 +4,35 @@
   <div class="dialog-container" *ngIf="isDialogOpen">
     <div class="d-flex justify-content-end">
       <div class="detective-container">
-        <img class="img" src="img/detective.png" alt="detective">
+        <img class="img" src="img/detective.png" alt="detective" />
       </div>
     </div>
     <div class="dialog-box">
-      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
+      <button
+        (click)="closeDialogTypeWriter()"
+        type="button"
+        class="close-button"
+      >
         <i class="bi bi-x-circle fs-3"></i>
       </button>
       <div class="message px-5">
         <!-- Utilisation du message directement depuis le service -->
-        <div>{{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span></div>
+        <div>
+          {{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span>
+        </div>
       </div>
     </div>
   </div>
-  
+
   <!-- Titre de la section avec statut de progression -->
   <div class="section-header">
     <h2 class="section-title">Projections Futures: Profil & Aspirations</h2>
-    <div class="projection-status"> Statut : 
-      <span *ngIf="isModuleCompleted" class="status-badge completed">Complété</span>
-      <span *ngIf="!isModuleCompleted" class="status-badge">En cours</span> 
+    <div class="projection-status">
+      Statut :
+      <span *ngIf="isModuleCompleted" class="status-badge completed"
+        >Complété</span
+      >
+      <span *ngIf="!isModuleCompleted" class="status-badge">En cours</span>
     </div>
   </div>
 
@@ -35,198 +44,250 @@
         <span class="control yellow"></span>
         <span class="control green"></span>
       </div>
-      <div class="terminal-title">SYSTÈME DE PROJECTION PROFESSIONNELLE v2.0</div>
+      <div class="terminal-title">
+        SYSTÈME DE PROJECTION PROFESSIONNELLE v2.0
+      </div>
       <!-- Bouton pour afficher les notes -->
     </div>
-    
+
     <div class="terminal-content">
       <div class="terminal-output" #terminalOutput>
-        <div *ngFor="let line of terminalLines" class="terminal-line" [class.active]="line.active">
+        <div
+          *ngFor="let line of terminalLines"
+          class="terminal-line"
+          [class.active]="line.active"
+        >
           <span class="prompt" *ngIf="line.type === 'input'">$</span>
-          <span class="command" *ngIf="line.type === 'input'">{{line.text}}</span>
-          <pre class="response" *ngIf="line.type === 'output'" [innerHTML]="line.text"></pre>
+          <span class="command" *ngIf="line.type === 'input'">{{
+            line.text
+          }}</span>
+          <pre
+            class="response"
+            *ngIf="line.type === 'output'"
+            [innerHTML]="line.text"
+          ></pre>
         </div>
         <div class="cursor-line" *ngIf="showCursor">
           <span class="prompt">$</span>
-          <span class="current-input">{{currentInput}}</span>
+          <span class="current-input">{{ currentInput }}</span>
           <span class="cursor-blink"></span>
         </div>
       </div>
     </div>
-    
+
     <div class="terminal-input-area">
       <div class="suggestion-buttons">
         <div class="suggestion-group">
           <h4>Commandes disponibles:</h4>
           <div class="buttons-row">
-            <button *ngFor="let cmd of availableCommands" 
-                    class="suggestion-btn" 
-                    [class.disabled]="isTyping || executingCommand"
-                    (click)="executeCommand(cmd)">
-              {{cmd}}
+            <button
+              *ngFor="let cmd of availableCommands"
+              class="suggestion-btn"
+              [class.disabled]="isTyping || executingCommand"
+              (click)="executeCommand(cmd)"
+            >
+              {{ cmd }}
             </button>
           </div>
         </div>
-        
+
         <div class="suggestion-group" *ngIf="showTopicSuggestions">
           <h4>Explorer un sujet:</h4>
           <div class="buttons-row">
-            <button *ngFor="let topic of availableTopics" 
-                    class="topic-btn" 
-                    [class.disabled]="isTyping || executingCommand"
-                    (click)="exploreTopic(topic)">
-              {{topic}}
+            <button
+              *ngFor="let topic of availableTopics"
+              class="topic-btn"
+              [class.disabled]="isTyping || executingCommand"
+              (click)="exploreTopic(topic)"
+            >
+              {{ topic }}
             </button>
           </div>
         </div>
       </div>
     </div>
   </div>
-  
+
   <!-- Carte mentale des aspirations -->
-<div class="aspirations-map" *ngIf="showAspirations">
-  <div class="map-header">
-    <h3>Carte d'Aspirations Professionnelles</h3>
-    <div class="legend">
-      <div class="legend-item">
-        <span class="priority high"></span>
-        <span>Priorité haute</span>
-      </div>
-      <div class="legend-item">
-        <span class="priority medium"></span>
-        <span>Priorité moyenne</span>
-      </div>
-      <div class="legend-item">
-        <span class="priority low"></span>
-        <span>Priorité standard</span>
-      </div>
-    </div>
-  </div>
-  
-  <div class="mind-map">
-    <div class="map-center">
-      <div class="center-node">
-        <i class="bi bi-person-badge"></i>
-        <span>Aspirations</span>
-      </div>
-    </div>
-    
-    <div class="map-branches">
-      <!-- Branches principales -->
-      <div *ngFor="let branch of aspirationBranches; let i = index"
-           class="branch"
-           [class.revealed]="branch.revealed"
-           [style.--branch-angle]="getNodeAngle(i, aspirationBranches.length)">
-        
-        <div class="connector"></div>
-        
-        <div class="branch-node" [class]="'priority-' + branch.priority">
-          <i [class]="'bi ' + branch.icon"></i>
-          <span>{{branch.title}}</span>
+  <div class="aspirations-map" *ngIf="showAspirations">
+    <div class="map-header">
+      <h3>Carte d'Aspirations Professionnelles</h3>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="priority high"></span>
+          <span>Priorité haute</span>
         </div>
-        
-        <!-- Sous-branches -->
-        <div *ngFor="let subBranch of branch.subBranches; let j = index"
-             class="sub-branch"
-             [class.revealed]="subBranch.revealed"
-             [style.--sub-branch-angle]="getSubNodeAngle(j, branch.subBranches.length)">
-          
-          <div class="sub-connector"></div>
-          
-          <div class="sub-branch-node" [class]="'priority-' + subBranch.priority">
-            <div class="node-content">
-              <i [class]="'bi ' + subBranch.icon"></i>
-              <span>{{subBranch.title}}</span>
-            </div>
-            <div class="node-details" *ngIf="subBranch.revealed">
-              <p>{{subBranch.description}}</p>
+        <div class="legend-item">
+          <span class="priority medium"></span>
+          <span>Priorité moyenne</span>
+        </div>
+        <div class="legend-item">
+          <span class="priority low"></span>
+          <span>Priorité standard</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mind-map">
+      <div class="map-center">
+        <div class="center-node">
+          <i class="bi bi-person-badge"></i>
+          <span>Aspirations</span>
+        </div>
+      </div>
+
+      <div class="map-branches">
+        <!-- Branches principales -->
+        <div
+          *ngFor="let branch of aspirationBranches; let i = index"
+          class="branch"
+          [class.revealed]="branch.revealed"
+          [style.--branch-angle]="getNodeAngle(i, aspirationBranches.length)"
+        >
+          <div class="connector"></div>
+
+          <div class="branch-node" [class]="'priority-' + branch.priority">
+            <i [class]="'bi ' + branch.icon"></i>
+            <span>{{ branch.title }}</span>
+          </div>
+
+          <!-- Sous-branches -->
+          <div
+            *ngFor="let subBranch of branch.subBranches; let j = index"
+            class="sub-branch"
+            [class.revealed]="subBranch.revealed"
+            [style.--sub-branch-angle]="
+              getSubNodeAngle(j, branch.subBranches.length)
+            "
+          >
+            <div class="sub-connector"></div>
+
+            <div
+              class="sub-branch-node"
+              [class]="'priority-' + subBranch.priority"
+            >
+              <div class="node-content">
+                <i [class]="'bi ' + subBranch.icon"></i>
+                <span>{{ subBranch.title }}</span>
+              </div>
+              <div class="node-details" *ngIf="subBranch.revealed">
+                <p>{{ subBranch.description }}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-  
+
   <!-- Projets futurs -->
   <div class="future-projects" *ngIf="showFutureProjects">
     <div class="projects-header">
       <h3>Projets & Opportunités Futures</h3>
       <div class="timeline-selector">
-        <button class="timeline-btn" [class.active]="selectedTimeline === 'short'" (click)="selectTimeline('short')">
+        <button
+          class="timeline-btn"
+          [class.active]="selectedTimeline === 'short'"
+          (click)="selectTimeline('short')"
+        >
           Court terme
         </button>
-        <button class="timeline-btn" [class.active]="selectedTimeline === 'mid'" (click)="selectTimeline('mid')">
+        <button
+          class="timeline-btn"
+          [class.active]="selectedTimeline === 'mid'"
+          (click)="selectTimeline('mid')"
+        >
           Moyen terme
         </button>
-        <button class="timeline-btn" [class.active]="selectedTimeline === 'long'" (click)="selectTimeline('long')">
+        <button
+          class="timeline-btn"
+          [class.active]="selectedTimeline === 'long'"
+          (click)="selectTimeline('long')"
+        >
           Long terme
         </button>
       </div>
     </div>
-    
+
     <div class="projects-container">
-      <div class="project-card" *ngFor="let project of getProjectsByTimeline()"
-           [class.high-priority]="project.priority === 'high'"
-           [class.opportunity]="project.type === 'opportunity'">
+      <div
+        class="project-card"
+        *ngFor="let project of getProjectsByTimeline()"
+        [class.high-priority]="project.priority === 'high'"
+        [class.opportunity]="project.type === 'opportunity'"
+      >
         <div class="project-header">
           <div class="project-badge" [class]="project.type">
-            <i [class]="'bi ' + (project.type === 'project' ? 'bi-briefcase' : 'bi-lightning')"></i>
+            <i
+              [class]="
+                'bi ' +
+                (project.type === 'project' ? 'bi-briefcase' : 'bi-lightning')
+              "
+            ></i>
           </div>
           <div class="project-title-area">
-            <h4>{{project.title}}</h4>
+            <h4>{{ project.title }}</h4>
             <div class="project-meta">
-              <span class="project-type">{{project.type === 'project' ? 'Projet' : 'Opportunité'}}</span>
-              <span class="project-timeline">{{getTimelineLabel(project.timeline)}}</span>
+              <span class="project-type">{{
+                project.type === "project" ? "Projet" : "Opportunité"
+              }}</span>
+              <span class="project-timeline">{{
+                getTimelineLabel(project.timeline)
+              }}</span>
             </div>
           </div>
         </div>
-        
+
         <div class="project-content">
-          <p>{{project.description}}</p>
-          
+          <p>{{ project.description }}</p>
+
           <div class="project-tags">
-            <span class="tag" *ngFor="let tag of project.tags">{{tag}}</span>
+            <span class="tag" *ngFor="let tag of project.tags">{{ tag }}</span>
           </div>
-          
-          <div class="project-objectives" *ngIf="project.objectives && project.objectives.length > 0">
+
+          <div
+            class="project-objectives"
+            *ngIf="project.objectives && project.objectives.length > 0"
+          >
             <h5>Objectifs:</h5>
             <ul>
-              <li *ngFor="let objective of project.objectives">{{objective}}</li>
+              <li *ngFor="let objective of project.objectives">
+                {{ objective }}
+              </li>
             </ul>
           </div>
         </div>
       </div>
     </div>
   </div>
-  
+
   <!-- Profil idéal -->
   <div class="ideal-profile" *ngIf="showIdealProfile">
     <div class="profile-header">
       <h3>Profil d'Environnement Idéal</h3>
       <div class="profile-meta">
-        Compatibilité avec les aspirations: 
+        Compatibilité avec les aspirations:
         <div class="compatibility-meter">
           <div class="compatibility-bar" [style.width.%]="85"></div>
         </div>
       </div>
     </div>
-    
+
     <div class="profile-categories">
       <div class="profile-category" *ngFor="let category of idealEnvironment">
         <div class="category-header">
           <i [class]="'bi ' + category.icon"></i>
-          <h4>{{category.title}}</h4>
+          <h4>{{ category.title }}</h4>
         </div>
-        
+
         <div class="category-items">
           <div class="profile-item" *ngFor="let item of category.items">
             <div class="item-icon">
               <i [class]="'bi ' + item.icon"></i>
             </div>
             <div class="item-content">
-              <h5>{{item.title}}</h5>
-              <p>{{item.description}}</p>
+              <h5>{{ item.title }}</h5>
+              <p>{{ item.description }}</p>
             </div>
           </div>
         </div>
@@ -238,220 +299,327 @@
   <div class="completion-message" *ngIf="isModuleCompleted">
     <div class="alert alert-success">
       <i class="bi bi-check-circle-fill"></i>
-      Module complété ! Toutes les projections futures ont été analysées avec succès.
+      Module complété ! Toutes les projections futures ont été analysées avec
+      succès.
     </div>
   </div>
 
-<!-- Bouton Continuer -->
-<div class="continue-section" *ngIf="canAccessQuiz()">
-  <button class="primary-action action-btn" (click)="openQuizModal()">
-    <i class="bi bi-arrow-right-circle"></i>
-    Continuer l'analyse
-  </button>
-</div>
+  <!-- Bouton Continuer -->
+  <div class="continue-section" *ngIf="canAccessQuiz()">
+    <button class="primary-action action-btn" (click)="openQuizModal()">
+      <i class="bi bi-arrow-right-circle"></i>
+      Continuer l'analyse
+    </button>
+  </div>
 
-<!-- Modal Quiz -->
-<div class="modal-overlay" *ngIf="isQuizModalOpen" (click)="closeQuizModal()">
-  <div class="quiz-modal" (click)="$event.stopPropagation()">
-    <div class="quiz-header">
-      <h3>Évaluation des Projections Futures</h3>
-      <button class="close-modal" (click)="closeQuizModal()">
-        <i class="bi bi-x-lg"></i>
-      </button>
-    </div>
-    
-    <div class="quiz-content">
-      <!-- Quiz de priorisation - Drag & Drop -->
-      <div *ngIf="quizType === 'prioritization' && !quizCompleted">
-        <div class="quiz-instructions">
-          <p>Priorisez les aspirations professionnelles selon leur importance pour le sujet (glissez-déposez les éléments):</p>
-        </div>
-
-        <div class="prioritization-container" cdkDropList (cdkDropListDropped)="dropPriority($event)">
-          <div class="priority-item" 
-               *ngFor="let aspiration of prioritizationItems; let i = index"
-               cdkDrag
-               [cdkDragDisabled]="prioritizationCompleted">
-            <div class="priority-rank">{{i + 1}}</div>
-            <div class="priority-content">
-              <div class="priority-icon">
-                <i [class]="'bi ' + aspiration.icon"></i>
-              </div>
-              <div class="priority-text">
-                <div class="priority-title">{{aspiration.title}}</div>
-                <div class="priority-description">{{aspiration.description}}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="quiz-action-container" *ngIf="!prioritizationCompleted">
-          <button class="secondary-action action-btn" (click)="validatePrioritization()">
-            Valider la priorisation
-          </button>
-        </div>
-        
-        <div class="prioritization-feedback" *ngIf="prioritizationCompleted">
-          <div class="feedback-message">
-            <i class="bi bi-check-circle"></i>
-            <span>Priorisation enregistrée. Votre analyse correspond à 85% au profil du sujet!</span>
-          </div>
-        </div>
+  <!-- Modal Quiz -->
+  <div class="modal-overlay" *ngIf="isQuizModalOpen" (click)="closeQuizModal()">
+    <div class="quiz-modal" (click)="$event.stopPropagation()">
+      <div class="quiz-header">
+        <h3>Évaluation des Projections Futures</h3>
+        <button class="close-modal" (click)="closeQuizModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
       </div>
 
-      <!-- Quiz de scenarios - Choix multiples -->
-      <div *ngIf="quizType === 'scenarios' && !quizCompleted">
-        <div class="quiz-instructions">
-          <p>Pour chaque scénario, sélectionnez la réaction la plus probable du sujet selon son profil:</p>
-        </div>
+      <div class="quiz-content">
+        <!-- Quiz de priorisation - Drag & Drop -->
+        <div *ngIf="quizType === 'prioritization' && !quizCompleted">
+          <div class="quiz-instructions">
+            <p>
+              Priorisez les aspirations professionnelles selon leur importance
+              pour le sujet (glissez-déposez les éléments):
+            </p>
+          </div>
 
-        <div class="scenario-container">
-          <div class="scenario-card">
-            <div class="scenario-number">Scénario {{currentScenarioIndex + 1}}/{{scenarios.length}}</div>
-            <h4 class="scenario-title">{{currentScenario.title}}</h4>
-            <p class="scenario-description">{{currentScenario.description}}</p>
-            
-            <div class="scenario-options">
-              <div class="scenario-option" 
-                   *ngFor="let option of currentScenario.options; let i = index"
-                   [class.selected]="selectedScenarioOption === i"
-                   [class.correct]="scenarioAnswered && i === currentScenario.correctOption"
-                   [class.incorrect]="scenarioAnswered && selectedScenarioOption === i && i !== currentScenario.correctOption"
-                   (click)="selectScenarioOption(i)">
-                <div class="option-checkbox">
-                  <div class="checkbox-inner" *ngIf="selectedScenarioOption === i"></div>
+          <div
+            class="prioritization-container"
+            cdkDropList
+            (cdkDropListDropped)="dropPriority($event)"
+          >
+            <div
+              class="priority-item"
+              *ngFor="let aspiration of prioritizationItems; let i = index"
+              cdkDrag
+              [cdkDragDisabled]="prioritizationCompleted"
+            >
+              <div class="priority-rank">{{ i + 1 }}</div>
+              <div class="priority-content">
+                <div class="priority-icon">
+                  <i [class]="'bi ' + aspiration.icon"></i>
                 </div>
-                <div class="option-text">{{option}}</div>
-              </div>
-            </div>
-            
-            <div class="scenario-feedback" *ngIf="scenarioAnswered">
-              <div class="feedback-message" [class.correct]="selectedScenarioOption === currentScenario.correctOption" [class.incorrect]="selectedScenarioOption !== currentScenario.correctOption">
-                <i class="bi" [ngClass]="selectedScenarioOption === currentScenario.correctOption ? 'bi-check-circle' : 'bi-x-circle'"></i>
-                <span>{{currentScenario.feedback[selectedScenarioOption === currentScenario.correctOption ? 'correct' : 'incorrect']}}</span>
+                <div class="priority-text">
+                  <div class="priority-title">{{ aspiration.title }}</div>
+                  <div class="priority-description">
+                    {{ aspiration.description }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      
-      <!-- Quiz de compatibilité - Slider -->
-      <div *ngIf="quizType === 'compatibility' && !quizCompleted">
-        <div class="quiz-instructions">
-          <p>Évaluez la compatibilité du sujet avec différents environnements de travail:</p>
+
+          <div class="quiz-action-container" *ngIf="!prioritizationCompleted">
+            <button
+              class="secondary-action action-btn"
+              (click)="validatePrioritization()"
+            >
+              Valider la priorisation
+            </button>
+          </div>
+
+          <div class="prioritization-feedback" *ngIf="prioritizationCompleted">
+            <div class="feedback-message">
+              <i class="bi bi-check-circle"></i>
+              <span
+                >Priorisation enregistrée. Votre analyse correspond à 85% au
+                profil du sujet!</span
+              >
+            </div>
+          </div>
         </div>
 
-        <div class="compatibility-container">
-          <div class="compatibility-item" *ngFor="let item of compatibilityItems; let i = index">
-            <div class="compatibility-header">
-              <div class="compatibility-icon">
-                <i [class]="'bi ' + item.icon"></i>
+        <!-- Quiz de scenarios - Choix multiples -->
+        <div *ngIf="quizType === 'scenarios' && !quizCompleted">
+          <div class="quiz-instructions">
+            <p>
+              Pour chaque scénario, sélectionnez la réaction la plus probable du
+              sujet selon son profil:
+            </p>
+          </div>
+
+          <div class="scenario-container">
+            <div class="scenario-card">
+              <div class="scenario-number">
+                Scénario {{ currentScenarioIndex + 1 }}/{{ scenarios.length }}
               </div>
-              <div class="compatibility-title">{{item.title}}</div>
-            </div>
-            
-            <div class="compatibility-description">{{item.description}}</div>
-            
-            <div class="compatibility-slider">
-              <div class="slider-labels">
-                <span>Faible</span>
-                <span>Moyenne</span>
-                <span>Élevée</span>
+              <h4 class="scenario-title">{{ currentScenario.title }}</h4>
+              <p class="scenario-description">
+                {{ currentScenario.description }}
+              </p>
+
+              <div class="scenario-options">
+                <div
+                  class="scenario-option"
+                  *ngFor="let option of currentScenario.options; let i = index"
+                  [class.selected]="selectedScenarioOption === i"
+                  [class.correct]="
+                    scenarioAnswered && i === currentScenario.correctOption
+                  "
+                  [class.incorrect]="
+                    scenarioAnswered &&
+                    selectedScenarioOption === i &&
+                    i !== currentScenario.correctOption
+                  "
+                  (click)="selectScenarioOption(i)"
+                >
+                  <div class="option-checkbox">
+                    <div
+                      class="checkbox-inner"
+                      *ngIf="selectedScenarioOption === i"
+                    ></div>
+                  </div>
+                  <div class="option-text">{{ option }}</div>
+                </div>
               </div>
-              <input 
-                type="range" 
-                class="slider" 
-                min="1" 
-                max="10" 
-                [(ngModel)]="compatibilityRatings[i]" 
-                [disabled]="compatibilityCompleted">
-              <div class="slider-value">{{compatibilityRatings[i]}}/10</div>
+
+              <div class="scenario-feedback" *ngIf="scenarioAnswered">
+                <div
+                  class="feedback-message"
+                  [class.correct]="
+                    selectedScenarioOption === currentScenario.correctOption
+                  "
+                  [class.incorrect]="
+                    selectedScenarioOption !== currentScenario.correctOption
+                  "
+                >
+                  <i
+                    class="bi"
+                    [ngClass]="
+                      selectedScenarioOption === currentScenario.correctOption
+                        ? 'bi-check-circle'
+                        : 'bi-x-circle'
+                    "
+                  ></i>
+                  <span>{{
+                    currentScenario.feedback[
+                      selectedScenarioOption === currentScenario.correctOption
+                        ? "correct"
+                        : "incorrect"
+                    ]
+                  }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
-        <div class="quiz-action-container" *ngIf="!compatibilityCompleted">
-          <button class="secondary-action action-btn" (click)="validateCompatibility()">
-            Soumettre l'évaluation
-          </button>
-        </div>
-        
-        <div class="compatibility-feedback" *ngIf="compatibilityCompleted">
-          <div class="feedback-message">
-            <i class="bi bi-check-circle"></i>
-            <span>Évaluation enregistrée. Votre analyse est cohérente avec le profil d'environnement idéal du sujet.</span>
+
+        <!-- Quiz de compatibilité - Slider -->
+        <div *ngIf="quizType === 'compatibility' && !quizCompleted">
+          <div class="quiz-instructions">
+            <p>
+              Évaluez la compatibilité du sujet avec différents environnements
+              de travail:
+            </p>
           </div>
-        </div>
-      </div>
-      
-      <!-- Résultats du quiz -->
-      <div class="quiz-results" *ngIf="quizCompleted">
-        <h4>Analyse des résultats</h4>
-        
-        <div class="results-score">
-          <div class="score-circle">
-            <div class="score-value">{{quizScore}}%</div>
+
+          <div class="compatibility-container">
+            <div
+              class="compatibility-item"
+              *ngFor="let item of compatibilityItems; let i = index"
+            >
+              <div class="compatibility-header">
+                <div class="compatibility-icon">
+                  <i [class]="'bi ' + item.icon"></i>
+                </div>
+                <div class="compatibility-title">{{ item.title }}</div>
+              </div>
+
+              <div class="compatibility-description">
+                {{ item.description }}
+              </div>
+
+              <div class="compatibility-slider">
+                <div class="slider-labels">
+                  <span>Faible</span>
+                  <span>Moyenne</span>
+                  <span>Élevée</span>
+                </div>
+                <input
+                  type="range"
+                  class="slider"
+                  min="1"
+                  max="10"
+                  [(ngModel)]="compatibilityRatings[i]"
+                  [disabled]="compatibilityCompleted"
+                />
+                <div class="slider-value">{{ compatibilityRatings[i] }}/10</div>
+              </div>
+            </div>
           </div>
-          <div class="score-label">Score final</div>
-        </div>
-        
-        <div class="results-message">
-          <p *ngIf="quizPassed">Félicitations! Votre analyse des projections futures du sujet est précise.</p>
-          <p *ngIf="!quizPassed">Votre analyse pourrait être affinée. Réexaminez les données du dossier.</p>
-        </div>
-        
-        <div class="results-details">
-          <h5>Résumé de l'analyse:</h5>
-          <ul>
-            <li><strong>Aspirations clés:</strong> Leadership technique, Innovation technologique, Projets à impact</li>
-            <li><strong>Projections court terme:</strong> Architecture Cloud, Direction d'équipe</li>
-            <li><strong>Environnement idéal:</strong> Culture innovante, Équipe pluridisciplinaire, Défis techniques complexes</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    
-    <div class="quiz-footer">
-      <!-- Boutons pour le quiz de priorisation -->
-      <button *ngIf="quizType === 'prioritization' && prioritizationCompleted"
-              class="primary-action action-btn"
-              (click)="goToNextQuiz()">
-        Quiz suivant
-      </button>
-      
-      <!-- Boutons pour le quiz de scénarios -->
-      <button *ngIf="quizType === 'scenarios' && !scenarioAnswered && selectedScenarioOption !== null"
-              class="secondary-action action-btn justify-content-center"
-              (click)="validateScenarioAnswer()">
-        Vérifier
-      </button>
-      
-      <button *ngIf="quizType === 'scenarios' && scenarioAnswered"
-              class="primary-action action-btn"
-              (click)="goToNextScenario()">
-        {{currentScenarioIndex < scenarios.length - 1 ? 'Scénario suivant' : 'Quiz suivant'}}
-      </button>
-      
-      <!-- Boutons pour le quiz de compatibilité -->
-      <button *ngIf="quizType === 'compatibility' && compatibilityCompleted"
-              class="primary-action action-btn"
-              (click)="completeQuiz()">
-        Voir les résultats
-      </button>
-      
-      <!-- Boutons pour les résultats -->
-      <button *ngIf="quizCompleted && quizPassed"
-              class="primary-action action-btn"
-              (click)="navigateToNextPage()">
-        Continuer l'enquête
-      </button>
-      
-      <button *ngIf="quizCompleted && !quizPassed"
+
+          <div class="quiz-action-container" *ngIf="!compatibilityCompleted">
+            <button
               class="secondary-action action-btn"
-              (click)="restartQuiz()">
-        Réessayer
-      </button>
+              (click)="validateCompatibility()"
+            >
+              Soumettre l'évaluation
+            </button>
+          </div>
+
+          <div class="compatibility-feedback" *ngIf="compatibilityCompleted">
+            <div class="feedback-message">
+              <i class="bi bi-check-circle"></i>
+              <span
+                >Évaluation enregistrée. Votre analyse est cohérente avec le
+                profil d'environnement idéal du sujet.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Résultats du quiz -->
+        <div class="quiz-results" *ngIf="quizCompleted">
+          <h4>Analyse des résultats</h4>
+
+          <div class="results-score">
+            <div class="score-circle">
+              <div class="score-value">{{ quizScore }}%</div>
+            </div>
+            <div class="score-label">Score final</div>
+          </div>
+
+          <div class="results-message">
+            <p *ngIf="quizPassed">
+              Félicitations! Votre analyse des projections futures du sujet est
+              précise.
+            </p>
+            <p *ngIf="!quizPassed">
+              Votre analyse pourrait être affinée. Réexaminez les données du
+              dossier.
+            </p>
+          </div>
+
+          <div class="results-details">
+            <h5>Résumé de l'analyse:</h5>
+            <ul>
+              <li>
+                <strong>Aspirations clés:</strong> Leadership technique,
+                Innovation technologique, Projets à impact
+              </li>
+              <li>
+                <strong>Projections court terme:</strong> Architecture Cloud,
+                Direction d'équipe
+              </li>
+              <li>
+                <strong>Environnement idéal:</strong> Culture innovante, Équipe
+                pluridisciplinaire, Défis techniques complexes
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-footer">
+        <!-- Boutons pour le quiz de priorisation -->
+        <button
+          *ngIf="quizType === 'prioritization' && prioritizationCompleted"
+          class="primary-action action-btn"
+          (click)="goToNextQuiz()"
+        >
+          Quiz suivant
+        </button>
+
+        <!-- Boutons pour le quiz de scénarios -->
+        <button
+          *ngIf="
+            quizType === 'scenarios' &&
+            !scenarioAnswered &&
+            selectedScenarioOption !== null
+          "
+          class="secondary-action action-btn justify-content-center"
+          (click)="validateScenarioAnswer()"
+        >
+          Vérifier
+        </button>
+
+        <button
+          *ngIf="quizType === 'scenarios' && scenarioAnswered"
+          class="primary-action action-btn"
+          (click)="goToNextScenario()"
+        >
+          {{
+            currentScenarioIndex < scenarios.length - 1
+              ? "Scénario suivant"
+              : "Quiz suivant"
+          }}
+        </button>
+
+        <!-- Boutons pour le quiz de compatibilité -->
+        <button
+          *ngIf="quizType === 'compatibility' && compatibilityCompleted"
+          class="primary-action action-btn"
+          (click)="completeQuiz()"
+        >
+          Voir les résultats
+        </button>
+
+        <!-- Boutons pour les résultats -->
+        <button
+          *ngIf="quizCompleted && quizPassed"
+          class="primary-action action-btn"
+          (click)="navigateToNextPage()"
+        >
+          Continuer l'enquête
+        </button>
+
+        <button
+          *ngIf="quizCompleted && !quizPassed"
+          class="secondary-action action-btn"
+          (click)="restartQuiz()"
+        >
+          Réessayer
+        </button>
+      </div>
     </div>
   </div>
-</div>
 </div>

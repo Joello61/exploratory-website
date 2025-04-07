@@ -8,7 +8,7 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
@@ -68,8 +68,17 @@ export class CentresInteretComponent
 {
   @ViewChild('typewriterText') typewriterText!: ElementRef;
 
-    // Identifiant du module
-    private readonly MODULE_ID = 'centres';
+  // Pour gérer la destruction proprement
+  private destroy$ = new Subject<void>();
+
+  // Gérer les timeouts
+  private introDialogTimeoutId: number | null = null;
+  private closeDialogTimeoutId: number | null = null;
+  private congratulationTimeoutId: number | null = null;
+  private navigationTimeoutId: number | null = null;
+
+  // Identifiant du module
+  private readonly MODULE_ID = 'centres';
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, pour compléter le profil de notre sujet, nous devons analyser ses centres d'intérêt personnels. Ces activités hors travail peuvent révéler des aspects clés de sa personnalité, ses motivations et ses compétences transversales. Recueillez des indices et explorez chaque domaine en profondeur.";
@@ -320,12 +329,12 @@ export class CentresInteretComponent
     // Vérifier si le module est disponible
     if (!this.progressService.isModuleAvailable('centres')) {
       console.warn("Ce module n'est pas encore disponible");
-      // Logique de redirection à implémenter si nécessaire
     }
 
     // Vérifier si le module est déjà complété
-    this.subscriptions.push(
-      this.progressService.moduleStatuses$.subscribe((statuses) => {
+    this.progressService.moduleStatuses$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((statuses) => {
         this.isModuleCompleted = statuses.centres;
         this.moduleProgressPercentage =
           this.progressService.getCompletionPercentage();
@@ -334,32 +343,64 @@ export class CentresInteretComponent
         if (this.isModuleCompleted) {
           this.loadSavedState();
         }
-      })
-    );
+      });
 
-    this.subscriptions.push(
-      this.dialogService.isDialogOpen$.subscribe((isOpen) => {
+    // S'abonner aux états du dialogue
+    this.dialogService.isDialogOpen$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isOpen) => {
         this.isDialogOpen = isOpen;
-      }),
-      this.dialogService.isTyping$.subscribe((isTyping) => {
+      });
+
+    this.dialogService.isTyping$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isTyping) => {
         this.isTyping = isTyping;
-      }),
-      this.dialogService.currentMessage$.subscribe((message) => {
+      });
+
+    this.dialogService.currentMessage$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message) => {
         this.dialogMessage = message;
-      })
-    );
+      });
   }
 
   ngAfterViewInit(): void {
-    // Utiliser le DialogService au lieu du typewriter manuel
-    setTimeout(() => {
+    // Utiliser le DialogService avec un timeout géré
+    this.introDialogTimeoutId = window.setTimeout(() => {
       this.showIntroDialog();
+      this.introDialogTimeoutId = null;
     }, 500);
   }
 
   ngOnDestroy(): void {
-    // Nettoyer les souscriptions pour éviter les fuites de mémoire
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    // Émettre le signal de destruction pour tous les observables
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    // Nettoyer tous les timeouts
+    this.clearAllTimeouts();
+
+    // Fermer tout dialogue ouvert
+    if (this.isDialogOpen) {
+      this.dialogService.closeDialog();
+    }
+  }
+
+  // Nettoyer tous les timeouts
+  private clearAllTimeouts(): void {
+    const timeouts = [
+      this.introDialogTimeoutId,
+      this.closeDialogTimeoutId,
+      this.congratulationTimeoutId,
+      this.navigationTimeoutId,
+    ];
+
+    timeouts.forEach((timeoutId) => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    });
   }
 
   showIntroDialog(): void {
@@ -369,8 +410,14 @@ export class CentresInteretComponent
     };
     this.dialogService.openDialog(dialogMessage);
     this.dialogService.startTypewriter(this.fullText, () => {
-      setTimeout(() => {
+      // Nettoyer tout timeout précédent
+      if (this.closeDialogTimeoutId !== null) {
+        clearTimeout(this.closeDialogTimeoutId);
+      }
+
+      this.closeDialogTimeoutId = window.setTimeout(() => {
         this.dialogService.closeDialog();
+        this.closeDialogTimeoutId = null;
       }, 3000);
     });
   }
@@ -378,6 +425,12 @@ export class CentresInteretComponent
   // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
+
+    // Annuler tout timeout de fermeture programmé
+    if (this.closeDialogTimeoutId !== null) {
+      clearTimeout(this.closeDialogTimeoutId);
+      this.closeDialogTimeoutId = null;
+    }
   }
 
   // Charger l'état sauvegardé précédemment
@@ -752,34 +805,45 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
   // Naviguer vers le module suivant
   continueToNextModule(): void {
     if (this.isModuleCompleted) {
-
+      // Sauvegarder l'état du module
       this.userDataService.saveResponse(
         this.MODULE_ID,
         'module_completed',
         true
       );
-      
-      // Marquer officiellement le module comme complété dans le service de progression
+
+      // Marquer officiellement le module comme complété
       this.progressService.completeModule(this.MODULE_ID);
 
       // Afficher un message de confirmation
       const message =
         "Module d'analyse des centres d'intérêt complété. Vous pouvez maintenant passer au module suivant.";
-  
+
       const dialogMessage: DialogMessage = {
         text: message,
         character: 'detective',
       };
-  
+
       this.dialogService.openDialog(dialogMessage);
       this.dialogService.startTypewriter(message);
-  
+
       // D'abord fermer le modal
       this.closeQuizModal();
-      
+
+      // Nettoyer tout timeout de navigation précédent
+      if (this.navigationTimeoutId !== null) {
+        clearTimeout(this.navigationTimeoutId);
+      }
+
       // Puis rediriger vers le prochain module après un court délai
-      setTimeout(() => {
+      this.navigationTimeoutId = window.setTimeout(() => {
+        // Nettoyer les ressources avant la navigation
+        this.clearAllTimeouts();
+
+        // Naviguer vers le module suivant
         this.router.navigate(['/conclusion']);
+
+        this.navigationTimeoutId = null;
       }, 5000);
     } else if (
       this.getDiscoveredCount() >= Math.ceil(this.evidenceItems.length * 0.75)
@@ -790,12 +854,12 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
       // Si pas assez d'indices ont été découverts
       const message =
         "Vous devez découvrir plus d'indices avant de pouvoir passer au module suivant.";
-  
+
       const dialogMessage: DialogMessage = {
         text: message,
         character: 'detective',
       };
-  
+
       this.dialogService.openDialog(dialogMessage);
       this.dialogService.startTypewriter(message);
     }
@@ -803,23 +867,23 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
 
   getPinDistance(index: number): number {
     const totalItems = this.evidenceItems.length;
-    
+
     // Calculer l'angle du pin en radians (distribué uniformément autour du cercle)
-    const angle = (index * 2 * Math.PI / totalItems);
-    
+    const angle = (index * 2 * Math.PI) / totalItems;
+
     // Dimensions du polaroid
     const polaroidWidth = 200;
     const polaroidHeight = 300;
-    
+
     const baseDistance = 90; // Distance minimale depuis le bord du polaroid
-    
+
     // Calculer une distance qui suit approximativement le contour du rectangle
-    const horizontalComponent = Math.abs(Math.cos(angle)) * (polaroidWidth/2);
-    const verticalComponent = Math.abs(Math.sin(angle)) * (polaroidHeight/2);
-    
+    const horizontalComponent = Math.abs(Math.cos(angle)) * (polaroidWidth / 2);
+    const verticalComponent = Math.abs(Math.sin(angle)) * (polaroidHeight / 2);
+
     // Utiliser la plus grande des deux composantes pour déterminer la distance
     const rectangleRadius = Math.max(horizontalComponent, verticalComponent);
-    
+
     return rectangleRadius + baseDistance;
   }
 

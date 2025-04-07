@@ -7,16 +7,16 @@ import { AuthService } from './auth.service';
 import { NoteService } from './note.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AppStateService {
-
   private isFirstVisitSubject = new BehaviorSubject<boolean>(true);
-  public isFirstVisit$: Observable<boolean> = this.isFirstVisitSubject.asObservable();
-  
+  public isFirstVisit$: Observable<boolean> =
+    this.isFirstVisitSubject.asObservable();
+
   // Nouvelle clé pour la modale de son
   private readonly SOUND_MODAL_KEY = 'enquete_sound_modal_shown';
-  
+
   constructor(
     private progressService: ProgressService,
     private timeTrackerService: TimeTrackerService,
@@ -39,14 +39,14 @@ export class AppStateService {
       this.isFirstVisitSubject.next(false);
     }
   }
-  
+
   /**
    * Vérifie si la modale de son a déjà été affichée
    */
   public wasSoundModalShown(): boolean {
     return localStorage.getItem(this.SOUND_MODAL_KEY) === 'true';
   }
-  
+
   /**
    * Marque la modale de son comme ayant été affichée
    */
@@ -61,16 +61,16 @@ export class AppStateService {
     this.progressService.resetProgress();
     this.timeTrackerService.resetTimer();
     this.userDataService.resetAllResponses();
-    
+
     // Réinitialiser l'authentification
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('agentId');
-    
+
     localStorage.removeItem('enquete_first_visit');
     localStorage.removeItem(this.SOUND_MODAL_KEY);
     this.isFirstVisitSubject.next(true);
     localStorage.setItem('enquete_first_visit', 'false');
-    
+
     this.authService.logout();
   }
 
@@ -85,9 +85,9 @@ export class AppStateService {
       responses: localStorage.getItem('enquete_user_responses'),
       notes: localStorage.getItem('enquete_notes'),
       startTime: localStorage.getItem('enquete_start_time'),
-      soundModalShown: localStorage.getItem(this.SOUND_MODAL_KEY)
+      soundModalShown: localStorage.getItem(this.SOUND_MODAL_KEY),
     };
-    
+
     return JSON.stringify(appData);
   }
 
@@ -97,33 +97,33 @@ export class AppStateService {
   importAppData(jsonData: string): boolean {
     try {
       const appData = JSON.parse(jsonData);
-      
+
       if (appData.progress) {
         localStorage.setItem('enquete_module_statuses', appData.progress);
       }
-      
+
       if (appData.responses) {
         localStorage.setItem('enquete_user_responses', appData.responses);
       }
-      
+
       if (appData.notes) {
         localStorage.setItem('enquete_notes', appData.notes);
       }
-      
+
       if (appData.startTime) {
         localStorage.setItem('enquete_start_time', appData.startTime);
       }
-      
+
       if (appData.soundModalShown) {
         localStorage.setItem(this.SOUND_MODAL_KEY, appData.soundModalShown);
       }
-      
+
       // Recharger tous les services
       this.refreshAllServices();
-      
+
       return true;
     } catch (error) {
-      console.error('Erreur lors de l\'importation des données:', error);
+      console.error("Erreur lors de l'importation des données:", error);
       return false;
     }
   }

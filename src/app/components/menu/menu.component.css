@@ -60,9 +60,17 @@
 }
 
 @keyframes blink {
-  0%, 40% { opacity: 1; }
-  50%, 90% { opacity: 0; }
-  100% { opacity: 1; }
+  0%,
+  40% {
+    opacity: 1;
+  }
+  50%,
+  90% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .detective-container {
@@ -110,16 +118,29 @@
   position: absolute;
   width: 120px;
   height: 120px;
-  background: radial-gradient(circle, rgba(0, 191, 255, 0.3) 0%, rgba(0, 191, 255, 0) 70%);
+  background: radial-gradient(
+    circle,
+    rgba(0, 191, 255, 0.3) 0%,
+    rgba(0, 191, 255, 0) 70%
+  );
   border-radius: 50%;
   animation: pulse 3s infinite;
   z-index: 0;
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.95); opacity: 0.5; }
-  50% { transform: scale(1.05); opacity: 0.8; }
-  100% { transform: scale(0.95); opacity: 0.5; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
 }
 
 .main-title {
@@ -139,13 +160,18 @@
 }
 
 .highlight::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -5px;
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, rgba(0, 191, 255, 0) 0%, rgba(0, 191, 255, 1) 50%, rgba(0, 191, 255, 0) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 191, 255, 0) 0%,
+    rgba(0, 191, 255, 1) 50%,
+    rgba(0, 191, 255, 0) 100%
+  );
 }
 
 .status-container {
@@ -252,8 +278,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .item-icon {
@@ -294,12 +326,20 @@
 
 .grid-intro {
   grid-column: span 2;
-  background: linear-gradient(to right bottom, rgba(15, 15, 26, 0.7), rgba(26, 26, 46, 0.7));
+  background: linear-gradient(
+    to right bottom,
+    rgba(15, 15, 26, 0.7),
+    rgba(26, 26, 46, 0.7)
+  );
 }
 
 .grid-conclusion {
   grid-column: span 2;
-  background: linear-gradient(to right bottom, rgba(0, 191, 255, 0.1), rgba(26, 26, 46, 0.7));
+  background: linear-gradient(
+    to right bottom,
+    rgba(0, 191, 255, 0.1),
+    rgba(26, 26, 46, 0.7)
+  );
 }
 
 .grid-conclusion .item-icon {
@@ -348,9 +388,21 @@
 }
 
 @keyframes pulse-dot {
-  0% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 5px rgba(0, 191, 255, 0.5); }
-  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 10px rgba(0, 191, 255, 0.8); }
-  100% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 5px rgba(0, 191, 255, 0.5); }
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+    box-shadow: 0 0 5px rgba(0, 191, 255, 0.5);
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.8);
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+    box-shadow: 0 0 5px rgba(0, 191, 255, 0.5);
+  }
 }
 
 .special-glow {
@@ -364,9 +416,15 @@
 }
 
 @keyframes special-pulse {
-  0% { opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { opacity: 0.5; }
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
 }
 
 /* Statistiques d'enquête */
@@ -446,16 +504,16 @@
     gap: 20px;
     text-align: center;
   }
-  
+
   .main-title {
     font-size: 2.4rem;
   }
-  
+
   .grid-intro,
   .grid-conclusion {
     grid-column: auto;
   }
-  
+
   .investigation-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
@@ -465,21 +523,21 @@
   .investigation-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .header-section {
     padding: 15px;
   }
-  
+
   .main-title {
     font-size: 2rem;
   }
-  
+
   .dialog-box {
     font-size: 18px;
     height: auto;
     min-height: 120px;
   }
-  
+
   .img {
     width: 60px;
     height: 60px;
@@ -491,20 +549,20 @@
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .header-section {
     margin-bottom: 20px;
   }
-  
+
   .main-title {
     font-size: 1.8rem;
   }
-  
+
   .status-container {
     flex-direction: column;
     gap: 5px;
   }
-  
+
   .status-badge {
     padding: 5px 10px;
     font-size: 0.9rem;

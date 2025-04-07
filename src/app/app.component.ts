@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Subscription, Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 
 // Import des services
 import { SoundService } from './services/sound.service';
@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 
 interface Note {
-  id: string; // Ajout d'un ID unique
+  id: string;
   content: string;
   timestamp: number;
 }
@@ -46,8 +46,15 @@ export class AppComponent implements OnInit, OnDestroy {
   // Date actuelle pour les notes
   currentDate: Date = new Date();
 
-  // Subscriptions pour gérer la mémoire
-  private subscriptions: Subscription[] = [];
+  // Pour gérer la destruction proprement
+  private destroy$ = new Subject<void>();
+
+  // Stockage des gestionnaires d'événements DOM pour nettoyage
+  private enableSoundButtonHandler: (() => void) | null = null;
+  private closeSoundModalButtonHandler: (() => void) | null = null;
+
+  // Stockage des timeouts
+  private soundTimeoutId: number | null = null;
 
   constructor(
     public soundService: SoundService,
@@ -65,19 +72,22 @@ export class AppComponent implements OnInit, OnDestroy {
     this.animateBackground();
 
     // S'abonner à l'état d'authentification
-    this.subscriptions.push(
-      this.authService.isAuthenticated$.subscribe((isAuth) => {
+    this.authService.isAuthenticated$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isAuth) => {
         this.isAuthenticated = isAuth;
 
         // Vérifier l'authentification après réception de la valeur
         if (!isAuth) {
           this.router.navigate(['/']);
         }
-      })
-    );
+      });
 
     // Vérifier et gérer le son - uniquement si la modale n'a pas déjà été affichée
-    if (!this.soundService.isSoundEnabled && !this.appStateService.wasSoundModalShown()) {
+    if (
+      !this.soundService.isSoundEnabled &&
+      !this.appStateService.wasSoundModalShown()
+    ) {
       const modal = document.getElementById('sound-modal');
       if (modal) {
         modal.classList.add('show');
@@ -85,39 +95,54 @@ export class AppComponent implements OnInit, OnDestroy {
         // Bouton pour activer le son
         const enableSoundButton = document.getElementById('enable-sound-btn');
         if (enableSoundButton) {
-          enableSoundButton.addEventListener('click', () => {
+          this.enableSoundButtonHandler = () => {
             // Activer le son dans le service
             this.soundService.toggleSound();
 
+            // Nettoyer tout timeout existant avant d'en créer un nouveau
+            if (this.soundTimeoutId !== null) {
+              clearTimeout(this.soundTimeoutId);
+            }
+
             // Jouer la musique après un petit délai
-            setTimeout(() => {
+            this.soundTimeoutId = window.setTimeout(() => {
               this.soundService.playBackgroundMusic(0.3);
+              this.soundTimeoutId = null;
             }, 100);
 
             // Fermer la modale
             modal.classList.remove('show');
-            
+
             // Marquer la modale comme affichée
             this.appStateService.markSoundModalShown();
-          });
+          };
+
+          enableSoundButton.addEventListener(
+            'click',
+            this.enableSoundButtonHandler
+          );
         }
-        
+
         // Ajouter un gestionnaire pour le bouton de fermeture (s'il existe)
         const closeButton = document.getElementById('close-sound-modal-btn');
         if (closeButton) {
-          closeButton.addEventListener('click', () => {
+          this.closeSoundModalButtonHandler = () => {
             modal.classList.remove('show');
             this.appStateService.markSoundModalShown();
-          });
+          };
+
+          closeButton.addEventListener(
+            'click',
+            this.closeSoundModalButtonHandler
+          );
         }
       }
-    } 
-    else {
+    } else {
       // Si le son est déjà activé, jouer la musique
       if (this.soundService.isSoundEnabled) {
         this.soundService.playBackgroundMusic(0.3);
       }
-      
+
       // Marquer la modale comme vue si ce n'est pas encore fait
       if (!this.appStateService.wasSoundModalShown()) {
         this.appStateService.markSoundModalShown();
@@ -125,35 +150,32 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     // S'abonner aux notes
-    this.subscriptions.push(
-      this.noteService.notes$.subscribe({
-        next: (notes) => {
-          this.notes = notes as Array<Note>; // Cast explicite avec le nouveau type Note
-        },
-        error: (err) => {
-          console.error('Erreur lors de la récupération des notes:', err);
-        },
-      })
-    );
+    this.noteService.notes$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (notes) => {
+        this.notes = notes as Array<Note>;
+      },
+      error: (err) => {
+        console.error('Erreur lors de la récupération des notes:', err);
+      },
+    });
 
     // S'abonner à la visibilité des notes
-    this.subscriptions.push(
-      this.noteService.isNotesVisible$.subscribe({
-        next: (visible) => {
-          this.showNotes = visible;
-        },
-        error: (err) => {
-          console.error(
-            'Erreur lors de la récupération de la visibilité des notes:',
-            err
-          );
-        },
-      })
-    );
+    this.noteService.isNotesVisible$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (visible) => {
+        this.showNotes = visible;
+      },
+      error: (err) => {
+        console.error(
+          'Erreur lors de la récupération de la visibilité des notes:',
+          err
+        );
+      },
+    });
 
-    // S'abonner aux services pour obtenir l'état de l'application
-    this.subscriptions.push(
-      this.progressService.moduleStatuses$.subscribe({
+    // S'abonner aux statuts des modules
+    this.progressService.moduleStatuses$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (statuses) => {
           this.moduleStatuses = statuses;
           this.completionPercentage =
@@ -165,18 +187,22 @@ export class AppComponent implements OnInit, OnDestroy {
             err
           );
         },
-      }),
+      });
 
-      this.timeTracker.elapsedTime$.subscribe({
-        next: (time) => {
-          this.elapsedTime = time;
-        },
-        error: (err) => {
-          console.error('Erreur lors de la récupération du temps écoulé:', err);
-        },
-      }),
+    // S'abonner au temps écoulé
+    this.timeTracker.elapsedTime$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (time) => {
+        this.elapsedTime = time;
+      },
+      error: (err) => {
+        console.error('Erreur lors de la récupération du temps écoulé:', err);
+      },
+    });
 
-      this.appStateService.isFirstVisit$.subscribe({
+    // S'abonner à l'état de première visite
+    this.appStateService.isFirstVisit$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (isFirst) => {
           this.isFirstVisit = isFirst;
 
@@ -191,19 +217,56 @@ export class AppComponent implements OnInit, OnDestroy {
             err
           );
         },
-      })
-    );
+      });
   }
 
   ngOnDestroy(): void {
-    // Nettoyer les animations et les souscriptions
+    // Émettre le signal de destruction pour tous les observables
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    // Nettoyer les animations
     if (this.requestAnimationId !== null) {
       cancelAnimationFrame(this.requestAnimationId);
+      this.requestAnimationId = null;
     }
 
+    // Nettoyer les écouteurs d'événements
     document.removeEventListener('mousemove', this.handleMouseMove);
 
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    // Nettoyer les écouteurs de la modale son
+    if (this.enableSoundButtonHandler) {
+      const enableSoundButton = document.getElementById('enable-sound-btn');
+      if (enableSoundButton) {
+        enableSoundButton.removeEventListener(
+          'click',
+          this.enableSoundButtonHandler
+        );
+      }
+      this.enableSoundButtonHandler = null;
+    }
+
+    if (this.closeSoundModalButtonHandler) {
+      const closeButton = document.getElementById('close-sound-modal-btn');
+      if (closeButton) {
+        closeButton.removeEventListener(
+          'click',
+          this.closeSoundModalButtonHandler
+        );
+      }
+      this.closeSoundModalButtonHandler = null;
+    }
+
+    // Nettoyer les timeouts
+    if (this.soundTimeoutId !== null) {
+      clearTimeout(this.soundTimeoutId);
+      this.soundTimeoutId = null;
+    }
+
+    // Arrêter la musique
+    if (this.soundService) {
+      this.soundService.pauseBackgroundMusic();
+    }
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -262,8 +325,6 @@ export class AppComponent implements OnInit, OnDestroy {
       )
     ) {
       this.appStateService.resetApplication();
-      // Déconnecter l'utilisateur également
-      this.authService.logout();
     }
   }
 
@@ -279,8 +340,12 @@ export class AppComponent implements OnInit, OnDestroy {
     a.download = `enquete_data_${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+
+    // Nettoyer les ressources
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
   }
 
   // Permettre l'importation des données

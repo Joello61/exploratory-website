@@ -8,17 +8,17 @@ export interface Note {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NoteService {
-
   private readonly STORAGE_KEY = 'enquete_notes';
   private isNotesVisibleSubject = new BehaviorSubject<boolean>(false);
   private notesSubject = new BehaviorSubject<Note[]>([]);
-  
-  public isNotesVisible$: Observable<boolean> = this.isNotesVisibleSubject.asObservable();
+
+  public isNotesVisible$: Observable<boolean> =
+    this.isNotesVisibleSubject.asObservable();
   public notes$: Observable<Note[]> = this.notesSubject.asObservable();
-  
+
   constructor() {
     this.loadNotes();
   }
@@ -43,7 +43,7 @@ export class NoteService {
   private saveNotes(): void {
     try {
       localStorage.setItem(
-        this.STORAGE_KEY, 
+        this.STORAGE_KEY,
         JSON.stringify(this.notesSubject.value)
       );
     } catch (error) {
@@ -65,9 +65,9 @@ export class NoteService {
     const newNote: Note = {
       id: this.generateId(),
       content,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     const currentNotes = [...this.notesSubject.value, newNote];
     this.notesSubject.next(currentNotes);
     this.saveNotes();
@@ -78,15 +78,15 @@ export class NoteService {
    */
   updateNote(id: string, content: string): void {
     const currentNotes = [...this.notesSubject.value];
-    const noteIndex = currentNotes.findIndex(note => note.id === id);
-    
+    const noteIndex = currentNotes.findIndex((note) => note.id === id);
+
     if (noteIndex >= 0) {
       currentNotes[noteIndex] = {
         ...currentNotes[noteIndex],
         content,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
-      
+
       this.notesSubject.next(currentNotes);
       this.saveNotes();
     }
@@ -96,7 +96,9 @@ export class NoteService {
    * Supprime une note
    */
   deleteNote(id: string): void {
-    const currentNotes = this.notesSubject.value.filter(note => note.id !== id);
+    const currentNotes = this.notesSubject.value.filter(
+      (note) => note.id !== id
+    );
     this.notesSubject.next(currentNotes);
     this.saveNotes();
   }
@@ -107,5 +109,4 @@ export class NoteService {
   private generateId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
-
 }

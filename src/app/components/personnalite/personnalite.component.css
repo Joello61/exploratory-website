@@ -5,7 +5,7 @@
   background: linear-gradient(135deg, #0f0f20 0%, #1a1a35 100%);
   min-height: 100vh;
   color: #e0e0ff;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 /* ======= DIALOG BOX ======= */
@@ -61,9 +61,17 @@
 }
 
 @keyframes blink {
-  0%, 40% { opacity: 1; }
-  50%, 90% { opacity: 0; }
-  100% { opacity: 1; }
+  0%,
+  40% {
+    opacity: 1;
+  }
+  50%,
+  90% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .detective-container {
@@ -735,7 +743,8 @@
   gap: 30px;
 }
 
-.profile-card, .traits-card {
+.profile-card,
+.traits-card {
   background: rgba(25, 25, 45, 0.6);
   border-radius: 10px;
   padding: 25px;
@@ -744,7 +753,8 @@
   transition: all 0.3s ease;
 }
 
-.profile-card:hover, .traits-card:hover {
+.profile-card:hover,
+.traits-card:hover {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 191, 255, 0.15);
 }
 
@@ -899,11 +909,13 @@
   margin-bottom: 20px;
 }
 
-.trait-manifestations, .trait-impact {
+.trait-manifestations,
+.trait-impact {
   margin-bottom: 20px;
 }
 
-.trait-manifestations h5, .trait-impact h5 {
+.trait-manifestations h5,
+.trait-impact h5 {
   color: #c0c0ff;
   font-size: 1rem;
   margin: 0 0 10px 0;
@@ -956,7 +968,9 @@
 }
 
 /* ======= ZONES VERROUILLÉES ======= */
-.profile-locked, .style-locked, .values-locked {
+.profile-locked,
+.style-locked,
+.values-locked {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1858,23 +1872,25 @@
   .investigation-content {
     flex-direction: column;
   }
-  
+
   .insights-panel {
     width: 100%;
   }
-  
-  .traits-grid, .motivation-factors, .collab-grid {
+
+  .traits-grid,
+  .motivation-factors,
+  .collab-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .process-item {
     flex: 1 1 100%;
   }
-  
+
   .comm-scale {
     flex-wrap: wrap;
   }
-  
+
   .scale-label {
     width: auto;
     flex: 1;
@@ -1887,43 +1903,46 @@
     align-items: flex-start;
     gap: 15px;
   }
-  
+
   .profile-status {
     align-self: flex-start;
   }
-  
+
   .folder-tabs {
     flex-wrap: wrap;
   }
-  
+
   .folder-tab {
     flex: 1 1 50%;
   }
-  
-  .investigation-header, .summary-header, .style-header, .values-header {
+
+  .investigation-header,
+  .summary-header,
+  .style-header,
+  .values-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .investigation-status {
     align-items: stretch;
     width: 100%;
     margin-top: 10px;
   }
-  
+
   .progress-container {
     width: 100%;
   }
-  
+
   .trait-progress-container {
     margin-top: 20px;
   }
-  
+
   .score-bar {
     width: 60px;
   }
-  
+
   .nav-buttons {
     flex-direction: column;
   }
@@ -1933,118 +1952,126 @@
   .psycho-profile-container {
     padding: 20px 10px;
   }
-  
+
   .section-title {
     font-size: 1.5rem;
   }
-  
+
   .folder-tab {
     flex: 1 1 100%;
   }
-  
+
   .folder-content {
     padding: 20px 15px;
   }
-  
+
   .img {
     width: 60px;
     height: 60px;
   }
-  
+
   .dialog-box {
     font-size: 18px;
     height: auto;
     min-height: 150px;
   }
-  
+
   .message {
     padding: 0 10px !important;
   }
-  
+
   .trait-item {
     padding: 5px;
   }
-  
+
   .quiz-modal {
     width: 95%;
   }
-  
+
   .quiz-option {
     padding: 10px;
   }
-  
+
   .option-marker {
     width: 25px;
     height: 25px;
     font-size: 0.8rem;
   }
-  
+
   .option-text {
     font-size: 0.9rem;
   }
-  
+
   .quiz-question p {
     font-size: 1rem;
   }
-  
+
   .quiz-modal-body {
     padding: 20px 15px;
   }
-  
-  .quiz-intro-title, .quiz-result-title {
+
+  .quiz-intro-title,
+  .quiz-result-title {
     font-size: 1.3rem;
   }
-  
-  .quiz-intro-text, .quiz-result-message {
+
+  .quiz-intro-text,
+  .quiz-result-message {
     font-size: 0.9rem;
   }
 }
 
 /* ======= ANIMATIONS ======= */
 @keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px); 
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.investigation-content, .profile-content, .style-content, .values-content {
+.investigation-content,
+.profile-content,
+.style-content,
+.values-content {
   animation: fadeIn 0.5s ease;
 }
 
-.trait-profile-card, .collab-aspect, .motivation-factor, .value-tag {
+.trait-profile-card,
+.collab-aspect,
+.motivation-factor,
+.value-tag {
   animation: fadeIn 0.5s ease backwards;
 }
 
 /* Décalage des animations pour un effet cascade */
-.trait-profile-card:nth-child(1), 
-.collab-aspect:nth-child(1), 
-.motivation-factor:nth-child(1), 
+.trait-profile-card:nth-child(1),
+.collab-aspect:nth-child(1),
+.motivation-factor:nth-child(1),
 .value-tag:nth-child(1) {
   animation-delay: 0.1s;
 }
 
-.trait-profile-card:nth-child(2), 
-.collab-aspect:nth-child(2), 
-.motivation-factor:nth-child(2), 
+.trait-profile-card:nth-child(2),
+.collab-aspect:nth-child(2),
+.motivation-factor:nth-child(2),
 .value-tag:nth-child(2) {
   animation-delay: 0.2s;
 }
 
-.trait-profile-card:nth-child(3), 
-.collab-aspect:nth-child(3), 
-.motivation-factor:nth-child(3), 
+.trait-profile-card:nth-child(3),
+.collab-aspect:nth-child(3),
+.motivation-factor:nth-child(3),
 .value-tag:nth-child(3) {
   animation-delay: 0.3s;
 }
 
-.trait-profile-card:nth-child(4), 
-.collab-aspect:nth-child(4), 
-.motivation-factor:nth-child(4), 
+.trait-profile-card:nth-child(4),
+.collab-aspect:nth-child(4),
+.motivation-factor:nth-child(4),
 .value-tag:nth-child(4) {
   animation-delay: 0.4s;
 }
@@ -2066,17 +2093,25 @@
 }
 
 /* Animation pour les marqueurs de progression */
-.trait-progress-bar, .quiz-progress-bar, .score-fill {
+.trait-progress-bar,
+.quiz-progress-bar,
+.score-fill {
   animation: progressFill 1.5s ease;
 }
 
 @keyframes progressFill {
-  from { width: 0; }
+  from {
+    width: 0;
+  }
 }
 
 /* Animation subtile de brillance pour les éléments découverts */
-.trait-item.discovered, .collab-aspect.discovered, .process-item.discovered, 
-.motivation-factor.discovered, .value-tag.discovered, .preference-item.discovered {
+.trait-item.discovered,
+.collab-aspect.discovered,
+.process-item.discovered,
+.motivation-factor.discovered,
+.value-tag.discovered,
+.preference-item.discovered {
   animation: glowPulse 3s infinite alternate;
 }
 

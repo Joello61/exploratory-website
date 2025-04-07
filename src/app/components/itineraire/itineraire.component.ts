@@ -7,7 +7,7 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { DialogService, DialogMessage } from '../../services/dialog.service';
 import { NoteService } from '../../services/note.service';
 import { ProgressService } from '../../services/progress.service';
@@ -82,6 +82,16 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;
   @ViewChild('map') mapElement!: ElementRef;
 
+  // Pour gérer la destruction du composant
+  private destroy$ = new Subject<void>();
+
+  // Gérer les timeouts
+  private introDialogTimeoutId: number | null = null;
+  private closeDialogTimeoutId: number | null = null;
+
+  // Référence au graphique pour pouvoir le détruire
+  private skillsChart: Chart | null = null;
+
   // Texte du dialogue d'introduction
   private fullText: string =
     "Agent, cette section détaille l'itinéraire personnel et éducatif du sujet. Examinez attentivement ces informations pour comprendre son parcours. Certaines données sont encore cryptées et nécessitent une découverte progressive. Collectez tous les éléments pour obtenir une vision complète de sa formation et de ses origines.";
@@ -105,7 +115,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       name: 'Toulouse',
       period: '2024 - Présent',
       description:
-        'Lieu de résidence actuel et ville d\'études pour le Master Informatique à l\'Université de Toulouse Jean Jaurès.',
+        "Lieu de résidence actuel et ville d'études pour le Master Informatique à l'Université de Toulouse Jean Jaurès.",
       coordinates: { lat: 43.6047, lng: 1.4442 }, // Coordonnées réelles de Toulouse
       data: [
         { label: 'Influence', value: 'Actuelle' },
@@ -119,7 +129,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       name: 'Marseille',
       period: '2024 - Présent',
       description:
-        'Lieu de l\'alternance chez ANG Tech, où se déroule l\'expérience professionnelle actuelle en développement Fullstack.',
+        "Lieu de l'alternance chez ANG Tech, où se déroule l'expérience professionnelle actuelle en développement Fullstack.",
       coordinates: { lat: 43.2965, lng: 5.3698 }, // Coordonnées réelles de Marseille
       data: [
         { label: 'Influence', value: 'Professionnelle' },
@@ -132,13 +142,16 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       id: 'loc3',
       name: 'Yaoundé, Cameroun',
       period: '2020 - 2023',
-      description: 
-        'Lieu des premières expériences professionnelles (stages chez SKOOVEL et Megasoft) et des études en Licence et DUT à l\'IUT de Bandjoun.',
-      coordinates: { lat: 3.8480, lng: 11.5021 }, // Coordonnées réelles de Yaoundé
+      description:
+        "Lieu des premières expériences professionnelles (stages chez SKOOVEL et Megasoft) et des études en Licence et DUT à l'IUT de Bandjoun.",
+      coordinates: { lat: 3.848, lng: 11.5021 }, // Coordonnées réelles de Yaoundé
       data: [
         { label: 'Influence', value: 'Fondamentale' },
         { label: 'Formation initiale', value: 'Informatique' },
-        { label: 'Expériences', value: 'Premières expériences professionnelles' },
+        {
+          label: 'Expériences',
+          value: 'Premières expériences professionnelles',
+        },
       ],
       discovered: false,
     },
@@ -146,8 +159,8 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       id: 'loc4',
       name: 'Bandjoun, Cameroun',
       period: '2020 - 2023',
-      description: 
-        'Site de l\'IUT où ont été suivies les formations de DUT Génie Logiciel et de Licence Informatique et réseau.',
+      description:
+        "Site de l'IUT où ont été suivies les formations de DUT Génie Logiciel et de Licence Informatique et réseau.",
       coordinates: { lat: 5.3772, lng: 10.4111 }, // Coordonnées approximatives de Bandjoun
       data: [
         { label: 'Influence', value: 'Académique' },
@@ -177,8 +190,8 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
       achievements: [
         "Projet d'alternance : Développement d'une application web/mobile avec intégration 3D",
-        "Mise en place de pipelines CI/CD avec GitLab",
-        "Rédaction de documentation technique complète"
+        'Mise en place de pipelines CI/CD avec GitLab',
+        'Rédaction de documentation technique complète',
       ],
       discovered: true,
       expanded: false,
@@ -197,9 +210,9 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
         'Bases de données relationnelles',
       ],
       achievements: [
-        "Stage de 10 mois chez SKOOVEL en tant que consultant informatique",
-        "Projets académiques en développement web et gestion de bases de données",
-        "Analyse de données et support technique en environnement professionnel"
+        'Stage de 10 mois chez SKOOVEL en tant que consultant informatique',
+        'Projets académiques en développement web et gestion de bases de données',
+        'Analyse de données et support technique en environnement professionnel',
       ],
       discovered: true,
       expanded: false,
@@ -211,36 +224,59 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       institution: 'IUT de Bandjoun, Cameroun',
       description:
         "Formation technique axée sur le développement logiciel, les méthodologies de conception et la programmation, établissant des bases solides en développement d'applications.",
-      skills: [
-        'Java',
-        'PHP',
-        'JavaScript',
-        'Conception orientée objet',
-      ],
+      skills: ['Java', 'PHP', 'JavaScript', 'Conception orientée objet'],
       achievements: [
-        "Stage de 3 mois chez Megasoft Sarl en développement web",
+        'Stage de 3 mois chez Megasoft Sarl en développement web',
         "Intégration d'API REST et maintenance d'applications",
-        "Optimisation de requêtes SQL et tests unitaires"
+        'Optimisation de requêtes SQL et tests unitaires',
       ],
       discovered: true,
       expanded: false,
-    }
+    },
   ];
 
   // Données pour les graphiques
   skillsEvolution: SkillEvolution[] = [
-    { year: '2020', level: 30, tooltip: 'Début DUT Génie Logiciel - Bases de programmation' },
-    { year: '2021', level: 45, tooltip: 'Milieu DUT - Compétences web fondamentales' },
-    { year: '2022', level: 60, tooltip: 'Stage Megasoft + Début Licence - Développement web et API' },
-    { year: '2023', level: 75, tooltip: 'Stage SKOOVEL - Polyvalence technique et bases de données' },
-    { year: '2024', level: 85, tooltip: 'Début Master et alternance - Développement Fullstack' },
-    { year: '2025', level: 95, tooltip: 'Projection - Expertise 3D et DevOps avancé' },
+    {
+      year: '2020',
+      level: 30,
+      tooltip: 'Début DUT Génie Logiciel - Bases de programmation',
+    },
+    {
+      year: '2021',
+      level: 45,
+      tooltip: 'Milieu DUT - Compétences web fondamentales',
+    },
+    {
+      year: '2022',
+      level: 60,
+      tooltip: 'Stage Megasoft + Début Licence - Développement web et API',
+    },
+    {
+      year: '2023',
+      level: 75,
+      tooltip: 'Stage SKOOVEL - Polyvalence technique et bases de données',
+    },
+    {
+      year: '2024',
+      level: 85,
+      tooltip: 'Début Master et alternance - Développement Fullstack',
+    },
+    {
+      year: '2025',
+      level: 95,
+      tooltip: 'Projection - Expertise 3D et DevOps avancé',
+    },
   ];
 
   keyIndicators: KeyIndicator[] = [
     { label: 'Années de formation', value: '5', trend: 'up' },
     { label: 'Expériences professionnelles', value: '3', trend: 'up' },
-    { label: "Niveau d'expertise fullstack", value: 'Intermédiaire', trend: 'up' },
+    {
+      label: "Niveau d'expertise fullstack",
+      value: 'Intermédiaire',
+      trend: 'up',
+    },
     { label: 'Technologies maîtrisées', value: '10+', trend: 'up' },
     { label: 'Compétences 3D web', value: 'Spécialisation', trend: 'up' },
     { label: 'Mobilité géographique', value: '2 pays', trend: 'neutral' },
@@ -261,9 +297,9 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       correctOptionIndex: 1,
       feedback: {
         correct:
-          'Correct ! Le Master Informatique à l\'Université de Toulouse Jean Jaurès est la formation la plus récente (2024-en cours).',
+          "Correct ! Le Master Informatique à l'Université de Toulouse Jean Jaurès est la formation la plus récente (2024-en cours).",
         incorrect:
-          'Incorrect. Le Master Informatique à l\'Université de Toulouse Jean Jaurès (2024-en cours) est la formation la plus récente du parcours.',
+          "Incorrect. Le Master Informatique à l'Université de Toulouse Jean Jaurès (2024-en cours) est la formation la plus récente du parcours.",
       },
     },
     {
@@ -272,15 +308,14 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       options: ['Toulouse', 'Yaoundé', 'Marseille', 'Bandjoun'],
       correctOptionIndex: 2,
       feedback: {
-        correct:
-          'Correct ! L\'alternance chez ANG Tech se déroule à Marseille.',
+        correct: "Correct ! L'alternance chez ANG Tech se déroule à Marseille.",
         incorrect:
-          'Incorrect. L\'alternance chez ANG Tech se déroule à Marseille, tandis que le Master est suivi à Toulouse.',
+          "Incorrect. L'alternance chez ANG Tech se déroule à Marseille, tandis que le Master est suivi à Toulouse.",
       },
     },
     {
       id: 'q3',
-      text: 'Quelle technologie spécifique est mise en avant dans le poste actuel d\'alternant ?',
+      text: "Quelle technologie spécifique est mise en avant dans le poste actuel d'alternant ?",
       options: [
         'Intelligence artificielle',
         'Blockchain',
@@ -290,77 +325,62 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! L\'intégration 3D est une technologie clé dans le poste actuel chez ANG Tech, avec le développement d\'une application web/mobile incorporant des fonctionnalités 3D.',
+          "Correct ! L'intégration 3D est une technologie clé dans le poste actuel chez ANG Tech, avec le développement d'une application web/mobile incorporant des fonctionnalités 3D.",
         incorrect:
-          'Incorrect. L\'intégration 3D est la technologie spécifique mise en avant dans le poste actuel, notamment pour l\'analyse des mesures corporelles.',
+          "Incorrect. L'intégration 3D est la technologie spécifique mise en avant dans le poste actuel, notamment pour l'analyse des mesures corporelles.",
       },
     },
     {
       id: 'q4',
-      text: 'Quel est le niveau d\'expertise fullstack atteint en 2024 selon l\'évolution des compétences ?',
+      text: "Quel est le niveau d'expertise fullstack atteint en 2024 selon l'évolution des compétences ?",
       options: ['60%', '75%', '85%', '95%'],
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! En 2024, le niveau d\'expertise fullstack est de 85%, correspondant au début du Master et de l\'alternance.',
+          "Correct ! En 2024, le niveau d'expertise fullstack est de 85%, correspondant au début du Master et de l'alternance.",
         incorrect:
-          'Incorrect. En 2024, le niveau d\'expertise fullstack est de 85%, marquant le début du Master Informatique et de l\'alternance chez ANG Tech.',
+          "Incorrect. En 2024, le niveau d'expertise fullstack est de 85%, marquant le début du Master Informatique et de l'alternance chez ANG Tech.",
       },
     },
     {
       id: 'q5',
       text: 'Quel framework frontend est principalement utilisé dans le poste actuel ?',
-      options: [
-        'React',
-        'Angular',
-        'Vue.js',
-        'Svelte',
-      ],
+      options: ['React', 'Angular', 'Vue.js', 'Svelte'],
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! Vue.js est le framework frontend principal utilisé chez ANG Tech pour le développement de l\'application web/mobile avec intégration 3D.',
+          "Correct ! Vue.js est le framework frontend principal utilisé chez ANG Tech pour le développement de l'application web/mobile avec intégration 3D.",
         incorrect:
-          'Incorrect. Vue.js est le framework frontend principalement utilisé dans le poste actuel pour développer l\'interface utilisateur de l\'application avec intégration 3D.',
+          "Incorrect. Vue.js est le framework frontend principalement utilisé dans le poste actuel pour développer l'interface utilisateur de l'application avec intégration 3D.",
       },
     },
     {
       id: 'q6',
-      text: 'Combien d\'expériences professionnelles figurent dans le parcours du développeur ?',
-      options: [
-        '1',
-        '2',
-        '3',
-        '4',
-      ],
+      text: "Combien d'expériences professionnelles figurent dans le parcours du développeur ?",
+      options: ['1', '2', '3', '4'],
       correctOptionIndex: 2,
       feedback: {
         correct:
           'Correct ! Le parcours comprend 3 expériences professionnelles : alternance chez ANG Tech, stage chez SKOOVEL et stage chez Megasoft.',
         incorrect:
-          'Incorrect. Le parcours comprend 3 expériences professionnelles distinctes : l\'alternance actuelle chez ANG Tech, le stage de 10 mois chez SKOOVEL et le stage de 3 mois chez Megasoft.',
+          "Incorrect. Le parcours comprend 3 expériences professionnelles distinctes : l'alternance actuelle chez ANG Tech, le stage de 10 mois chez SKOOVEL et le stage de 3 mois chez Megasoft.",
       },
     },
     {
       id: 'q7',
       text: 'Quel outil DevOps est utilisé pour les pipelines CI/CD dans le poste actuel ?',
-      options: [
-        'Jenkins',
-        'GitHub Actions',
-        'GitLab CI/CD',
-        'Azure DevOps',
-      ],
+      options: ['Jenkins', 'GitHub Actions', 'GitLab CI/CD', 'Azure DevOps'],
       correctOptionIndex: 2,
       feedback: {
         correct:
-          'Correct ! GitLab CI/CD est l\'outil utilisé pour mettre en place des pipelines d\'intégration et de déploiement continus chez ANG Tech.',
+          "Correct ! GitLab CI/CD est l'outil utilisé pour mettre en place des pipelines d'intégration et de déploiement continus chez ANG Tech.",
         incorrect:
-          'Incorrect. GitLab CI/CD est l\'outil DevOps utilisé dans le poste actuel pour automatiser les tests et déploiements.',
+          "Incorrect. GitLab CI/CD est l'outil DevOps utilisé dans le poste actuel pour automatiser les tests et déploiements.",
       },
     },
   ];
 
-  statut: string = ""
+  statut: string = '';
 
   currentQuestionIndex: number = 0;
   selectedOption: number | null = null;
@@ -377,11 +397,11 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   options = {
     layers: [
       tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&amp;copy; OpenStreetMap contributors'
-      })
+        attribution: '&amp;copy; OpenStreetMap contributors',
+      }),
     ],
     zoom: 3,
-    center: latLng([30.8566, 2.3522])
+    center: latLng([30.8566, 2.3522]),
   };
 
   constructor(
@@ -399,88 +419,130 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // Vérifier si le module est déjà complété
-    this.subscriptions.push(
-      this.progressService.moduleStatuses$.subscribe((statuses) => {
+    this.progressService.moduleStatuses$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((statuses) => {
         this.isModuleCompleted = statuses.itineraire;
 
         // Si le module est déjà complété, on peut pré-charger les réponses utilisateur
         if (this.isModuleCompleted) {
           this.loadSavedState();
-          this.statut = "TERMINÉ"
+          this.statut = 'TERMINÉ';
         } else {
           this.initializeData();
-          this.statut = "EN COURS"
+          this.statut = 'EN COURS';
         }
-      })
-    );
+      });
 
-    this.subscriptions.push(
-      this.dialogService.isDialogOpen$.subscribe((isOpen) => {
+    // S'abonner aux états du dialogue
+    this.dialogService.isDialogOpen$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isOpen) => {
         this.isDialogOpen = isOpen;
-      }),
-      this.dialogService.isTyping$.subscribe((isTyping) => {
+      });
+
+    this.dialogService.isTyping$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isTyping) => {
         this.isTyping = isTyping;
-      }),
-      this.dialogService.currentMessage$.subscribe((message) => {
+      });
+
+    this.dialogService.currentMessage$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message) => {
         this.dialogMessage = message;
-      })
-    );
+      });
 
     // Créer les marqueurs à partir des localisations
-  this.originLocations.forEach(loc => {
-    const m = marker([loc.coordinates.lat, loc.coordinates.lng], {
-      title: loc.name,
-      icon: icon({
-        iconUrl: 'leaflet/marker-icon.png', // par défaut Leaflet, ou personnalise ici
-        shadowUrl: 'leaflet/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      })
-    });
+    this.originLocations.forEach((loc) => {
+      const m = marker([loc.coordinates.lat, loc.coordinates.lng], {
+        title: loc.name,
+        icon: icon({
+          iconUrl: 'leaflet/marker-icon.png',
+          shadowUrl: 'leaflet/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41],
+        }),
+      });
 
-    m.bindPopup(`<b>${loc.name}</b><br>${loc.period}<br>${loc.description}`);
-    this.markers.push(m);
-  });
+      m.bindPopup(`<b>${loc.name}</b><br>${loc.period}<br>${loc.description}`);
+      this.markers.push(m);
+    });
   }
 
   ngAfterViewInit(): void {
-    // Utiliser le DialogService au lieu du typewriter manuel
-    setTimeout(() => {
+    // Utiliser le DialogService avec un timeout géré
+    this.introDialogTimeoutId = window.setTimeout(() => {
       this.showIntroDialog();
+      this.introDialogTimeoutId = null;
     }, 500);
 
     this.initSkillsChart();
   }
 
   ngOnDestroy(): void {
-    // Nettoyer les souscriptions pour éviter les fuites de mémoire
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    // Émettre le signal de destruction pour tous les observables
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    // Nettoyer les timeouts
+    if (this.introDialogTimeoutId !== null) {
+      clearTimeout(this.introDialogTimeoutId);
+    }
+
+    if (this.closeDialogTimeoutId !== null) {
+      clearTimeout(this.closeDialogTimeoutId);
+    }
+
+    // Détruire le graphique Chart.js
+    if (this.skillsChart) {
+      this.skillsChart.destroy();
+      this.skillsChart = null;
+    }
+
+    // Nettoyer la carte Leaflet
+    if (this.map) {
+      this.markers.forEach((m) => {
+        m.removeFrom(this.map);
+      });
+      this.map.remove();
+    }
+
+    // Fermer tout dialogue ouvert
+    if (this.isDialogOpen) {
+      this.dialogService.closeDialog();
+    }
   }
 
   initSkillsChart() {
-    const ctx = document.getElementById('skillsEvolutionChart') as HTMLCanvasElement;
-    
-    const skillsChart = new Chart(ctx, {
+    const ctx = document.getElementById(
+      'skillsEvolutionChart'
+    ) as HTMLCanvasElement;
+    if (!ctx) return;
+
+    this.skillsChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: this.skillsEvolution.map(skill => skill.year),
-        datasets: [{
-          label: 'Niveau de compétence',
-          data: this.skillsEvolution.map(skill => skill.level),
-          backgroundColor: 'rgba(0, 191, 255, 0.6)',
-          borderColor: 'rgba(0, 191, 255, 1)',
-          borderWidth: 1
-        }]
+        labels: this.skillsEvolution.map((skill) => skill.year),
+        datasets: [
+          {
+            label: 'Niveau de compétence',
+            data: this.skillsEvolution.map((skill) => skill.level),
+            backgroundColor: 'rgba(0, 191, 255, 0.6)',
+            borderColor: 'rgba(0, 191, 255, 1)',
+            borderWidth: 1,
+          },
+        ],
       },
       options: {
         responsive: true,
         scales: {
           y: {
             beginAtZero: true,
-            max: 100
-          }
+            max: 100,
+          },
         },
         plugins: {
           tooltip: {
@@ -488,19 +550,18 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
               label: (context: TooltipItem<'bar'>) => {
                 const index = context.dataIndex;
                 return this.skillsEvolution[index].tooltip;
-              }
-            }
-          }
-        }
-      }
+              },
+            },
+          },
+        },
+      },
     });
   }
 
   onMapReady(map: Map) {
     this.map = map;
-    this.markers.forEach(m => m.addTo(this.map));
+    this.markers.forEach((m) => m.addTo(this.map));
   }
-  
 
   showIntroDialog(): void {
     const dialogMessage: DialogMessage = {
@@ -509,8 +570,9 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
     };
     this.dialogService.openDialog(dialogMessage);
     this.dialogService.startTypewriter(this.fullText, () => {
-      setTimeout(() => {
-        this.dialogService.closeDialog()
+      this.closeDialogTimeoutId = window.setTimeout(() => {
+        this.dialogService.closeDialog();
+        this.closeDialogTimeoutId = null;
       }, 3000);
     });
   }
@@ -518,6 +580,12 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   // Fermer le dialogue
   closeDialogTypeWriter(): void {
     this.dialogService.closeDialog();
+
+    // Annuler tout timeout de fermeture programmé
+    if (this.closeDialogTimeoutId !== null) {
+      clearTimeout(this.closeDialogTimeoutId);
+      this.closeDialogTimeoutId = null;
+    }
   }
 
   // Initialiser les données

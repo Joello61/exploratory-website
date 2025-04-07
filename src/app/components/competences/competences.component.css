@@ -60,9 +60,17 @@
 }
 
 @keyframes blink {
-  0%, 40% { opacity: 1; }
-  50%, 90% { opacity: 0; }
-  100% { opacity: 1; }
+  0%,
+  40% {
+    opacity: 1;
+  }
+  50%,
+  90% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .img {
@@ -129,7 +137,8 @@
   background: linear-gradient(to right, #00bfff, #33ccff);
 }
 
-.time-elapsed, .progress-percentage {
+.time-elapsed,
+.progress-percentage {
   color: #a0d8ff;
   font-size: 0.9rem;
 }
@@ -210,7 +219,7 @@
 }
 
 .scan-indicator.active::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -4px;
   left: -4px;
@@ -222,9 +231,18 @@
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.8); opacity: 1; }
-  70% { transform: scale(1.2); opacity: 0; }
-  100% { transform: scale(0.8); opacity: 0; }
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
 }
 
 .scan-text {
@@ -460,7 +478,8 @@
   --node-distance: 0.5;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) rotate(0) translate(calc(var(--node-distance) * 200px), 0) rotate(0);
+  transform: translate(-50%, -50%) rotate(0)
+    translate(calc(var(--node-distance) * 200px), 0) rotate(0);
   transform-origin: center center;
   opacity: 0.5;
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
@@ -479,8 +498,12 @@
 }
 
 @keyframes scanPulse {
-  from { box-shadow: 0 0 10px rgba(0, 191, 255, 0.5); }
-  to { box-shadow: 0 0 25px rgba(0, 191, 255, 0.8); }
+  from {
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+  }
+  to {
+    box-shadow: 0 0 25px rgba(0, 191, 255, 0.8);
+  }
 }
 
 .node-connector {
@@ -881,7 +904,9 @@
   background: #00bfff;
   border-radius: 50%;
   box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
-  transform: rotate(calc(var(--point-angle) * 1deg)) translateX(calc(var(--point-distance) * 150px)) rotate(calc(-1 * var(--point-angle) * 1deg));
+  transform: rotate(calc(var(--point-angle) * 1deg))
+    translateX(calc(var(--point-distance) * 150px))
+    rotate(calc(-1 * var(--point-angle) * 1deg));
 }
 
 /* Message de confirmation de complétion */
@@ -908,27 +933,33 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideIn {
-  from { 
+  from {
     opacity: 0;
     transform: translateY(20px);
   }
-  to { 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
 @keyframes scaleIn {
-  from { 
+  from {
     opacity: 0;
     transform: scale(0.8);
   }
-  to { 
+  to {
     opacity: 1;
     transform: scale(1);
   }
@@ -939,7 +970,7 @@
   .lab-interface {
     grid-template-columns: 1fr;
   }
-  
+
   .top-skills-list {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
@@ -951,33 +982,33 @@
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .summary-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
   }
-  
+
   .summary-progress {
     align-items: flex-start;
     width: 100%;
   }
-  
+
   .progress-container {
     width: 100%;
   }
-  
+
   .dialog-box {
     font-size: 16px;
     height: auto;
     min-height: 150px;
   }
-  
+
   .img {
     width: 60px;
     height: 60px;
   }
-  
+
   .lab-status {
     flex-direction: column;
     align-items: flex-start;
@@ -990,45 +1021,45 @@
     top: 15px;
     right: 15px;
   }
-  
+
   .visualization-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
     padding-bottom: 40px;
   }
-  
+
   .skill-visualization {
     padding: 15px;
   }
-  
+
   .skills-graph {
     height: 350px;
   }
-  
+
   .skill-node {
     padding: 8px;
     min-width: 90px;
   }
-  
+
   .skill-icon {
     width: 30px;
     height: 30px;
     font-size: 1rem;
   }
-  
+
   .skill-name {
     font-size: 0.8rem;
   }
-  
+
   .category-btn {
     padding: 10px;
   }
-  
+
   .top-skills-list {
     grid-template-columns: 1fr;
   }
-  
+
   .placeholder-chart {
     width: 250px;
     height: 250px;

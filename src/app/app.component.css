@@ -87,7 +87,10 @@
     rgba(0, 191, 255, 0.15) 30%,
     transparent 70%
   );
-  transform: translate(calc(var(--x, 0px) - 175px), calc(var(--y, 0px) - 175px));
+  transform: translate(
+    calc(var(--x, 0px) - 175px),
+    calc(var(--y, 0px) - 175px)
+  );
   mix-blend-mode: screen;
   z-index: 0;
   filter: blur(25px);
@@ -221,9 +224,15 @@
   display: none;
 }
 
-.export-btn { background-color: rgba(13, 110, 253, 0.2); }
-.import-btn { background-color: rgba(108, 117, 125, 0.2); }
-.reset-btn { background-color: rgba(220, 53, 69, 0.2); }
+.export-btn {
+  background-color: rgba(13, 110, 253, 0.2);
+}
+.import-btn {
+  background-color: rgba(108, 117, 125, 0.2);
+}
+.reset-btn {
+  background-color: rgba(220, 53, 69, 0.2);
+}
 
 /* Notes de l'enquêteur */
 .investigator-notes {
@@ -243,8 +252,12 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .notes-header {
@@ -359,41 +372,40 @@
   display: inline;
 }
 
-
 /* Styles responsifs pour les petits écrans */
 @media (max-width: 768px) {
   .utility-buttons {
     right: 10px;
   }
-  
+
   .utility-btn {
     width: 40px;
     height: 40px;
     font-size: 1rem;
   }
-  
+
   .btn {
     padding: 6px 10px;
     font-size: 0.8rem;
   }
-  
+
   .progress-bar-container {
     width: 95%;
   }
-  
+
   .modal-content {
     max-width: 90%;
     padding: 15px;
   }
-  
+
   .modal-content h2 {
     font-size: 1.4rem;
   }
-  
+
   .modal-content p {
     font-size: 1rem;
   }
-  
+
   .enable-sound-btn {
     padding: 10px 20px;
     font-size: 1rem;
@@ -419,8 +431,14 @@ router-outlet + * {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Bouton contrôle du son */
