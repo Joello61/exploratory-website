@@ -11,6 +11,11 @@ export class SoundService {
   
   public soundEnabled$: Observable<boolean> = this.soundEnabledSubject.asObservable();
   
+  // Référence à l'élément audio de la musique de fond
+  private backgroundMusicElement: HTMLAudioElement | null = null;
+
+  private isMusicPlaying: boolean = false;
+  
   constructor() {
     this.loadSoundPreference();
   }
@@ -43,6 +48,12 @@ export class SoundService {
     }
   }
 
+  onReload(): void {
+    const newState = false;
+    this.soundEnabledSubject.next(newState);
+    this.saveSoundPreference();
+  }
+
   /**
    * Active/désactive le son
    */
@@ -50,6 +61,15 @@ export class SoundService {
     const newState = !this.soundEnabledSubject.value;
     this.soundEnabledSubject.next(newState);
     this.saveSoundPreference();
+    
+    // Si on désactive le son, mettre en pause la musique sans la détruire
+    if (!newState && this.backgroundMusicElement) {
+      this.pauseBackgroundMusic();
+    } 
+    // Si on active le son et qu'il y a une musique en pause, la reprendre
+    else if (newState && this.backgroundMusicElement && !this.isMusicPlaying) {
+      this.resumeBackgroundMusic();
+    }
   }
 
   /**
@@ -93,6 +113,59 @@ export class SoundService {
    * Joue la musique d'ambiance principale
    */
   playBackgroundMusic(volume: number = 0.3): HTMLAudioElement | null {
-    return this.playSound('song.mp3', volume, true);
+    // Si une musique existe déjà, ajuster son volume et la jouer si nécessaire
+    if (this.backgroundMusicElement) {
+      this.backgroundMusicElement.volume = Math.min(Math.max(volume, 0), 1);
+      if (!this.isMusicPlaying) {
+        this.resumeBackgroundMusic();
+      }
+      return this.backgroundMusicElement;
+    }
+    
+    // Sinon, créer un nouvel élément audio
+    const audio = this.playSound('song.mp3', volume, true);
+    
+    // Stocker la référence
+    if (audio) {
+      this.backgroundMusicElement = audio;
+      this.isMusicPlaying = true;
+    }
+    
+    return audio;
+  }
+
+  pauseBackgroundMusic(): void {
+    if (this.backgroundMusicElement && this.isMusicPlaying) {
+      this.backgroundMusicElement.pause();
+      this.isMusicPlaying = false;
+    }
+  }
+
+  resumeBackgroundMusic(): void {
+    if (this.backgroundMusicElement && !this.isMusicPlaying && this.isSoundEnabled) {
+      this.backgroundMusicElement.play()
+        .then(() => {
+          this.isMusicPlaying = true;
+        })
+        .catch(error => {
+          console.error('Erreur lors de la reprise de la musique:', error);
+        });
+    }
+  }
+  
+  /**
+   * Arrête la musique d'ambiance
+   */
+  stopBackgroundMusic(): void {
+    if (this.backgroundMusicElement) {
+      this.backgroundMusicElement.pause();
+      this.backgroundMusicElement.currentTime = 0; // Remettre au début
+      this.backgroundMusicElement = null;
+      this.isMusicPlaying = false;
+    }
+  }
+
+  hasMusicLoaded(): boolean {
+    return this.backgroundMusicElement !== null;
   }
 }

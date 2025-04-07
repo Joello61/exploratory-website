@@ -102,5 +102,11 @@
   <span *ngIf="!showNotes">Notes</span>
 </button>
 
+<!-- Bouton pour activer/désactiver le son -->
+<button class="toggle-sound-btn" (click)="toggleSound()">
+  <i class="bi" [ngClass]="soundService.isSoundEnabled ? 'bi-volume-up' : 'bi-volume-mute'"></i>
+  <span>{{ soundService.isSoundEnabled ? 'Désactiver le son' : 'Activer le son' }}</span>
+</button>
+
 <!-- Le contenu principal des pages -->
 <router-outlet></router-outlet>
