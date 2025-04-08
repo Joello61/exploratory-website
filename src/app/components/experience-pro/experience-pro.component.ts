@@ -855,6 +855,6 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
   // Naviguer vers la page suivante
   navigateToNextPage(): void {
     this.closeQuizModal();
-    this.router.navigate(['/attentes']);
+    this.router.navigate(['/competences']);
   }
 }
