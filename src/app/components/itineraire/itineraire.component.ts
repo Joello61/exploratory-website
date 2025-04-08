@@ -32,6 +32,7 @@ import { QUIZQUESTIONSDATA } from '../../database/itineraire/quizQuestions.data'
 @Component({
     selector: 'app-itineraire',
     imports: [CommonModule, LeafletModule],
+    standalone: true,
     templateUrl: './itineraire.component.html',
     styleUrls: ['./itineraire.component.css']
 })

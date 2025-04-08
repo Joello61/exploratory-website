@@ -34,6 +34,7 @@ import { SKILLSDATA } from '../../database/competences/skills.data';
 @Component({
     selector: 'app-competences',
     imports: [CommonModule],
+    standalone: true,
     templateUrl: './competences.component.html',
     styleUrls: ['./competences.component.css']
 })

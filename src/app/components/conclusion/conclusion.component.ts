@@ -43,6 +43,7 @@ import { SUMMARYKEYWORDSDATA } from '../../database/conclusion/summaryKeywords.d
 @Component({
     selector: 'app-conclusion',
     imports: [CommonModule],
+    standalone: true,
     templateUrl: './conclusion.component.html',
     styleUrls: ['./conclusion.component.css']
 })

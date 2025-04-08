@@ -27,6 +27,7 @@ import { QUIZQUESTIONSDATA } from '../../database/centres/quizQuestions.data';
 
 @Component({
     selector: 'app-centres-interet',
+    standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './centres-interet.component.html',
     styleUrls: ['./centres-interet.component.css']

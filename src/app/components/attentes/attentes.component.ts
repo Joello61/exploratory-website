@@ -40,6 +40,7 @@ import { SCENARIOSDATA } from '../../database/attentes/scenarios.data';
 
 @Component({
     selector: 'app-attentes',
+    standalone: true,
     imports: [CommonModule, FormsModule, DragDropModule],
     templateUrl: './attentes.component.html',
     styleUrls: ['./attentes.component.css']

@@ -30,6 +30,7 @@ import { MATCHINGJOBSDATA } from '../../database/experiences/matchingJobs.data';
 @Component({
     selector: 'app-experience-pro',
     imports: [CommonModule, DragDropModule],
+    standalone: true,
     templateUrl: './experience-pro.component.html',
     styleUrls: ['./experience-pro.component.css']
 })

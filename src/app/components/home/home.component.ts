@@ -22,6 +22,7 @@ import { DialogMessage } from '../../models/others/dialod-message';
 @Component({
     selector: 'app-home',
     imports: [CommonModule, FormsModule],
+    standalone: true,
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.css']
 })

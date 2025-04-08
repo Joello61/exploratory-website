@@ -43,6 +43,7 @@ import { MOTIVATIONFACTORSDATA } from '../../database/motivations/motivationFact
 @Component({
     selector: 'app-motivation-socio-pro',
     imports: [CommonModule],
+    standalone: true,
     templateUrl: './motivation-socio-pro.component.html',
     styleUrls: ['./motivation-socio-pro.component.css']
 })

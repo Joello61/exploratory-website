@@ -37,6 +37,7 @@ import { WORKPREFERENCESDATA } from '../../database/personnalite/workPreferences
 @Component({
     selector: 'app-personnalite',
     imports: [CommonModule, FormsModule],
+    standalone: true,
     templateUrl: './personnalite.component.html',
     styleUrls: ['./personnalite.component.css']
 })

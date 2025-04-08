@@ -19,6 +19,7 @@ import { ModuleStatus } from '../../models/others/modul-status';
 @Component({
     selector: 'app-menu',
     imports: [CommonModule],
+    standalone: true,
     templateUrl: './menu.component.html',
     styleUrls: ['./menu.component.css']
 })

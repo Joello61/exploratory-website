@@ -16,6 +16,7 @@ import { Note } from './models/others/note';
 
 @Component({
     selector: 'app-root',
+    standalone: true,
     imports: [RouterOutlet, RouterModule, CommonModule],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css'
