@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "docs/exploratory-website",
+            "outputPath": "exploratory-website-v1",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
