@@ -12,11 +12,12 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppStateService } from '../../services/app-state.service';
-import { DialogService, DialogMessage } from '../../services/dialog.service';
+import { DialogService } from '../../services/dialog.service';
 import { ProgressService } from '../../services/progress.service';
 import { TimeTrackerService } from '../../services/time-tracker.service';
 import { UserDataService } from '../../services/user-data.service';
 import { AuthService } from '../../services/auth.service';
+import { DialogMessage } from '../../models/others/dialod-message';
 
 @Component({
   selector: 'app-home',

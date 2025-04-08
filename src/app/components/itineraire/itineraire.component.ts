@@ -23,6 +23,11 @@ import { SkillEvolution } from '../../models/itineraire/skill-evolution';
 import { Location } from '../../models/itineraire/location';
 import { QuizQuestion } from '../../models/itineraire/quiz-question';
 import { DialogMessage } from '../../models/others/dialod-message';
+import { ORIGINLOCATIONSDATA } from '../../database/itineraire/originLocations.data';
+import { EDUCATIONTIMELINEDATA } from '../../database/itineraire/educationTimeline.data';
+import { SKILLSEVOLUTIONDATA } from '../../database/itineraire/skillsEvolution.data';
+import { KEYINDICATORSDATA } from '../../database/itineraire/keyIndicators.data';
+import { QUIZQUESTIONSDATA } from '../../database/itineraire/quizQuestions.data';
 
 @Component({
   selector: 'app-itineraire',
@@ -60,277 +65,7 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   // Statistiques
   dataRecoveryPercentage: number = 35;
 
-  // Coordonnées géographiques réelles pour les lieux
-  originLocations: Location[] = [
-    {
-      id: 'loc1',
-      name: 'Toulouse',
-      period: '2024 - Présent',
-      description:
-        "Lieu de résidence actuel et ville d'études pour le Master Informatique à l'Université de Toulouse Jean Jaurès.",
-      coordinates: { lat: 43.6047, lng: 1.4442 }, // Coordonnées réelles de Toulouse
-      data: [
-        { label: 'Influence', value: 'Actuelle' },
-        { label: 'Formation', value: 'Master Informatique' },
-        { label: "Secteur d'activité", value: 'Développement Fullstack' },
-      ],
-      discovered: false,
-    },
-    {
-      id: 'loc2',
-      name: 'Marseille',
-      period: '2024 - Présent',
-      description:
-        "Lieu de l'alternance chez ANG Tech, où se déroule l'expérience professionnelle actuelle en développement Fullstack.",
-      coordinates: { lat: 43.2965, lng: 5.3698 }, // Coordonnées réelles de Marseille
-      data: [
-        { label: 'Influence', value: 'Professionnelle' },
-        { label: 'Expérience', value: 'Développement 3D' },
-        { label: 'Connexions', value: 'Professionnelles' },
-      ],
-      discovered: false,
-    },
-    {
-      id: 'loc3',
-      name: 'Yaoundé, Cameroun',
-      period: '2020 - 2023',
-      description:
-        "Lieu des premières expériences professionnelles (stages chez SKOOVEL et Megasoft) et des études en Licence et DUT à l'IUT de Bandjoun.",
-      coordinates: { lat: 3.848, lng: 11.5021 }, // Coordonnées réelles de Yaoundé
-      data: [
-        { label: 'Influence', value: 'Fondamentale' },
-        { label: 'Formation initiale', value: 'Informatique' },
-        {
-          label: 'Expériences',
-          value: 'Premières expériences professionnelles',
-        },
-      ],
-      discovered: false,
-    },
-    {
-      id: 'loc4',
-      name: 'Bandjoun, Cameroun',
-      period: '2020 - 2023',
-      description:
-        "Site de l'IUT où ont été suivies les formations de DUT Génie Logiciel et de Licence Informatique et réseau.",
-      coordinates: { lat: 5.3772, lng: 10.4111 }, // Coordonnées approximatives de Bandjoun
-      data: [
-        { label: 'Influence', value: 'Académique' },
-        { label: 'Formation', value: 'DUT et Licence' },
-        { label: 'Environnement', value: 'Universitaire' },
-      ],
-      discovered: false,
-    },
-  ];
-
   selectedLocation: Location | null = null;
-
-  // Données pour la timeline de formation
-  educationTimeline: Education[] = [
-    {
-      id: 'edu1',
-      years: '2024 - En cours',
-      title: 'Master Informatique',
-      institution: 'Université de Toulouse Jean Jaurès, Toulouse',
-      description:
-        "Formation avancée en informatique avec spécialisation en développement d'applications, réalisée en alternance pour combiner théorie et pratique professionnelle chez ANG Tech.",
-      skills: [
-        'Développement Fullstack',
-        'Intégration 3D',
-        'Architecture logicielle',
-        'DevOps & CI/CD',
-      ],
-      achievements: [
-        "Projet d'alternance : Développement d'une application web/mobile avec intégration 3D",
-        'Mise en place de pipelines CI/CD avec GitLab',
-        'Rédaction de documentation technique complète',
-      ],
-      discovered: true,
-      expanded: false,
-    },
-    {
-      id: 'edu2',
-      years: '2022 - 2023',
-      title: 'Licence Informatique et réseau',
-      institution: 'IUT de Bandjoun, Cameroun',
-      description:
-        "Formation approfondie en informatique et réseaux, avec un focus sur les technologies web, les architectures de systèmes d'information et la sécurité informatique.",
-      skills: [
-        'Programmation avancée',
-        'Architecture réseau',
-        'Sécurité des systèmes',
-        'Bases de données relationnelles',
-      ],
-      achievements: [
-        'Stage de 10 mois chez SKOOVEL en tant que consultant informatique',
-        'Projets académiques en développement web et gestion de bases de données',
-        'Analyse de données et support technique en environnement professionnel',
-      ],
-      discovered: true,
-      expanded: false,
-    },
-    {
-      id: 'edu3',
-      years: '2020 - 2022',
-      title: 'DUT Génie Logiciel',
-      institution: 'IUT de Bandjoun, Cameroun',
-      description:
-        "Formation technique axée sur le développement logiciel, les méthodologies de conception et la programmation, établissant des bases solides en développement d'applications.",
-      skills: ['Java', 'PHP', 'JavaScript', 'Conception orientée objet'],
-      achievements: [
-        'Stage de 3 mois chez Megasoft Sarl en développement web',
-        "Intégration d'API REST et maintenance d'applications",
-        'Optimisation de requêtes SQL et tests unitaires',
-      ],
-      discovered: true,
-      expanded: false,
-    },
-  ];
-
-  // Données pour les graphiques
-  skillsEvolution: SkillEvolution[] = [
-    {
-      year: '2020',
-      level: 30,
-      tooltip: 'Début DUT Génie Logiciel - Bases de programmation',
-    },
-    {
-      year: '2021',
-      level: 45,
-      tooltip: 'Milieu DUT - Compétences web fondamentales',
-    },
-    {
-      year: '2022',
-      level: 60,
-      tooltip: 'Stage Megasoft + Début Licence - Développement web et API',
-    },
-    {
-      year: '2023',
-      level: 75,
-      tooltip: 'Stage SKOOVEL - Polyvalence technique et bases de données',
-    },
-    {
-      year: '2024',
-      level: 85,
-      tooltip: 'Début Master et alternance - Développement Fullstack',
-    },
-    {
-      year: '2025',
-      level: 95,
-      tooltip: 'Projection - Expertise 3D et DevOps avancé',
-    },
-  ];
-
-  keyIndicators: KeyIndicator[] = [
-    { label: 'Années de formation', value: '5', trend: 'up' },
-    { label: 'Expériences professionnelles', value: '3', trend: 'up' },
-    {
-      label: "Niveau d'expertise fullstack",
-      value: 'Intermédiaire',
-      trend: 'up',
-    },
-    { label: 'Technologies maîtrisées', value: '10+', trend: 'up' },
-    { label: 'Compétences 3D web', value: 'Spécialisation', trend: 'up' },
-    { label: 'Mobilité géographique', value: '2 pays', trend: 'neutral' },
-  ];
-
-  isQuizModalOpen: boolean = false;
-
-  quizQuestions: QuizQuestion[] = [
-    {
-      id: 'q1',
-      text: 'Quelle est la formation la plus récente du parcours éducatif ?',
-      options: [
-        'Licence Informatique et réseau',
-        'Master Informatique',
-        'DUT Génie Logiciel',
-        'Stage chez SKOOVEL',
-      ],
-      correctOptionIndex: 1,
-      feedback: {
-        correct:
-          "Correct ! Le Master Informatique à l'Université de Toulouse Jean Jaurès est la formation la plus récente (2024-en cours).",
-        incorrect:
-          "Incorrect. Le Master Informatique à l'Université de Toulouse Jean Jaurès (2024-en cours) est la formation la plus récente du parcours.",
-      },
-    },
-    {
-      id: 'q2',
-      text: 'Dans quelle ville le développeur effectue-t-il actuellement son alternance ?',
-      options: ['Toulouse', 'Yaoundé', 'Marseille', 'Bandjoun'],
-      correctOptionIndex: 2,
-      feedback: {
-        correct: "Correct ! L'alternance chez ANG Tech se déroule à Marseille.",
-        incorrect:
-          "Incorrect. L'alternance chez ANG Tech se déroule à Marseille, tandis que le Master est suivi à Toulouse.",
-      },
-    },
-    {
-      id: 'q3',
-      text: "Quelle technologie spécifique est mise en avant dans le poste actuel d'alternant ?",
-      options: [
-        'Intelligence artificielle',
-        'Blockchain',
-        'Intégration 3D',
-        'Internet des objets (IoT)',
-      ],
-      correctOptionIndex: 2,
-      feedback: {
-        correct:
-          "Correct ! L'intégration 3D est une technologie clé dans le poste actuel chez ANG Tech, avec le développement d'une application web/mobile incorporant des fonctionnalités 3D.",
-        incorrect:
-          "Incorrect. L'intégration 3D est la technologie spécifique mise en avant dans le poste actuel, notamment pour l'analyse des mesures corporelles.",
-      },
-    },
-    {
-      id: 'q4',
-      text: "Quel est le niveau d'expertise fullstack atteint en 2024 selon l'évolution des compétences ?",
-      options: ['60%', '75%', '85%', '95%'],
-      correctOptionIndex: 2,
-      feedback: {
-        correct:
-          "Correct ! En 2024, le niveau d'expertise fullstack est de 85%, correspondant au début du Master et de l'alternance.",
-        incorrect:
-          "Incorrect. En 2024, le niveau d'expertise fullstack est de 85%, marquant le début du Master Informatique et de l'alternance chez ANG Tech.",
-      },
-    },
-    {
-      id: 'q5',
-      text: 'Quel framework frontend est principalement utilisé dans le poste actuel ?',
-      options: ['React', 'Angular', 'Vue.js', 'Svelte'],
-      correctOptionIndex: 2,
-      feedback: {
-        correct:
-          "Correct ! Vue.js est le framework frontend principal utilisé chez ANG Tech pour le développement de l'application web/mobile avec intégration 3D.",
-        incorrect:
-          "Incorrect. Vue.js est le framework frontend principalement utilisé dans le poste actuel pour développer l'interface utilisateur de l'application avec intégration 3D.",
-      },
-    },
-    {
-      id: 'q6',
-      text: "Combien d'expériences professionnelles figurent dans le parcours du développeur ?",
-      options: ['1', '2', '3', '4'],
-      correctOptionIndex: 2,
-      feedback: {
-        correct:
-          'Correct ! Le parcours comprend 3 expériences professionnelles : alternance chez ANG Tech, stage chez SKOOVEL et stage chez Megasoft.',
-        incorrect:
-          "Incorrect. Le parcours comprend 3 expériences professionnelles distinctes : l'alternance actuelle chez ANG Tech, le stage de 10 mois chez SKOOVEL et le stage de 3 mois chez Megasoft.",
-      },
-    },
-    {
-      id: 'q7',
-      text: 'Quel outil DevOps est utilisé pour les pipelines CI/CD dans le poste actuel ?',
-      options: ['Jenkins', 'GitHub Actions', 'GitLab CI/CD', 'Azure DevOps'],
-      correctOptionIndex: 2,
-      feedback: {
-        correct:
-          "Correct ! GitLab CI/CD est l'outil utilisé pour mettre en place des pipelines d'intégration et de déploiement continus chez ANG Tech.",
-        incorrect:
-          "Incorrect. GitLab CI/CD est l'outil DevOps utilisé dans le poste actuel pour automatiser les tests et déploiements.",
-      },
-    },
-  ];
 
   statut: string = '';
 
@@ -355,6 +90,23 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
     zoom: 3,
     center: latLng([30.8566, 2.3522]),
   };
+
+  isQuizModalOpen: boolean = false;
+
+  //données
+
+  // Coordonnées géographiques réelles pour les lieux
+  originLocations: Location[] = ORIGINLOCATIONSDATA;
+
+  // Données pour la timeline de formation
+  educationTimeline: Education[] = EDUCATIONTIMELINEDATA;
+
+  // Données pour les graphiques
+  skillsEvolution: SkillEvolution[] = SKILLSEVOLUTIONDATA;
+
+  keyIndicators: KeyIndicator[] = KEYINDICATORSDATA;
+
+  quizQuestions: QuizQuestion[] = QUIZQUESTIONSDATA;
 
   constructor(
     private progressService: ProgressService,

@@ -33,6 +33,11 @@ import { MotivationFactor } from '../../models/motivations/motivation-factor';
 import { MotivationProfile } from '../../models/motivations/motivation-profile';
 import { QuizResult } from '../../models/motivations/quiz-result';
 import { DialogMessage } from '../../models/others/dialod-message';
+import { OPTIMUMCONDITIONSDATA } from '../../database/motivations/optimumConditions.data';
+import { EVIDENCEITEMSDATA } from '../../database/motivations/evidenceItems.data';
+import { MOTIVATIONPROFILESDATA } from '../../database/motivations/motivationProfiles.data';
+import { QUIZQUESTIONSDATA } from '../../database/motivations/quizQuestions.data';
+import { MOTIVATIONFACTORSDATA } from '../../database/motivations/motivationFactors.data';
 
 
 @Component({
@@ -99,245 +104,27 @@ export class MotivationSocioProComponent
   analysisConclusion: string =
     "Le profil motivationnel indique une compatibilité optimale avec des environnements professionnels innovants qui valorisent l'autonomie et offrent des défis techniques significatifs. Le sujet s'épanouira dans des rôles où il peut contribuer à la fois à la résolution de problèmes complexes et à l'évolution stratégique des projets. L'équilibre entre collaboration et responsabilité individuelle semble être un facteur clé de satisfaction à long terme.";
 
-  // Conditions optimales
-  optimumConditions: string[] = [
-    "Environnement favorisant l'innovation et l'exploration de nouvelles approches",
-    "Autonomie décisionnelle et confiance accordée dans l'exécution des projets",
-    'Projets ayant un impact concret et mesurable',
-    'Équilibre entre expertise technique et implication stratégique',
-    "Culture d'apprentissage continu et de développement professionnel",
-    'Collaboration avec des équipes pluridisciplinaires talentueuses',
-  ];
-
-  // Indices motivationnels
-  evidenceItems: Evidence[] = [
-    {
-      id: 'ev1',
-      title: "Centres d'intérêt",
-      icon: 'bi-heart',
-      date: '2020-2024',
-      description:
-        "Les centres d'intérêt révèlent une forte attirance pour l'innovation technologique, l'apprentissage continu et les activités créatives. Ces inclinaisons personnelles montrent une motivation intrinsèque pour rester à la pointe des évolutions du domaine et explorer de nouvelles approches.",
-      keywords: ['Innovation', 'Apprentissage', 'Créativité'],
-      discovered: true,
-      connections: ['ev2', 'ev5'],
-    },
-    {
-      id: 'ev2',
-      title: 'Personnalité',
-      icon: 'bi-person-badge',
-      date: 'Profil établi',
-      description:
-        "L'analyse de personnalité montre un profil analytique et orienté résolution de problèmes, avec une forte autonomie et une grande capacité d'adaptation. Ces traits sont cohérents avec une motivation pour les environnements professionnels offrant liberté d'action et défis intellectuels stimulants.",
-      keywords: ['Autonomie', 'Adaptabilité', 'Analyse'],
-      discovered: true,
-      connections: ['ev1', 'ev3'],
-    },
-    {
-      id: 'ev3',
-      title: 'Itinéraire',
-      icon: 'bi-map',
-      date: '2015-2024',
-      description:
-        "Le parcours personnel et professionnel indique une progression délibérée vers des rôles demandant plus de responsabilité et d'impact. Les choix de carrière montrent une préférence claire pour des environnements innovants privilégiant l'excellence technique et l'évolution continue.",
-      keywords: ['Progression', 'Impact', 'Évolution'],
-      discovered: true,
-      connections: ['ev4', 'ev6'],
-    },
-    {
-      id: 'ev4',
-      title: 'Expérience professionnelle',
-      icon: 'bi-briefcase',
-      date: '2016-2024',
-      description:
-        "L'analyse des expériences professionnelles révèle une constante recherche de défis techniques complexes et de projets à fort impact. Les transitions de carrière indiquent une motivation pour les environnements valorisant l'expertise technique combinée à une vision stratégique.",
-      keywords: ['Expertise', 'Impact', 'Défis'],
-      discovered: true,
-      connections: ['ev3', 'ev5'],
-    },
-    {
-      id: 'ev5',
-      title: 'Compétences',
-      icon: 'bi-tools',
-      date: 'Évaluation récente',
-      description:
-        "Le profil de compétences montre un investissement significatif dans l'acquisition et le perfectionnement de savoir-faire techniques avancés, dépassant souvent les exigences immédiates des postes occupés. Cette démarche témoigne d'une motivation intrinsèque pour la maîtrise et l'excellence technique.",
-      keywords: ['Maîtrise', 'Excellence', 'Développement'],
-      discovered: true,
-      connections: ['ev1', 'ev4'],
-    },
-    {
-      id: 'ev6',
-      title: 'Attentes professionnelles',
-      icon: 'bi-arrow-up-circle',
-      date: 'Projection future',
-      description:
-        "Les attentes professionnelles exprimées mettent en avant le désir d'équilibrer défis techniques stimulants et vision stratégique, avec une forte valorisation de l'autonomie et de l'impact concret. La recherche d'un environnement favorisant l'innovation et l'évolution continue est une constante.",
-      keywords: ['Autonomie', 'Impact', 'Innovation'],
-      discovered: true,
-      connections: ['ev3'],
-    },
-  ];
-  // Profils de motivation
-  motivationProfiles: MotivationProfile[] = [
-    {
-      id: 'builder',
-      name: 'Bâtisseur technique',
-      icon: 'bi-tools',
-      description:
-        'Ce profil de motivation est caractérisé par un fort désir de créer des solutions techniques robustes et innovantes qui résolvent des problèmes complexes. Il combine expertise technique approfondie et vision architecturale pour construire des systèmes durables et évolutifs.',
-      aspects: [
-        {
-          title: 'Excellence technique',
-          icon: 'bi-award',
-          description:
-            "Recherche constante de qualité et d'optimisation dans les implémentations techniques, avec un souci particulier pour la maintenabilité et l'évolutivité des solutions.",
-        },
-        {
-          title: 'Innovation pragmatique',
-          icon: 'bi-lightbulb',
-          description:
-            "Équilibre entre exploration de nouvelles approches et solutions éprouvées, avec une préférence pour l'innovation ayant un impact concret sur les problématiques abordées.",
-        },
-        {
-          title: 'Apprentissage continu',
-          icon: 'bi-book',
-          description:
-            "Motivation intrinsèque pour l'acquisition de nouvelles compétences et la maîtrise approfondie des technologies, au-delà des exigences immédiates des projets.",
-        },
-      ],
-    },
-    {
-      id: 'strategist',
-      name: "Stratège d'innovation",
-      icon: 'bi-graph-up',
-      description:
-        "Ce profil combine vision technique et compréhension stratégique pour identifier et développer des approches novatrices à fort impact. Il est motivé par la transformation des défis complexes en opportunités d'innovation avec des applications concrètes.",
-      aspects: [
-        {
-          title: 'Vision systémique',
-          icon: 'bi-intersect',
-          description:
-            'Capacité à percevoir les interconnexions entre différents domaines et à synthétiser des approches multidisciplinaires pour résoudre des problèmes complexes.',
-        },
-        {
-          title: 'Impact mesurable',
-          icon: 'bi-bullseye',
-          description:
-            'Forte motivation pour les projets générant une valeur tangible et des résultats mesurables, avec une préférence pour les solutions ayant un impact significatif.',
-        },
-        {
-          title: 'Évolution constante',
-          icon: 'bi-arrow-up-right',
-          description:
-            "Recherche permanente d'amélioration et d'évolution, tant au niveau personnel que des solutions développées, avec une vision à long terme.",
-        },
-      ],
-    },
-    {
-      id: 'collaborator',
-      name: 'Collaborateur autonome',
-      icon: 'bi-people',
-      description:
-        "Ce profil valorise l'équilibre entre collaboration d'équipe efficace et autonomie personnelle. Il est motivé par les environnements qui favorisent l'échange d'expertise tout en offrant l'espace nécessaire pour explorer et développer des solutions de manière indépendante.",
-      aspects: [
-        {
-          title: 'Autonomie responsable',
-          icon: 'bi-person-check',
-          description:
-            "Préférence pour les contextes offrant une liberté décisionnelle encadrée par des objectifs clairs, permettant une expression optimale de la créativité et de l'expertise.",
-        },
-        {
-          title: 'Synergie collective',
-          icon: 'bi-puzzle',
-          description:
-            "Valorisation des dynamiques d'équipe qui permettent l'enrichissement mutuel et la combinaison des forces individuelles pour atteindre des résultats supérieurs.",
-        },
-        {
-          title: "Partage d'expertise",
-          icon: 'bi-share',
-          description:
-            "Motivation pour transmettre et recevoir des connaissances au sein d'un écosystème professionnel, contribuant à l'élévation collective des compétences.",
-        },
-      ],
-    },
-  ];
-
   userAnswers: number[] = [];
   quizResult: QuizResult | null = null;
   isQuizModalOpen: boolean = false;
-  quizQuestions: QuizQuestion[] = [
-    {
-      id: 1,
-      text: "Quel est le facteur de motivation principal identifié dans l'analyse ?",
-      options: [
-        'La reconnaissance externe et le statut social',
-        "Les défis techniques et l'impact concret",
-        'La stabilité professionnelle et la sécurité',
-        'La progression hiérarchique rapide',
-      ],
-      correctAnswer: 1,
-    },
-    {
-      id: 2,
-      text: "Quelle caractéristique d'environnement professionnel est la plus valorisée selon le profil motivationnel ?",
-      options: [
-        'Structure très hiérarchisée avec des directives claires',
-        'Environnement compétitif orienté résultats individuels',
-        "Cadre favorisant l'autonomie et l'innovation",
-        'Organisation très structurée avec des processus standardisés',
-      ],
-      correctAnswer: 2,
-    },
-    {
-      id: 3,
-      text: "Quel élément issu des centres d'intérêt influence positivement la motivation professionnelle ?",
-      options: [
-        "La pratique d'activités sportives compétitives",
-        "L'intérêt pour les activités sociales et communautaires",
-        "L'attirance pour l'innovation technologique et l'apprentissage continu",
-        'La préférence pour les activités structurées et prévisibles',
-      ],
-      correctAnswer: 2,
-    },
-    {
-      id: 4,
-      text: "Selon l'analyse de personnalité, quel trait contribue à la motivation pour des environnements professionnels spécifiques ?",
-      options: [
-        "La préférence pour le travail en équipe plutôt qu'individuel",
-        'Le besoin de validation externe et de reconnaissance',
-        "L'aversion pour le risque et l'incertitude",
-        "L'autonomie et la capacité d'adaptation",
-      ],
-      correctAnswer: 3,
-    },
-    {
-      id: 5,
-      text: 'Quel facteur de motivation a été évalué avec le score le plus élevé (niveau 9) ?',
-      options: [
-        'Reconnaissance',
-        'Stabilité',
-        'Défis techniques',
-        'Collaboration',
-      ],
-      correctAnswer: 2,
-    },
-  ];
 
   showCorrections: boolean = false;
   incorrectAnswers: IncorrectAnswer[] = [];
 
+  //données
+
+  // Conditions optimales
+  optimumConditions: string[] = OPTIMUMCONDITIONSDATA;
+
+  // Indices motivationnels
+  evidenceItems: Evidence[] = EVIDENCEITEMSDATA;
+  // Profils de motivation
+  motivationProfiles: MotivationProfile[] = MOTIVATIONPROFILESDATA;
+
+  quizQuestions: QuizQuestion[] = QUIZQUESTIONSDATA;
+
   // Facteurs de motivation
-  motivationFactors: MotivationFactor[] = [
-    { name: 'Défis techniques', icon: 'bi-code-square', level: 9 },
-    { name: 'Autonomie', icon: 'bi-person-check', level: 8 },
-    { name: 'Impact concret', icon: 'bi-graph-up', level: 9 },
-    { name: 'Innovation', icon: 'bi-lightbulb', level: 8 },
-    { name: 'Apprentissage', icon: 'bi-book', level: 9 },
-    { name: 'Collaboration', icon: 'bi-people', level: 7 },
-    { name: 'Reconnaissance', icon: 'bi-trophy', level: 5 },
-    { name: 'Stabilité', icon: 'bi-shield', level: 4 },
-  ];
+  motivationFactors: MotivationFactor[] = MOTIVATIONFACTORSDATA;
 
   constructor(
     private progressService: ProgressService,

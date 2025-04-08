@@ -29,6 +29,14 @@ import { Scenario } from '../../models/attentes/scenario';
 import { TerminalLine } from '../../models/attentes/terminal-line';
 import { PrioritizationItem } from '../../models/attentes/prioritization-time';
 import { DialogMessage } from '../../models/others/dialod-message';
+import { ASPIRATIONBRANCHESDATA } from '../../database/attentes/aspirationBranches.data';
+import { AVAILABLECOMMANDSDATA } from '../../database/attentes/availableCommands.data';
+import { AVAILABLETOPICSDATA } from '../../database/attentes/availableTopics.data';
+import { COMPATIBILITYITEMSDATA } from '../../database/attentes/compatibilityItems.data';
+import { FUTUREPROJECTSDATA } from '../../database/attentes/futureProjects.data';
+import { IDEALENVIRONMENTDATA } from '../../database/attentes/idealEnvironment.data';
+import { PRIORITIZATIONITEMSDATA } from '../../database/attentes/prioritizationItems.data';
+import { SCENARIOSDATA } from '../../database/attentes/scenarios.data';
 
 @Component({
   selector: 'app-attentes',
@@ -71,24 +79,6 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
   showTopicSuggestions: boolean = false;
   showAspirations: boolean = false;
 
-  // Commandes disponibles
-  availableCommands: string[] = [
-    'help',
-    'scan_aspirations',
-    'scan_projects',
-    'scan_environment',
-    'clear',
-  ];
-
-  // Sujets disponibles pour explorer
-  availableTopics: string[] = [
-    'développement-fullstack',
-    'technologies-3d',
-    'devops-cicd',
-    'mobile-web',
-    'équilibre-études-travail',
-  ];
-
   // Visibilité des sections
   showAspirationsMap: boolean = false;
   showFutureProjects: boolean = false;
@@ -102,395 +92,6 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
   moduleProgressPercentage: number = 0;
   elapsedTime: string = '00:00:00';
 
-  // Données des aspirations professionnelles
-  aspirationBranches: AspirationBranch[] = [
-    {
-      title: 'Expertise Technique',
-      icon: 'bi-code-slash',
-      priority: 'high',
-      revealed: false,
-      subBranches: [
-        {
-          title: 'Maîtrise des Frameworks Frontend',
-          icon: 'bi-window',
-          description:
-            'Perfectionner votre expertise en Vue.js et approfondir vos connaissances en Angular pour développer des interfaces utilisateur avancées et performantes.',
-          priority: 'high',
-          revealed: false,
-        },
-        {
-          title: 'Technologies 3D Web',
-          icon: 'bi-box',
-          description:
-            "Approfondir vos compétences en intégration 3D web, en vous appuyant sur votre expérience acquise chez ANG Tech dans le développement d'applications intégrant la 3D.",
-          priority: 'medium',
-          revealed: false,
-        },
-        {
-          title: 'Backend Robuste',
-          icon: 'bi-server',
-          description:
-            'Renforcer votre maîtrise des frameworks backend (Spring Boot, Symfony, Node.js) et des architectures API REST sécurisées que vous avez déjà commencé à utiliser.',
-          priority: 'high',
-          revealed: false,
-        },
-      ],
-    },
-    {
-      title: 'Spécialisation DevOps',
-      icon: 'bi-gear-wide-connected',
-      priority: 'medium',
-      revealed: false,
-      subBranches: [
-        {
-          title: 'CI/CD Avancé',
-          icon: 'bi-arrow-repeat',
-          description:
-            "Développer une expertise plus poussée en pipelines CI/CD en vous basant sur votre expérience avec GitLab, et explorer d'autres outils comme Jenkins ou GitHub Actions.",
-          priority: 'medium',
-          revealed: false,
-        },
-        {
-          title: 'Conteneurisation & Orchestration',
-          icon: 'bi-boxes',
-          description:
-            "Approfondir vos connaissances Docker et vous former à Kubernetes pour l'orchestration de conteneurs à grande échelle.",
-          priority: 'high',
-          revealed: false,
-        },
-        {
-          title: 'Infrastructure as Code',
-          icon: 'bi-file-code',
-          description:
-            'Acquérir des compétences en IaC avec des outils comme Terraform ou Ansible pour compléter votre profil DevOps.',
-          priority: 'medium',
-          revealed: false,
-        },
-      ],
-    },
-    {
-      title: 'Innovation Mobile',
-      icon: 'bi-phone',
-      priority: 'high',
-      revealed: false,
-      subBranches: [
-        {
-          title: 'Applications Hybrides',
-          icon: 'bi-phone-flip',
-          description:
-            'Exploiter votre expérience en développement mobile pour maîtriser des frameworks comme React Native ou Flutter, en complément de vos compétences web.',
-          priority: 'high',
-          revealed: false,
-        },
-        {
-          title: 'Réalité Augmentée',
-          icon: 'bi-badge-ar',
-          description:
-            "Étendre vos compétences en 3D vers la réalité augmentée, en vous appuyant sur votre expérience d'intégration d'API de traitement d'images.",
-          priority: 'medium',
-          revealed: false,
-        },
-        {
-          title: 'PWA Avancées',
-          icon: 'bi-app',
-          description:
-            'Développer une expertise en Progressive Web Apps pour créer des expériences mobiles performantes, même hors connexion.',
-          priority: 'medium',
-          revealed: false,
-        },
-      ],
-    },
-    {
-      title: 'Data & Analytics',
-      icon: 'bi-database',
-      priority: 'medium',
-      revealed: false,
-      subBranches: [
-        {
-          title: 'Optimisation SQL',
-          icon: 'bi-table',
-          description:
-            "Approfondir vos compétences en PostgreSQL et MySQL, notamment sur l'optimisation des requêtes complexes, en vous appuyant sur votre expérience de création et d'optimisation de requêtes SQL.",
-          priority: 'high',
-          revealed: false,
-        },
-        {
-          title: 'Data Visualization',
-          icon: 'bi-graph-up',
-          description:
-            'Développer des compétences en visualisation de données avec des bibliothèques JavaScript comme D3.js ou Chart.js pour enrichir vos applications frontend.',
-          priority: 'medium',
-          revealed: false,
-        },
-        {
-          title: 'Intégration IA',
-          icon: 'bi-cpu',
-          description:
-            "Explorer l'intégration d'API d'intelligence artificielle dans vos applications, similaire à votre expérience avec l'API de traitement d'images pour la reconstruction 3D.",
-          priority: 'medium',
-          revealed: false,
-        },
-      ],
-    },
-    {
-      title: 'Leadership Technique',
-      icon: 'bi-people',
-      priority: 'medium',
-      revealed: false,
-      subBranches: [
-        {
-          title: 'Documentation Avancée',
-          icon: 'bi-file-text',
-          description:
-            "Perfectionner vos compétences en rédaction de documentation technique, en vous appuyant sur votre expérience de documentation d'architecture et de guides utilisateur.",
-          priority: 'medium',
-          revealed: false,
-        },
-        {
-          title: 'Tests & Qualité',
-          icon: 'bi-check-circle',
-          description:
-            'Devenir expert en méthodologies de test et assurance qualité, en développant votre expérience en tests unitaires et fonctionnels.',
-          priority: 'high',
-          revealed: false,
-        },
-        {
-          title: 'Gestion de Projet Tech',
-          icon: 'bi-kanban',
-          description:
-            'Renforcer vos compétences en gestion de projets techniques, en capitalisant sur votre expérience en gestion de projets chez SKOOVEL.',
-          priority: 'medium',
-          revealed: false,
-        },
-      ],
-    },
-  ];
-
-  // Projets futurs
-  futureProjects: FutureProject[] = [
-    {
-      title: 'Application 3D Interactive',
-      description:
-        "Développer une application web/mobile avancée intégrant des fonctionnalités 3D interactives pour l'industrie du e-commerce ou de la formation.",
-      type: 'project',
-      timeline: 'short',
-      priority: 'high',
-      tags: ['Vue.js', '3D Web', 'WebGL', 'API REST'],
-      objectives: [
-        "Approfondir l'expérience acquise en développement 3D chez ANG Tech",
-        "Intégrer des API avancées de traitement d'images et de reconstruction 3D",
-        'Concevoir une interface utilisateur intuitive pour manipuler des objets 3D',
-      ],
-    },
-    {
-      title: 'Expertise Full Stack Vue.js & Spring Boot',
-      description:
-        "Renforcer l'expertise technique en développant une application complète utilisant Vue.js en frontend et Spring Boot en backend.",
-      type: 'opportunity',
-      timeline: 'short',
-      priority: 'high',
-      tags: ['Vue.js', 'Spring Boot', 'API REST', 'PostgreSQL'],
-      objectives: [
-        'Créer une architecture backend robuste avec Spring Boot',
-        'Développer une interface utilisateur réactive avec Vue.js',
-        'Mettre en place des pipelines CI/CD automatisés avec GitLab',
-      ],
-    },
-    {
-      title: 'Application Mobile Cross-Platform',
-      description:
-        'Élargir les compétences de développement mobile en créant une application cross-platform basée sur vos connaissances web actuelles.',
-      type: 'project',
-      timeline: 'mid',
-      priority: 'medium',
-      tags: ['React Native', 'TypeScript', 'API REST', 'Mobile'],
-      objectives: [
-        'Transférer les compétences JavaScript/TypeScript vers le développement mobile natif',
-        'Concevoir et développer une API REST sécurisée avec Node.js',
-        'Implémenter des fonctionnalités offline-first pour une expérience utilisateur optimale',
-      ],
-    },
-    {
-      title: "Plateforme d'Analyse de Données",
-      description:
-        "Développer une application d'analyse et de visualisation de données basée sur vos compétences en gestion de bases de données.",
-      type: 'project',
-      timeline: 'mid',
-      priority: 'medium',
-      tags: ['Python', 'Flask', 'PostgreSQL', 'Data Visualization'],
-      objectives: [
-        'Exploiter vos compétences en Python et bases de données',
-        'Créer des visualisations de données interactives avec D3.js',
-        'Optimiser les requêtes SQL pour des performances élevées',
-      ],
-    },
-    {
-      title: 'DevOps et Infrastructure as Code',
-      description:
-        'Approfondir les compétences DevOps en implémentant une infrastructure complète avec Docker et des outils CI/CD.',
-      type: 'opportunity',
-      timeline: 'short',
-      priority: 'high',
-      tags: ['Docker', 'CI/CD', 'GitLab', 'Infrastructure as Code'],
-      objectives: [
-        'Développer une expertise en conteneurisation avec Docker',
-        'Mettre en place des pipelines CI/CD automatisés pour le déploiement continu',
-        'Documenter les bonnes pratiques DevOps pour les équipes de développement',
-      ],
-    },
-    {
-      title: 'Contribution Open Source Vue.js/Angular',
-      description:
-        "Contribuer à des projets open source dans l'écosystème des frameworks frontend que vous maîtrisez déjà.",
-      type: 'project',
-      timeline: 'long',
-      priority: 'medium',
-      tags: ['Open Source', 'Vue.js', 'Angular', 'Communauté'],
-      objectives: [
-        'Développer des composants réutilisables pour Vue.js ou Angular',
-        "Participer à l'amélioration de la documentation technique",
-        'Acquérir de la visibilité dans la communauté des développeurs frontend',
-      ],
-    },
-    {
-      title: 'Formation Technique et Mentorat',
-      description:
-        'Partager vos connaissances techniques en développant du contenu éducatif et en mentorant des développeurs juniors.',
-      type: 'opportunity',
-      timeline: 'mid',
-      priority: 'medium',
-      tags: ['Formation', 'Documentation', 'Leadership Technique'],
-      objectives: [
-        'Créer des tutoriels et des guides sur les technologies que vous maîtrisez',
-        'Animer des sessions de formation sur le développement fullstack',
-        'Accompagner des développeurs juniors dans leur montée en compétence',
-      ],
-    },
-  ];
-
-  // Environnement idéal
-  idealEnvironment: EnvironmentCategory[] = [
-    {
-      title: "Culture d'entreprise",
-      icon: 'bi-building',
-      items: [
-        {
-          title: 'Innovation technique',
-          description:
-            "Entreprise qui valorise l'innovation technique et encourage l'exploration de nouvelles technologies comme la 3D web et les frameworks front-end modernes que vous maîtrisez.",
-          icon: 'bi-lightbulb',
-        },
-        {
-          title: 'Équilibre travail-études',
-          description:
-            "Organisation qui soutient pleinement le modèle d'alternance et offre un équilibre optimal entre missions professionnelles et formation académique en informatique.",
-          icon: 'bi-book',
-        },
-        {
-          title: 'Rigueur et créativité',
-          description:
-            'Culture qui combine rigueur technique et créativité, valorisant à la fois les solutions robustes et les approches innovantes, en phase avec votre profil.',
-          icon: 'bi-stars',
-        },
-      ],
-    },
-    {
-      title: 'Projets et technologies',
-      icon: 'bi-code-slash',
-      items: [
-        {
-          title: 'Projets Full Stack',
-          description:
-            'Projets qui exploitent pleinement la double compétence frontend/backend avec les technologies que vous maîtrisez (Vue.js, Angular, Spring Boot, Symfony).',
-          icon: 'bi-layers',
-        },
-        {
-          title: 'Expérimentation 3D/mobile',
-          description:
-            'Opportunités de développer des applications intégrant des technologies 3D et mobiles, prolongeant votre expérience actuelle chez ANG Tech.',
-          icon: 'bi-phone',
-        },
-        {
-          title: 'Infrastructure moderne',
-          description:
-            "Utilisation de Docker, Git et des pipelines CI/CD que vous connaissez déjà, avec possibilité d'approfondir ces compétences DevOps.",
-          icon: 'bi-gear',
-        },
-      ],
-    },
-    {
-      title: 'Équipe et collaboration',
-      icon: 'bi-people',
-      items: [
-        {
-          title: 'Équipe pluridisciplinaire',
-          description:
-            "Travail au sein d'une équipe aux compétences variées permettant d'enrichir votre vision fullstack et de renforcer vos soft skills comme le travail d'équipe.",
-          icon: 'bi-people-fill',
-        },
-        {
-          title: 'Mentorat technique',
-          description:
-            'Accès à des développeurs seniors pouvant vous guider dans votre progression technique et vous aider à approfondir vos connaissances.',
-          icon: 'bi-person-check',
-        },
-        {
-          title: 'Autonomie progressive',
-          description:
-            "Environnement qui vous permet de gagner en autonomie tout en bénéficiant d'un encadrement adapté à votre statut d'alternant.",
-          icon: 'bi-award',
-        },
-      ],
-    },
-    {
-      title: 'Développement professionnel',
-      icon: 'bi-arrow-up-right',
-      items: [
-        {
-          title: 'Montée en compétences techniques',
-          description:
-            "Possibilités d'approfondir vos compétences dans vos domaines de prédilection (Vue.js, Spring Boot) tout en explorant de nouvelles technologies.",
-          icon: 'bi-graph-up',
-        },
-        {
-          title: 'Documentation et formation',
-          description:
-            'Opportunités de renforcer vos compétences en rédaction technique et documentation, suite à votre expérience chez ANG Tech.',
-          icon: 'bi-file-text',
-        },
-        {
-          title: 'Préparation post-alternance',
-          description:
-            "Accompagnement dans la transition vers un rôle de développeur fullstack à temps plein à l'issue de votre Master en Informatique.",
-          icon: 'bi-signpost-split',
-        },
-      ],
-    },
-    {
-      title: 'Équilibre et bien-être',
-      icon: 'bi-heart',
-      items: [
-        {
-          title: "Flexibilité d'organisation",
-          description:
-            "Flexibilité permettant de concilier vos études à l'Université de Toulouse Jean Jaurès avec vos missions professionnelles.",
-          icon: 'bi-clock',
-        },
-        {
-          title: 'Espace pour les passions',
-          description:
-            "Culture qui respecte l'équilibre vie professionnelle/personnelle et vous laisse du temps pour vos centres d'intérêt comme la cuisine et le chant.",
-          icon: 'bi-music-note',
-        },
-        {
-          title: 'Localisation adaptée',
-          description:
-            'Emplacement géographique accessible depuis votre domicile à Toulouse ou possibilité de travail à distance partiel.',
-          icon: 'bi-geo-alt',
-        },
-      ],
-    },
-  ];
   // Ajouter ces propriétés à la classe AttentesComponent
   isQuizModalOpen: boolean = false;
   quizCompleted: boolean = false;
@@ -502,205 +103,41 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
   quizType: string = 'prioritization';
   quizIndex: number = 0;
 
-  // Données pour le quiz de priorisation
-  prioritizationItems: PrioritizationItem[] = [
-    {
-      id: 'expertise_fullstack',
-      title: 'Expertise Full Stack',
-      description:
-        "Maîtriser les technologies front-end (Vue.js, Angular) et back-end (Spring Boot, Symfony) ainsi que l'intégration 3D",
-      icon: 'bi-code-slash',
-      correctRank: 0,
-    },
-    {
-      id: 'reussite_alternance',
-      title: 'Réussite en Alternance',
-      description:
-        "Équilibrer formation académique à l'Université de Toulouse Jean Jaurès et missions professionnelles",
-      icon: 'bi-book',
-      correctRank: 1,
-    },
-    {
-      id: 'projets_techniques',
-      title: 'Projets Techniques Complets',
-      description:
-        "Développer des applications web/mobile complètes avec intégration d'API et expérience 3D",
-      icon: 'bi-layers',
-      correctRank: 2,
-    },
-    {
-      id: 'competences_devops',
-      title: 'Compétences DevOps',
-      description:
-        'Renforcer les connaissances en Docker, CI/CD et bonnes pratiques de développement',
-      icon: 'bi-gear',
-      correctRank: 3,
-    },
-    {
-      id: 'preparation_carriere',
-      title: 'Préparation à la Carrière',
-      description:
-        'Développer les bases solides pour évoluer vers des rôles techniques avancés après le Master',
-      icon: 'bi-graph-up',
-      correctRank: 4,
-    },
-  ];
-  prioritizationCompleted: boolean = false;
-
-  // Données pour le quiz de scénarios
-  scenarios: Scenario[] = [
-    {
-      title: 'Choix de projet',
-      description:
-        "En tant qu'alternant développeur Fullstack, on vous propose deux projets: développer une application web avec Vue.js et API REST ou travailler sur une application mobile native nécessitant d'apprendre un nouveau langage. Que choisiriez-vous?",
-      options: [
-        "L'application web avec Vue.js et API REST, technologies que vous maîtrisez déjà",
-        "L'application mobile native pour élargir vos compétences",
-        'Proposer une solution hybride utilisant vos compétences web pour créer une application cross-platform',
-        'Demander à partager votre temps entre les deux projets',
-      ],
-      correctOption: 2,
-      feedback: {
-        correct:
-          "Excellent choix! Votre profil montre une volonté d'exploiter vos compétences web existantes tout en les étendant vers le mobile, ce qui correspond à votre expérience chez ANG Tech.",
-        incorrect:
-          "Compte tenu de votre profil, vous privilégieriez une solution hybride qui combine vos compétences web actuelles (Vue.js) tout en développant votre expertise mobile, comme l'indique votre expérience en développement d'applications web/mobile.",
-      },
-    },
-    {
-      title: 'Équilibre études-travail',
-      description:
-        "Votre entreprise vous confie un projet ambitieux avec une deadline serrée qui coïncide avec une période d'examens importants à l'université. Comment gérez-vous cette situation?",
-      options: [
-        'Vous privilégiez le projet professionnel et réduisez le temps consacré à vos études',
-        'Vous privilégiez vos examens et demandez un délai supplémentaire pour le projet',
-        'Vous établissez un planning précis pour équilibrer les deux responsabilités et communiquez clairement avec les parties prenantes',
-        'Vous déléguez une partie du projet à vos collègues',
-      ],
-      correctOption: 2,
-      feedback: {
-        correct:
-          "Parfait! Cette approche reflète votre capacité de gestion du temps et d'organisation mentionnée dans vos soft skills, tout en respectant vos engagements académiques et professionnels.",
-        incorrect:
-          "Votre profil indique une forte capacité de gestion du temps et d'organisation. La meilleure approche serait d'établir un planning précis et de communiquer ouvertement avec toutes les parties prenantes pour trouver un équilibre entre vos études et votre travail.",
-      },
-    },
-    {
-      title: 'Développement technique',
-      description:
-        "Vous avez l'opportunité de vous former à une nouvelle technologie. Laquelle choisiriez-vous prioritairement, en fonction de votre profil actuel?",
-      options: [
-        "Une formation avancée en management d'équipe technique",
-        'Un framework JavaScript front-end concurrent de Vue.js',
-        'Une technologie de conteneurisation et orchestration comme Kubernetes',
-        'Un framework de développement mobile cross-platform comme React Native',
-      ],
-      correctOption: 3,
-      feedback: {
-        correct:
-          "Excellent choix! Le développement mobile cross-platform représente une extension naturelle de vos compétences web actuelles et s'aligne avec votre expérience en développement d'applications web/mobile.",
-        incorrect:
-          "Compte tenu de votre expérience en développement d'applications web et mobile et de votre maîtrise de JavaScript/TypeScript, apprendre React Native vous permettrait d'étendre naturellement vos compétences vers le mobile cross-platform.",
-      },
-    },
-    {
-      title: 'Environnement de travail',
-      description:
-        "Quelle caractéristique d'entreprise serait la plus importante pour vous dans votre situation d'alternant développeur Fullstack?",
-      options: [
-        'Une entreprise utilisant exclusivement les dernières technologies',
-        'Une société offrant la possibilité de télétravailler à 100%',
-        'Une organisation avec des mentors expérimentés et un accompagnement structuré',
-        'Une startup proposant des opportunités de prise de responsabilité rapide',
-      ],
-      correctOption: 2,
-      feedback: {
-        correct:
-          "Tout à fait! Dans votre situation d'alternant cherchant à développer vos compétences, l'accès à des mentors expérimentés et un bon accompagnement est crucial pour votre progression technique.",
-        incorrect:
-          "En tant qu'alternant développeur Fullstack en formation, l'accès à des mentors expérimentés et un accompagnement structuré vous permettrait de progresser plus efficacement, comme le suggère votre profil orienté vers l'apprentissage et le perfectionnement.",
-      },
-    },
-    {
-      title: 'Projet personnel',
-      description:
-        'Si vous deviez développer un projet personnel pour enrichir votre portfolio, lequel choisiriez-vous?',
-      options: [
-        'Un site web statique avec un design élaboré',
-        'Une application métier pure backend avec API REST complexe',
-        'Une application mobile native iOS ou Android',
-        'Une application web fullstack avec fonctionnalités 3D et interface responsive',
-      ],
-      correctOption: 3,
-      feedback: {
-        correct:
-          "Parfait choix! Une application fullstack avec des fonctionnalités 3D s'aligne parfaitement avec votre expérience chez ANG Tech et valorise l'ensemble de vos compétences frontend, backend et 3D.",
-        incorrect:
-          "Votre profil et votre expérience chez ANG Tech suggèrent qu'une application fullstack intégrant des éléments 3D serait idéale pour mettre en valeur l'ensemble de vos compétences techniques.",
-      },
-    },
-  ];
+  compatibilityRatings: number[] = [5, 5, 5, 5, 5];
+  compatibilityCompleted: boolean = false;
 
   currentScenarioIndex: number = 0;
   selectedScenarioOption: number | null = null;
   scenarioAnswered: boolean = false;
   scenarioScores: boolean[] = [];
 
+  prioritizationCompleted: boolean = false;
+
+  //données
+
+  // Commandes disponibles
+  availableCommands: string[] = AVAILABLECOMMANDSDATA;
+
+  // Sujets disponibles pour explorer
+  availableTopics: string[] = AVAILABLETOPICSDATA;
+
+  // Données des aspirations professionnelles
+  aspirationBranches: AspirationBranch[] = ASPIRATIONBRANCHESDATA;
+
+  // Projets futurs
+  futureProjects: FutureProject[] = FUTUREPROJECTSDATA;
+
+  // Environnement idéal
+  idealEnvironment: EnvironmentCategory[] = IDEALENVIRONMENTDATA;
+
+  // Données pour le quiz de priorisation
+  prioritizationItems: PrioritizationItem[] = PRIORITIZATIONITEMSDATA;
+
+  // Données pour le quiz de scénarios
+  scenarios: Scenario[] = SCENARIOSDATA;
+
   // Données pour le quiz de compatibilité
-  // Données pour le quiz de compatibilité adaptées au profil de développeur Fullstack en alternance
-  compatibilityItems: CompatibilityItem[] = [
-    {
-      title: 'Polyvalence technique',
-      description:
-        "Capacité à travailler sur différentes couches d'application (frontend, backend, bases de données)",
-      icon: 'bi-layers',
-      correctRating: 9,
-    },
-    {
-      title: 'Équilibre études-travail',
-      description:
-        'Aptitude à gérer efficacement les responsabilités académiques et professionnelles simultanément',
-      icon: 'bi-calendar-check',
-      correctRating: 8,
-    },
-    {
-      title: 'Adaptation technologique',
-      description:
-        'Capacité à apprendre et maîtriser rapidement de nouveaux frameworks et technologies',
-      icon: 'bi-lightning',
-      correctRating: 9,
-    },
-    {
-      title: 'Travail en équipe',
-      description:
-        'Affinité pour la collaboration, le partage de connaissances et les projets collectifs',
-      icon: 'bi-people',
-      correctRating: 7,
-    },
-    {
-      title: 'Documentation et rigueur',
-      description:
-        'Aptitude à documenter le code et les architectures avec précision et méthodologie',
-      icon: 'bi-file-text',
-      correctRating: 8,
-    },
-    {
-      title: 'Autonomie technique',
-      description:
-        'Capacité à résoudre des problèmes techniques et à progresser sans supervision constante',
-      icon: 'bi-person-check',
-      correctRating: 7,
-    },
-    {
-      title: 'Créativité technique',
-      description:
-        'Capacité à proposer des solutions innovantes et à penser hors des sentiers battus',
-      icon: 'bi-lightbulb',
-      correctRating: 8,
-    },
-  ];
-  compatibilityRatings: number[] = [5, 5, 5, 5, 5];
-  compatibilityCompleted: boolean = false;
+  compatibilityItems: CompatibilityItem[] = COMPATIBILITYITEMSDATA;
 
   constructor(
     private router: Router,

@@ -32,6 +32,13 @@ import { KeyStat } from '../../models/conclusion/key-stat';
 import { Keyword } from '../../models/conclusion/keyword';
 import { RecommendationCategory } from '../../models/conclusion/recommendation-category';
 import { DialogMessage } from '../../models/others/dialod-message';
+import { COMPATIBILITYENVIRONMENTSDATA } from '../../database/conclusion/compatibilityEnvironments.data';
+import { COMPATIBILITYFACTORSDATA } from '../../database/conclusion/compatibilityFactors.data';
+import { CVANNOTATIONSDATA } from '../../database/conclusion/cvAnnotations.data';
+import { KEYFINDINGSDATA } from '../../database/conclusion/keyFindings.data';
+import { KEYSTATSDATA } from '../../database/conclusion/keyStats.data';
+import { RECOMMENDATIONCATEGORIESDATA } from '../../database/conclusion/recommendationCategories.data';
+import { SUMMARYKEYWORDSDATA } from '../../database/conclusion/summaryKeywords.data';
 
 @Component({
   selector: 'app-conclusion',
@@ -92,231 +99,36 @@ export class ConclusionComponent implements OnInit, AfterViewInit, OnDestroy {
   investigationSummary: string =
     "L'analyse approfondie du profil professionnel a révélé un <strong>développeur Fullstack en formation</strong> avec une passion pour les <strong>technologies web modernes</strong> et l'<strong>intégration 3D</strong>. Les éléments recueillis montrent un parcours académique solide complété par des <strong>expériences professionnelles complémentaires</strong>, témoignant d'une capacité d'<strong>adaptation</strong> et d'une <strong>curiosité technique</strong> remarquables.<br><br>Le profil démontre un équilibre entre <strong>compétences frontend et backend</strong>, avec un intérêt particulier pour les <strong>technologies Vue.js</strong> et les <strong>architectures API REST</strong>. L'investigation a également mis en évidence une <strong>rigueur méthodologique</strong> dans la documentation technique et une volonté d'<strong>amélioration continue</strong>. L'alternance actuelle lui permet d'appliquer ses connaissances académiques dans un contexte professionnel, tout en développant des compétences en <strong>technologies 3D</strong> et <strong>DevOps</strong>.";
 
-  // Mots-clés du résumé
-  summaryKeywords: Keyword[] = [
-    { text: 'Fullstack', category: 'technical' },
-    { text: 'Vue.js', category: 'technical' },
-    { text: 'Intégration 3D', category: 'technical' },
-    { text: 'API REST', category: 'technical' },
-    { text: 'Documentation', category: 'soft' },
-    { text: 'Alternance', category: 'preference' },
-    { text: 'Adaptabilité', category: 'personality' },
-    { text: 'Rigueur', category: 'soft' },
-  ];
-
-  // Statistiques clés
-  keyStats: KeyStat[] = [
-    {
-      icon: 'bi-code-slash',
-      value: '85%',
-      label: 'Polyvalence technique',
-      highlight: true,
-    },
-    {
-      icon: 'bi-window',
-      value: '90%',
-      label: 'Maîtrise frontend',
-      highlight: true,
-    },
-    {
-      icon: 'bi-server',
-      value: '80%',
-      label: 'Compétences backend',
-      highlight: false,
-    },
-    {
-      icon: 'bi-mortarboard',
-      value: '95%',
-      label: "Potentiel d'apprentissage",
-      highlight: true,
-    },
-  ];
-
-  // Éléments clés
-  keyFindings: KeyFinding[] = [
-    {
-      icon: 'bi-mortarboard',
-      title: 'Formation et alternance',
-      description:
-        "Parcours académique complet du DUT au Master, avec choix stratégique de l'alternance pour combiner théorie et pratique professionnelle dans le développement d'applications.",
-      source: 'Analyse du parcours académique et professionnel',
-    },
-    {
-      icon: 'bi-box',
-      title: 'Spécialisation 3D',
-      description:
-        "Développement d'une expertise distinctive en intégration 3D dans les applications web, montrant une capacité à maîtriser des technologies complexes et innovantes.",
-      source: 'Expérience chez ANG Tech',
-    },
-    {
-      icon: 'bi-code-slash',
-      title: 'Polyvalence technique',
-      description:
-        "Maîtrise équilibrée des technologies frontend (Vue.js, Angular) et backend (Spring Boot, Symfony, Node.js), caractéristique d'un véritable profil Fullstack.",
-      source: 'Analyse des compétences techniques',
-    },
-    {
-      icon: 'bi-file-text',
-      title: 'Documentation et méthodologie',
-      description:
-        'Attention particulière portée à la documentation technique et aux méthodologies de développement, démontrant une approche structurée et professionnelle.',
-      source: 'Expériences professionnelles et compétences mentionnées',
-    },
-  ];
-
-  // Facteurs de compatibilité
-  compatibilityFactors: CompatibilityFactor[] = [
-    { name: 'Développement Fullstack', level: 8 },
-    { name: 'Technologies 3D', level: 9 },
-    { name: 'Vue.js/Angular', level: 8 },
-    { name: 'DevOps/CI-CD', level: 7 },
-    { name: 'Documentation', level: 8 },
-    { name: 'Adaptabilité', level: 9 },
-  ];
-
-  // Environnements de compatibilité
-  compatibilityEnvironments: CompatibilityEnvironment[] = [
-    { name: 'Agence web innovante', icon: 'bi-lightbulb', score: 95 },
-    { name: 'Startup technologie 3D', icon: 'bi-box', score: 93 },
-    { name: 'Équipe produit web/mobile', icon: 'bi-phone', score: 90 },
-    { name: 'Service IT grande entreprise', icon: 'bi-building', score: 75 },
-    { name: 'Freelance / Indépendant', icon: 'bi-person', score: 65 },
-  ];
-
   // Texte d'introduction des recommandations
   recommendationsIntro: string =
     "En se basant sur l'analyse du profil et du parcours en cours, nous recommandons un environnement professionnel qui favorise le développement des compétences Fullstack tout en permettant l'approfondissement des technologies 3D. Les caractéristiques suivantes constitueraient un cadre optimal pour la poursuite du développement professionnel après l'obtention du Master.";
-
-  // Catégories de recommandations
-  recommendationCategories: RecommendationCategory[] = [
-    {
-      title: 'Environnement de travail',
-      icon: 'bi-building',
-      expanded: true,
-      items: [
-        {
-          content:
-            "Équipe technique pluridisciplinaire permettant d'échanger avec des experts en frontend, backend et 3D",
-        },
-        {
-          content:
-            "Culture valorisant l'équilibre entre études et travail pendant l'alternance",
-        },
-        {
-          content: 'Structure offrant du mentorat par des développeurs seniors',
-        },
-        {
-          content:
-            "Environnement favorisant l'innovation technique et l'exploration des nouvelles technologies",
-        },
-      ],
-    },
-    {
-      title: 'Type de projets',
-      icon: 'bi-briefcase',
-      expanded: false,
-      items: [
-        {
-          content:
-            "Applications web/mobile avec composante 3D ou traitement d'images",
-        },
-        {
-          content:
-            'Projets fullstack impliquant à la fois frontend Vue.js et backend API REST',
-        },
-        {
-          content: 'Initiatives incluant des aspects DevOps et CI/CD',
-        },
-        {
-          content: 'Projets nécessitant une documentation technique rigoureuse',
-        },
-      ],
-    },
-    {
-      title: 'Développement professionnel',
-      icon: 'bi-graph-up',
-      expanded: false,
-      items: [
-        {
-          content:
-            'Évolution vers un rôle de développeur Fullstack senior avec spécialisation 3D',
-        },
-        {
-          content:
-            'Formation continue sur les frameworks frontend et backend modernes',
-        },
-        { content: 'Approfondissement des compétences DevOps et CI/CD' },
-        {
-          content:
-            'Préparation à des responsabilités techniques et de gestion de projets',
-        },
-      ],
-    },
-    {
-      title: 'Équilibre personnel',
-      icon: 'bi-heart',
-      expanded: false,
-      items: [
-        {
-          content:
-            "Environnement respectant l'équilibre entre vie professionnelle et personnelle",
-        },
-        {
-          content:
-            'Flexibilité pour concilier les passions (cuisine, chant, basketball)',
-        },
-        { content: 'Possibilité de travail hybride ou télétravail partiel' },
-        {
-          content:
-            "Culture d'entreprise valorisant la créativité et l'expression personnelle",
-        },
-      ],
-    },
-  ];
 
   // Texte des prochaines étapes
   nextStepsText: string =
     "Pour tirer pleinement parti de cette analyse, nous recommandons de finaliser le Master Informatique en continuant à développer l'expertise en intégration 3D acquise chez ANG Tech. À l'issue de l'alternance, une orientation vers des entreprises combinant développement web innovant et technologies 3D permettrait de valoriser au mieux ce profil unique. L'accent devrait être mis sur des projets fullstack complets permettant d'exercer les compétences techniques dans leur ensemble.";
 
+  //données
+
+  // Mots-clés du résumé
+  summaryKeywords: Keyword[] = SUMMARYKEYWORDSDATA;
+
+  // Statistiques clés
+  keyStats: KeyStat[] = KEYSTATSDATA;
+
+  // Éléments clés
+  keyFindings: KeyFinding[] = KEYFINDINGSDATA;
+
+  // Facteurs de compatibilité
+  compatibilityFactors: CompatibilityFactor[] = COMPATIBILITYFACTORSDATA;
+
+  // Environnements de compatibilité
+  compatibilityEnvironments: CompatibilityEnvironment[] = COMPATIBILITYENVIRONMENTSDATA;
+
+  // Catégories de recommandations
+  recommendationCategories: RecommendationCategory[] = RECOMMENDATIONCATEGORIESDATA;
+
   // Annotations du CV
-  cvAnnotations: CvAnnotation[] = [
-    {
-      id: '1',
-      title: 'Formation académique',
-      text: 'Parcours complet du DUT au Master, avec spécialisation progressive en développement Fullstack.',
-      position: {
-        top: 85,
-        left: 50,
-      },
-    },
-    {
-      id: '2',
-      title: 'Expérience en alternance',
-      text: 'Poste actuel permettant de développer une expertise distinctive en intégration 3D et API REST.',
-      position: {
-        top: 40,
-        left: 50,
-      },
-    },
-    {
-      id: '3',
-      title: 'Compétences techniques',
-      text: 'Profil Fullstack équilibré entre frontend, backend, et compétences complémentaires (DevOps, documentation).',
-      position: {
-        top: 45,
-        left: 10,
-      },
-    },
-    {
-      id: '4',
-      title: "Centres d'intérêt",
-      text: "Personnalité équilibrée avec des intérêts variés (cuisine, chant, basketball, technologies) témoignant d'une ouverture d'esprit.",
-      position: {
-        top: 67,
-        left: 10,
-      },
-    },
-  ];
+  cvAnnotations: CvAnnotation[] = CVANNOTATIONSDATA;
 
   constructor(
     private progressService: ProgressService,

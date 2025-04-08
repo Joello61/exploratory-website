@@ -19,6 +19,10 @@ import { Interest } from '../../models/centres/interest';
 import { InterestCategory } from '../../models/centres/interest-category';
 import { QuizQuestion } from '../../models/centres/quiz-question';
 import { DialogMessage } from '../../models/others/dialod-message';
+import { EVIDENCEITEMSDATA } from '../../database/centres/evidenceItems.data';
+import { INTERESTCATEGORIESDATA } from '../../database/centres/interestCategories.data';
+import { INTERESTSDATA } from '../../database/centres/interests.data';
+import { QUIZQUESTIONSDATA } from '../../database/centres/quizQuestions.data';
 
 
 @Component({
@@ -76,210 +80,18 @@ export class CentresInteretComponent
   quizScore: number = 0;
   quizPassed: boolean = false;
 
+  //données
+
   // Indices à découvrir
-  // Indices à découvrir adaptés au profil
-  evidenceItems: Evidence[] = [
-    {
-      id: 'evidence-cooking',
-      name: 'Ustensiles de cuisine spécialisés',
-      icon: 'bi-egg-fried',
-      description:
-        "Un ensemble d'ustensiles de cuisine de qualité et des ingrédients variés ont été découverts, témoignant d'une passion pour l'expérimentation culinaire et la préparation de plats créatifs.",
-      discovered: false,
-      unlocksInterests: ['cooking'],
-    },
-    {
-      id: 'evidence-music',
-      name: 'Équipement audio et partitions',
-      icon: 'bi-music-note-beamed',
-      description:
-        "Un microphone de qualité et des partitions de chant ont été identifiés, révélant une pratique régulière du chant et un intérêt pour l'exploration de différents styles vocaux.",
-      discovered: false,
-      unlocksInterests: ['singing'],
-    },
-    {
-      id: 'evidence-sports',
-      name: 'Équipement de basketball',
-      icon: 'bi-dribbble',
-      description:
-        'Un ballon de basketball, des chaussures de sport spécialisées et un abonnement à un complexe sportif ont été trouvés, indiquant une pratique hebdomadaire du basketball en loisir.',
-      discovered: false,
-      unlocksInterests: ['basketball'],
-    },
-    {
-      id: 'evidence-tech',
-      name: 'Abonnements à des newsletters tech',
-      icon: 'bi-cpu',
-      description:
-        "Plusieurs abonnements à des newsletters sur les innovations technologiques, notamment dans les domaines du développement web, mobile et des technologies 3D, témoignent d'une veille quotidienne sur les avancées du secteur.",
-      discovered: false,
-      unlocksInterests: ['new-tech'],
-    },
-  ];
+  evidenceItems: Evidence[] = EVIDENCEITEMSDATA;
 
   // Catégories d'intérêts
-  interestCategories: InterestCategory[] = [
-    {
-      id: 'culinary',
-      name: 'Cuisine',
-      icon: 'bi-egg-fried',
-      requiredEvidences: 1,
-    },
-    {
-      id: 'music',
-      name: 'Musique',
-      icon: 'bi-music-note-beamed',
-      requiredEvidences: 1,
-    },
-    {
-      id: 'sports',
-      name: 'Basketball',
-      icon: 'bi-dribbble',
-      requiredEvidences: 1,
-    },
-    {
-      id: 'tech',
-      name: 'Nouvelles Technologies',
-      icon: 'bi-cpu',
-      requiredEvidences: 1,
-    },
-  ];
+  interestCategories: InterestCategory[] = INTERESTCATEGORIESDATA;
 
   // Centres d'intérêt détaillés
-  interests: Interest[] = [
-    // Cuisine
-    {
-      id: 'cooking',
-      name: 'Cuisine',
-      icon: 'bi-egg-fried',
-      category: 'culinary',
-      description:
-        "Passion pour l'expérimentation culinaire et la préparation de plats créatifs, en explorant diverses techniques et influences internationales.",
-      frequency: 'Plusieurs fois par semaine',
-      skillsRelated: ['Créativité', 'Précision', 'Organisation'],
-      requiredEvidence: 'evidence-cooking',
-    },
+  interests: Interest[] = INTERESTSDATA;
 
-    // Musique
-    {
-      id: 'singing',
-      name: 'Chant',
-      icon: 'bi-mic',
-      category: 'music',
-      description:
-        'Pratique du chant comme expression artistique personnelle, avec un plaisir à explorer différents styles et techniques vocales.',
-      frequency: 'Régulière',
-      skillsRelated: [
-        'Expression artistique',
-        'Technique vocale',
-        'Confiance en soi',
-      ],
-      requiredEvidence: 'evidence-music',
-    },
-
-    // Basketball
-    {
-      id: 'basketball',
-      name: 'Basketball',
-      icon: 'bi-dribbble',
-      category: 'sports',
-      description:
-        "Pratique du basketball en loisir, permettant de maintenir une bonne condition physique tout en développant l'esprit d'équipe.",
-      frequency: 'Hebdomadaire',
-      skillsRelated: ["Esprit d'équipe", 'Coordination', 'Endurance'],
-      requiredEvidence: 'evidence-sports',
-    },
-
-    // Nouvelles Technologies
-    {
-      id: 'new-tech',
-      name: 'Nouvelles Technologies',
-      icon: 'bi-cpu',
-      category: 'tech',
-      description:
-        'Veille constante sur les innovations technologiques, particulièrement dans les domaines du développement web, mobile et des technologies 3D.',
-      frequency: 'Quotidienne',
-      skillsRelated: [
-        'Curiosité technique',
-        'Adaptabilité',
-        'Apprentissage continu',
-      ],
-      requiredEvidence: 'evidence-tech',
-    },
-  ];
-
-  quizQuestions: QuizQuestion[] = [
-    {
-      question:
-        'À quelle fréquence la cuisine est-elle pratiquée selon le profil?',
-      options: [
-        'Quotidiennement',
-        'Plusieurs fois par semaine',
-        'Mensuellement',
-        'Occasionnellement',
-      ],
-      correctAnswer: 1,
-    },
-    {
-      question: 'Quelle compétence est associée à la pratique du chant?',
-      options: [
-        'Patience',
-        'Coordination',
-        'Expression artistique',
-        'Adaptabilité',
-      ],
-      correctAnswer: 2,
-    },
-    {
-      question: 'À quelle fréquence le basketball est-il pratiqué?',
-      options: [
-        'Quotidiennement',
-        'Plusieurs fois par semaine',
-        'Hebdomadaire',
-        'Mensuellement',
-      ],
-      correctAnswer: 2,
-    },
-    {
-      question:
-        'Quelle valeur est développée par la pratique du basketball selon le profil?',
-      options: [
-        'Créativité',
-        "Esprit d'équipe",
-        'Technique vocale',
-        'Curiosité',
-      ],
-      correctAnswer: 1,
-    },
-    {
-      question:
-        'Dans quels domaines spécifiques porte la veille technologique?',
-      options: [
-        'Développement web, mobile et technologies 3D',
-        'Intelligence artificielle et machine learning',
-        'Cybersécurité et protection des données',
-        'Blockchain et cryptomonnaies',
-      ],
-      correctAnswer: 0,
-    },
-    {
-      question:
-        "Quelle compétence est associée à l'intérêt pour les nouvelles technologies?",
-      options: [
-        'Précision',
-        'Coordination',
-        'Adaptabilité',
-        'Expression artistique',
-      ],
-      correctAnswer: 2,
-    },
-    {
-      question:
-        'Quelle compétence est commune à la cuisine et au basketball selon le profil?',
-      options: ['Créativité', 'Coordination', 'Précision', 'Organisation'],
-      correctAnswer: 1,
-    },
-  ];
+  quizQuestions: QuizQuestion[] = QUIZQUESTIONSDATA;
 
   constructor(
     private progressService: ProgressService,
