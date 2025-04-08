@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 // Import des services
 import { SoundService } from './services/sound.service';
@@ -13,11 +13,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { ModuleStatus } from './models/others/modul-status';
 import { Note } from './models/others/note';
+import { AlertComponent } from './components/alert/alert.component';
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [RouterOutlet, RouterModule, CommonModule],
+    imports: [RouterOutlet, RouterModule, CommonModule, AlertComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css'
 })

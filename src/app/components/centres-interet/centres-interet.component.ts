@@ -23,6 +23,7 @@ import { EVIDENCEITEMSDATA } from '../../database/centres/evidenceItems.data';
 import { INTERESTCATEGORIESDATA } from '../../database/centres/interestCategories.data';
 import { INTERESTSDATA } from '../../database/centres/interests.data';
 import { QUIZQUESTIONSDATA } from '../../database/centres/quizQuestions.data';
+import { AlertService } from '../../services/alert.service';
 
 
 @Component({
@@ -98,7 +99,8 @@ export class CentresInteretComponent
     private userDataService: UserDataService,
     private dialogService: DialogService,
     private noteService: NoteService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {}
 
   ngOnInit() {
@@ -300,6 +302,14 @@ export class CentresInteretComponent
   completeModule(): void {
     this.progressService.completeModule('centres');
     this.isModuleCompleted = true;
+
+    this.alertService.success(
+      `Module Centres d'intérêt complété ! Tous les centres d'intérêt ont été découverts. 
+      Cliquez maintenant sur le bouton "Continuer" au fond de la page pour faire le mini jeu et passer au module suivant.`,
+      'Module terminé',
+      true,
+      20000
+    );
 
     // Ajouter une note automatique pour résumer ce qui a été fait
     this.addCompletionNote();

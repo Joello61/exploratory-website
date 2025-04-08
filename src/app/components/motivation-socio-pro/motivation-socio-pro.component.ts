@@ -38,6 +38,7 @@ import { EVIDENCEITEMSDATA } from '../../database/motivations/evidenceItems.data
 import { MOTIVATIONPROFILESDATA } from '../../database/motivations/motivationProfiles.data';
 import { QUIZQUESTIONSDATA } from '../../database/motivations/quizQuestions.data';
 import { MOTIVATIONFACTORSDATA } from '../../database/motivations/motivationFactors.data';
+import { AlertService } from '../../services/alert.service';
 
 
 @Component({
@@ -132,7 +133,8 @@ export class MotivationSocioProComponent
     private userDataService: UserDataService,
     private dialogService: DialogService,
     private noteService: NoteService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {}
 
   ngOnInit() {
@@ -374,6 +376,14 @@ export class MotivationSocioProComponent
     if (this.quizResult && this.quizResult.passed) {
       this.progressService.completeModule('motivations');
       this.isModuleCompleted = true;
+
+      this.alertService.success(
+        `Module Motivations socio-professionnelles complété ! Toutes les motivations socio-professionnelles ont été découvertes. 
+        Cliquez maintenant sur le bouton "Continuer" au fond de la page pour faire le mini jeu et passer au module suivant.`,
+        'Module terminé',
+        true,
+        20000
+      );
 
       // Ajouter une note automatique pour résumer ce qui a été fait
       this.addCompletionNote();

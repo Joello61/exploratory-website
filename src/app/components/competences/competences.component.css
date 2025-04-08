@@ -181,23 +181,8 @@
   flex-direction: column;
   gap: 20px;
   border: 1px solid rgba(0, 191, 255, 0.1);
-  max-height: 80vh; /* Limite la hauteur pour éviter le débordement */
-  overflow-y: auto; /* Permet le défilement vertical si nécessaire */
-}
-
-/* Stylisation de la barre de défilement du panneau de contrôle */
-.control-panel::-webkit-scrollbar {
-  width: 6px;
-}
-
-.control-panel::-webkit-scrollbar-track {
-  background: rgba(15, 15, 26, 0.3);
-  border-radius: 3px;
-}
-
-.control-panel::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 191, 255, 0.3);
-  border-radius: 3px;
+  max-height: 80vh;
+  overflow-y: hidden; /* Supprime explicitement le scroll du panneau principal */
 }
 
 .panel-header {
@@ -271,6 +256,8 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  flex-grow: 1; /* Permet à la section de prendre l'espace disponible */
+  overflow: hidden; /* Évite le débordement */
 }
 
 .tool-section h4 {
@@ -284,6 +271,29 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 60vh; /* Hauteur max pour permettre le scroll */
+  overflow-y: auto; /* Active le scroll vertical */
+  padding-right: 8px; /* Espace pour la scrollbar */
+  margin-right: -3px; /* Compense légèrement le padding */
+}
+
+.category-buttons::-webkit-scrollbar {
+  width: 6px;
+}
+
+.category-buttons::-webkit-scrollbar-track {
+  background: rgba(15, 15, 26, 0.3);
+  border-radius: 3px;
+}
+
+.category-buttons::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 191, 255, 0.3);
+  border-radius: 3px;
+}
+
+.category-buttons {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 191, 255, 0.3) rgba(15, 15, 26, 0.3);
 }
 
 .category-btn {
@@ -451,6 +461,7 @@
 
 /* Vue liste */
 .skills-list {
+  padding-left: 13px;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -1246,5 +1257,125 @@
   
   .score-value {
     font-size: 1.8rem;
+  }
+}
+
+/* Styles pour l'affichage de toutes les compétences */
+.all-skills {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 191, 255, 0.2);
+}
+
+.all-skills h4 {
+  margin: 0 0 15px;
+  font-size: 1.1rem;
+  color: #00bfff;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Onglets de catégories */
+.skills-categories-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.category-tab-btn {
+  background: rgba(15, 15, 26, 0.5);
+  border: 1px solid rgba(0, 191, 255, 0.2);
+  border-radius: 20px;
+  padding: 8px 15px;
+  color: #a0d8ff;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-tab-btn i {
+  font-size: 1.1rem;
+  color: #00bfff;
+}
+
+.category-tab-btn:hover {
+  background: rgba(0, 191, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.category-tab-btn.active {
+  background: rgba(0, 191, 255, 0.15);
+  border-color: rgba(0, 191, 255, 0.5);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
+}
+
+/* Grille des compétences */
+.all-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+  animation: fadeIn 0.5s ease;
+}
+
+.skill-grid-item {
+  background: rgba(26, 26, 46, 0.7);
+  border: 1px solid rgba(0, 191, 255, 0.2);
+  border-radius: 10px;
+  padding: 15px;
+  transition: all 0.3s ease;
+}
+
+.skill-grid-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 191, 255, 0.2);
+  border-color: rgba(0, 191, 255, 0.4);
+}
+
+.skill-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.skill-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 191, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #00bfff;
+  flex-shrink: 0;
+}
+
+.skill-description {
+  color: #b0d8e0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .all-skills-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .skills-categories-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    justify-content: flex-start;
+  }
+  
+  .category-tab-btn {
+    white-space: nowrap;
   }
 }

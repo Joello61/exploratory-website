@@ -33,13 +33,14 @@ import { WORKPROCESSESDATA } from '../../database/personnalite/workProcesses.dat
 import { MOTIVATIONFACTORSDATA } from '../../database/personnalite/motivationFactors.data';
 import { COREVALUESDATA } from '../../database/personnalite/coreValues.data';
 import { WORKPREFERENCESDATA } from '../../database/personnalite/workPreferences.data';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
-    selector: 'app-personnalite',
-    imports: [CommonModule, FormsModule],
-    standalone: true,
-    templateUrl: './personnalite.component.html',
-    styleUrls: ['./personnalite.component.css']
+  selector: 'app-personnalite',
+  imports: [CommonModule, FormsModule],
+  standalone: true,
+  templateUrl: './personnalite.component.html',
+  styleUrls: ['./personnalite.component.css'],
 })
 export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;
@@ -83,12 +84,12 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   investigationProgress: number = 0;
   maxInvestigationProgress: number = 100;
   insightsDiscovered: number = 0;
-  totalInsights: number = 18;
+  totalInsights: number = 21;
   currentScenarioIndex: number = 0;
   selectedResponse: number | null = null;
 
   // Scores des traits - à révéler progressivement
-  traitScores = {
+  traitScores: { [key: string]: number } = {
     extroversion: 7,
     agreeableness: 8,
     conscientiousness: 9,
@@ -96,7 +97,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   // Visibilité des traits
-  traitVisibility = {
+  traitVisibility: { [key: string]: boolean } = {
     extroversion: false,
     agreeableness: false,
     conscientiousness: false,
@@ -108,7 +109,6 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   activeTab: string = 'investigation';
 
   //données
-
   profileTabs: TabInfo[] = PROFILETABSDATA;
 
   // Scenarios d'investigation
@@ -140,7 +140,8 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     private userDataService: UserDataService,
     public dialogService: DialogService,
     public noteService: NoteService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -195,18 +196,22 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Nettoyer tous les timeouts
   private clearAllTimeouts(): void {
-    const timeouts = [
-      this.introDialogTimeoutId,
-      this.closeDialogTimeoutId,
-      this.quizEnableTimeoutId,
-      this.navigationTimeoutId,
-    ];
-
-    timeouts.forEach((timeoutId) => {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-      }
-    });
+    if (this.introDialogTimeoutId !== null) {
+      clearTimeout(this.introDialogTimeoutId);
+      this.introDialogTimeoutId = null;
+    }
+    if (this.closeDialogTimeoutId !== null) {
+      clearTimeout(this.closeDialogTimeoutId);
+      this.closeDialogTimeoutId = null;
+    }
+    if (this.quizEnableTimeoutId !== null) {
+      clearTimeout(this.quizEnableTimeoutId);
+      this.quizEnableTimeoutId = null;
+    }
+    if (this.navigationTimeoutId !== null) {
+      clearTimeout(this.navigationTimeoutId);
+      this.navigationTimeoutId = null;
+    }
   }
 
   // Charger les progrès précédents
@@ -225,6 +230,36 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
+    // Charger le scénario actuel s'il a été sauvegardé
+    const scenarioResponse = this.userDataService.getResponse(
+      this.MODULE_ID,
+      'current_scenario'
+    );
+    if (scenarioResponse) {
+      this.currentScenarioIndex = scenarioResponse.response as number;
+    }
+
+    // Charger l'état du quiz
+    const quizPassedResponse = this.userDataService.getResponse(
+      this.MODULE_ID,
+      'quiz_passed'
+    );
+    if (quizPassedResponse) {
+      this.quizPassed = quizPassedResponse.response as boolean;
+      if (this.quizPassed) {
+        this.moduleCompleted = true;
+      }
+    }
+
+    // Charger l'état du module
+    const moduleCompletedResponse = this.userDataService.getResponse(
+      this.MODULE_ID,
+      'module_completed'
+    );
+    if (moduleCompletedResponse) {
+      this.moduleCompleted = moduleCompletedResponse.response as boolean;
+    }
+
     // Charger les traits découverts
     this.loadDiscoveredTraits();
   }
@@ -239,8 +274,9 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       );
       if (traitResponse) {
         trait.discovered = traitResponse.response as boolean;
-        this.traitVisibility[trait.id as keyof typeof this.traitVisibility] =
-          trait.discovered;
+        if (trait.id && trait.discovered) {
+          this.traitVisibility[trait.id] = true;
+        }
       }
     });
 
@@ -300,71 +336,10 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     // Recalculer le nombre d'insights découverts
-    this.updateInsightsDiscovered();
+    this.updateInsightsCount();
   }
 
-  // Mettre à jour le nombre d'insights découverts - version améliorée
-
-  updateInsightsDiscovered(): void {
-    // Éviter la récursion
-    if (this.isUpdatingInsights) {
-      return;
-    }
-
-    this.isUpdatingInsights = true;
-
-    let count = 0;
-
-    // Compter tous les éléments découverts
-    this.personalityTraits.forEach((trait) => {
-      if (trait.discovered) count++;
-    });
-
-    this.collaborationAspects.forEach((aspect) => {
-      if (aspect.discovered) count++;
-    });
-
-    this.workProcesses.forEach((process) => {
-      if (process.discovered) count++;
-    });
-
-    this.motivationFactors.forEach((factor) => {
-      if (factor.discovered) count++;
-    });
-
-    this.coreValues.forEach((value) => {
-      if (value.discovered) count++;
-    });
-
-    this.workPreferences.forEach((pref) => {
-      if (pref.discovered) count++;
-    });
-
-    this.insightsDiscovered = count;
-
-    // Mettre à jour la progression globale
-    this.investigationProgress = Math.min(
-      Math.round((this.insightsDiscovered / this.totalInsights) * 100),
-      this.maxInvestigationProgress
-    );
-
-    // Sauvegarder la progression
-    this.userDataService.saveResponse(
-      this.MODULE_ID,
-      'investigation_progress',
-      this.investigationProgress
-    );
-
-    // Vérifier si le quiz peut être activé (à 70% de progression)
-    if (this.investigationProgress >= 70 && !this.isQuizAvailable()) {
-      this.enableFinalQuiz();
-      this.showQuizAvailableMessage();
-    }
-
-    this.isUpdatingInsights = false;
-  }
-
-  // Version alternative plus simple pour éviter les boucles
+  // Mettre à jour le nombre d'insights découverts de manière sécurisée
   updateInsightsCount(): void {
     let count = 0;
 
@@ -408,40 +383,133 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.investigationProgress
     );
 
-    // Activer le quiz si nécessaire
-    if (this.investigationProgress >= 70) {
+    // Vérifier si le module est prêt pour le quiz (75% des insights découverts)
+    const completionThreshold = Math.ceil(this.totalInsights * 0.75);
+    if (
+      this.insightsDiscovered >= completionThreshold &&
+      !this.isModuleReady()
+    ) {
+      this.moduleCompleted = true;
+      this.userDataService.saveResponse(
+        this.MODULE_ID,
+        'module_completed',
+        true
+      );
+
+      // Débloquer automatiquement tous les insights restants
+      this.revealAllTraits();
+
+      // Activer le quiz final
       this.enableFinalQuiz();
+
+      // Afficher l'alerte pour informer l'utilisateur
+      this.alertService.success(
+        `Module Personnalité complété ! Vous avez découvert suffisamment d'insights pour débloquer l'ensemble du profil. 
+    Vous pouvez maintenant passer l'évaluation finale en cliquant sur le bouton "Commencer l'évaluation" en bas de la page.`,
+        'Module complété',
+        true,
+        15000
+      );
+
+      // Afficher le message dans la boîte de dialogue
+      this.showQuizAvailableMessage();
     }
+  }
+
+  // Cette méthode est appelée quand le quiz est réussi
+  completeQuiz(): void {
+    const passScore = this.getPassScore();
+    this.quizPassed = this.quizScore >= passScore;
+
+    if (this.quizPassed) {
+      // Marquer le module comme complété dans le service de progression
+      this.progressService.completeModule(this.MODULE_ID);
+
+      // Révéler tous les traits si pas déjà fait
+      if (this.investigationProgress < 100) {
+        this.revealAllTraits();
+      }
+
+      // Ajouter une alerte de réussite
+      this.alertService.success(
+        `Quiz réussi ! Vous avez correctement analysé le profil psychologique. 
+        Vous pouvez maintenant passer au module suivant en cliquant sur le bouton "Continuer au module suivant".`,
+        'Évaluation terminée',
+        true,
+        15000
+      );
+
+      // Ajouter une note automatique pour résumer ce qui a été fait
+      this.addCompletionNote();
+    }
+
+    // Sauvegarder le résultat du quiz
+    this.userDataService.saveResponse(
+      this.MODULE_ID,
+      'quiz_passed',
+      this.quizPassed
+    );
+
+    this.userDataService.saveResponse(
+      this.MODULE_ID,
+      'quiz_score',
+      this.quizScore
+    );
+  }
+
+  // Ajouter cette nouvelle méthode pour créer une note de complétion
+  addCompletionNote(): void {
+    // Récupérer les traits dominants
+    const dominantTraits = this.getDominantTraits(2)
+      .map((trait) => `${trait.name} (${trait.score}/10)`)
+      .join(', ');
+
+    // Récupérer les aspects de collaboration découverts
+    const collaborationAspects = this.collaborationAspects
+      .filter((aspect) => aspect.discovered)
+      .map((aspect) => aspect.name)
+      .join(', ');
+
+    const noteContent = `
+Module "Personnalité" complété le ${new Date().toLocaleDateString()}.
+Traits dominants: ${dominantTraits}.
+Style de travail: ${this.getCommunicationSummary().substring(0, 100)}...
+Aspects de collaboration: ${collaborationAspects}.
+  `;
+
+    this.noteService.addNote(noteContent.trim());
   }
 
   // Ajouter cette méthode pour notifier l'utilisateur
   showQuizAvailableMessage(): void {
     const message =
-      "Vous avez découvert suffisamment d'insights pour tenter l'évaluation finale. Celle-ci est maintenant disponible dans la section d'investigation.";
-
+      "Félicitations ! Vous avez complété le module de profil psychologique. Tous les insights ont été débloqués automatiquement. Vous pouvez maintenant passer l'évaluation finale pour valider votre compréhension du profil.";
+  
     const dialogMessage: DialogMessage = {
       text: message,
       character: 'detective',
     };
-
+  
     this.dialogService.openDialog(dialogMessage);
     this.dialogService.startTypewriter(message);
   }
 
   // Révéler tous les traits
   revealAllTraits(): void {
+    // Traits de personnalité
     this.personalityTraits.forEach((trait) => {
       trait.discovered = true;
-      this.traitVisibility[trait.id as keyof typeof this.traitVisibility] =
-        true;
-
-      this.userDataService.saveResponse(
-        this.MODULE_ID,
-        `trait_${trait.id}`,
-        true
-      );
+      if (trait.id) {
+        this.traitVisibility[trait.id] = true;
+        this.userDataService.saveResponse(
+          this.MODULE_ID,
+          `trait_${trait.id}`,
+          true
+        );
+      }
     });
 
+    // Aspects de collaboration
     this.collaborationAspects.forEach((aspect, index) => {
       aspect.discovered = true;
       this.userDataService.saveResponse(
@@ -451,6 +519,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     });
 
+    // Processus de travail
     this.workProcesses.forEach((process, index) => {
       process.discovered = true;
       this.userDataService.saveResponse(
@@ -460,6 +529,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     });
 
+    // Facteurs de motivation
     this.motivationFactors.forEach((factor, index) => {
       factor.discovered = true;
       this.userDataService.saveResponse(
@@ -469,11 +539,13 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     });
 
+    // Valeurs
     this.coreValues.forEach((value, index) => {
       value.discovered = true;
       this.userDataService.saveResponse(this.MODULE_ID, `value_${index}`, true);
     });
 
+    // Préférences
     this.workPreferences.forEach((pref, index) => {
       pref.discovered = true;
       this.userDataService.saveResponse(
@@ -483,10 +555,8 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     });
 
-    // Mettre à jour les insights découverts sans créer de boucle
-    if (!this.isUpdatingInsights) {
-      this.updateInsightsCount();
-    }
+    // Mettre à jour le compteur d'insights
+    this.updateInsightsCount();
   }
 
   // Afficher le dialogue d'introduction
@@ -624,7 +694,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
         const trait = this.personalityTraits.find((t) => t.id === id);
         if (trait) {
           trait.discovered = true;
-          this.traitVisibility[id as keyof typeof this.traitVisibility] = true;
+          this.traitVisibility[id] = true;
           this.userDataService.saveResponse(
             this.MODULE_ID,
             `trait_${id}`,
@@ -681,34 +751,32 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
       // Préférences
-      // Dans la méthode revealInsights
       else if (id.startsWith('preference')) {
         const index = parseInt(id.replace('preference', '')) - 1;
         if (index >= 0 && index < this.workPreferences.length) {
-          // Débloquer toutes les préférences d'un coup
-          this.workPreferences.forEach((pref, i) => {
-            pref.discovered = true;
-            this.userDataService.saveResponse(
-              this.MODULE_ID,
-              `preference_${i}`,
-              true
-            );
-          });
+          this.workPreferences[index].discovered = true;
+          this.userDataService.saveResponse(
+            this.MODULE_ID,
+            `preference_${index}`,
+            true
+          );
         }
       }
       // Élément de communication
       else if (id === 'communication') {
         // La communication est un aspect transversal, pourrait affecter plusieurs catégories
         // Par exemple, révéler un aspect spécifique de collaboration lié à la communication
-        if (!this.collaborationAspects[3]?.discovered) {
-          if (this.collaborationAspects.length > 3) {
-            this.collaborationAspects[3].discovered = true;
-            this.userDataService.saveResponse(
-              this.MODULE_ID,
-              `collaboration_3`,
-              true
-            );
-          }
+        if (this.collaborationAspects.length > 0) {
+          const communicationIndex = Math.min(
+            this.collaborationAspects.length - 1,
+            0
+          );
+          this.collaborationAspects[communicationIndex].discovered = true;
+          this.userDataService.saveResponse(
+            this.MODULE_ID,
+            `collaboration_${communicationIndex}`,
+            true
+          );
         }
       }
     });
@@ -717,7 +785,6 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateInsightsCount();
   }
 
-  // Afficher un message lorsque l'investigation est suffisamment avancée
   // Afficher un message lorsque l'investigation est suffisamment avancée
   showCompleteInvestigationMessage(): void {
     const message =
@@ -752,10 +819,11 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   // Démarrer le quiz final
   startQuiz(): void {
     this.showQuizModal = true;
-    this.quizStarted = true;
+    this.quizStarted = false; // Initialement false pour montrer l'introduction
     this.currentQuizQuestion = 0;
     this.selectedAnswer = null;
     this.quizScore = 0;
+    this.quizPassed = false;
   }
 
   // Sélectionner une réponse au quiz
@@ -784,36 +852,6 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // Terminer le quiz et afficher les résultats
-  completeQuiz(): void {
-    const passScore = Math.ceil(this.quizQuestions.length * 0.7); // 70% pour réussir
-    this.quizPassed = this.quizScore >= passScore;
-
-    if (this.quizPassed) {
-      // Marquer le module comme complété
-      this.moduleCompleted = true;
-      this.progressService.completeModule(this.MODULE_ID);
-
-      // Révéler tous les traits si pas déjà fait
-      if (this.investigationProgress < 100) {
-        this.revealAllTraits();
-      }
-    }
-
-    // Sauvegarder le résultat du quiz
-    this.userDataService.saveResponse(
-      this.MODULE_ID,
-      'quiz_passed',
-      this.quizPassed
-    );
-
-    this.userDataService.saveResponse(
-      this.MODULE_ID,
-      'quiz_score',
-      this.quizScore
-    );
-  }
-
   // Fermer le modal du quiz
   closeQuizModal(): void {
     this.showQuizModal = false;
@@ -839,19 +877,23 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
       {
         id: 'extroversion',
         name: 'Extraversion',
-        score: this.traitScores.extroversion,
+        score: this.traitScores['extroversion'],
+      },
+      {
+        id: 'openness',
+        name: 'Ouverture',
+        score: this.traitScores['openness'],
       },
       {
         id: 'agreeableness',
-        name: 'Coopération',
-        score: this.traitScores.agreeableness,
+        name: 'Amabilité',
+        score: this.traitScores['agreeableness'],
       },
       {
         id: 'conscientiousness',
-        name: 'Rigueur',
-        score: this.traitScores.conscientiousness,
+        name: 'Conscienciosité',
+        score: this.traitScores['conscientiousness'],
       },
-      { id: 'openness', name: 'Ouverture', score: this.traitScores.openness },
     ];
   }
 
@@ -885,7 +927,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Obtenir le score d'un trait
   getTraitScore(traitId: string): number {
-    return this.traitScores[traitId as keyof typeof this.traitScores] || 0;
+    return this.traitScores[traitId] || 0;
   }
 
   // Obtenir les traits dominants
@@ -899,10 +941,7 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Vérifier si un trait a été découvert
   isTraitDiscovered(traitId: string): boolean {
-    return (
-      this.traitVisibility[traitId as keyof typeof this.traitVisibility] ||
-      false
-    );
+    return this.traitVisibility[traitId] || false;
   }
 
   // Vérifier si le profil est assez complet pour afficher un résumé
@@ -953,9 +992,9 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     conciseness: number;
   } {
     // Calculé à partir des scores de traits
-    const directness = 60 + (this.traitScores.extroversion - 5) * 5;
-    const factual = 65 + (this.traitScores.conscientiousness - 5) * 5;
-    const conciseness = 60 - (this.traitScores.openness - 5) * 3;
+    const directness = 60 + (this.traitScores['extroversion'] - 5) * 5;
+    const factual = 65 + (this.traitScores['conscientiousness'] - 5) * 5;
+    const conciseness = 60 - (this.traitScores['openness'] - 5) * 3;
 
     return {
       directness: Math.min(Math.max(directness, 0), 100),
@@ -1054,20 +1093,19 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
     return false;
   }
 
-  // Vérifier si le module est complété
-  isModuleCompleted(): boolean {
-    const quizPassedResponse = this.userDataService.getResponse(
-      this.MODULE_ID,
-      'quiz_passed'
-    );
-    return quizPassedResponse
-      ? (quizPassedResponse.response as boolean)
-      : false;
+  // Vérifier si le module est complété (75% des insights découverts)
+  isModuleReady(): boolean {
+    return this.moduleCompleted;
+  }
+
+  // Vérifier si le quiz a été réussi
+  isQuizPassed(): boolean {
+    return this.quizPassed;
   }
 
   // Fonction pour continuer au module suivant
   continueToNextModule(): void {
-    if (this.isModuleCompleted()) {
+    if (this.isQuizPassed()) {
       // Vérifier que toutes les données sont bien sauvegardées
       this.userDataService.saveResponse(
         this.MODULE_ID,
@@ -1109,9 +1147,9 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
         this.navigationTimeoutId = null;
       }, 5000);
     } else {
-      // Si le module n'est pas complété, informer l'utilisateur
+      // Si le quiz n'est pas réussi, informer l'utilisateur
       const message =
-        "Vous devez d'abord compléter l'évaluation finale pour continuer.";
+        "Vous devez d'abord réussir l'évaluation finale pour continuer.";
 
       const dialogMessage: DialogMessage = {
         text: message,
@@ -1124,35 +1162,18 @@ export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getCollaborationDiscoveredCount(): number {
-    let count = 0;
-    for (const aspect of this.collaborationAspects) {
-      if (aspect.discovered) {
-        count++;
-      }
-    }
-    return count;
+    return this.collaborationAspects.filter((aspect) => aspect.discovered)
+      .length;
   }
 
   // Obtenir le nombre de processus de travail découverts
   getProcessDiscoveredCount(): number {
-    let count = 0;
-    for (const process of this.workProcesses) {
-      if (process.discovered) {
-        count++;
-      }
-    }
-    return count;
+    return this.workProcesses.filter((process) => process.discovered).length;
   }
 
   // Obtenir le nombre de facteurs de motivation découverts
   getMotivationDiscoveredCount(): number {
-    let count = 0;
-    for (const factor of this.motivationFactors) {
-      if (factor.discovered) {
-        count++;
-      }
-    }
-    return count;
+    return this.motivationFactors.filter((factor) => factor.discovered).length;
   }
 
   // Obtenir le score de passage pour le quiz (70%)

@@ -28,6 +28,7 @@ import { EDUCATIONTIMELINEDATA } from '../../database/itineraire/educationTimeli
 import { SKILLSEVOLUTIONDATA } from '../../database/itineraire/skillsEvolution.data';
 import { KEYINDICATORSDATA } from '../../database/itineraire/keyIndicators.data';
 import { QUIZQUESTIONSDATA } from '../../database/itineraire/quizQuestions.data';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
     selector: 'app-itineraire',
@@ -113,7 +114,8 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private userDataService: UserDataService,
     private dialogService: DialogService,
-    private noteService: NoteService
+    private noteService: NoteService,
+    private alertService: AlertService,
   ) {}
 
   ngOnInit() {
@@ -425,6 +427,14 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   completeModule(): void {
     this.progressService.completeModule('itineraire');
     this.isModuleCompleted = true;
+
+    this.alertService.success(
+      `Module Itinéraire complété ! L'itinéraire complet du sujet a été découvert. 
+      Cliquez maintenant sur le bouton "Continuer" au fond de la page pour faire le mini jeu et passer au module suivant.`,
+      'Module terminé',
+      true,
+      20000
+    );
 
     // Ajouter une note automatique pour résumer ce qui a été fait
     this.addCompletionNote();

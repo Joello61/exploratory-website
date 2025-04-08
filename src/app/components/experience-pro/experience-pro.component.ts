@@ -26,6 +26,7 @@ import { OriginalChronology } from '../../models/experiences/original-chronology
 import { JOBSDATA } from '../../database/experiences/jobs.data';
 import { MATCHINGSKILLSDATA } from '../../database/experiences/matchingSkills.data';
 import { MATCHINGJOBSDATA } from '../../database/experiences/matchingJobs.data';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
     selector: 'app-experience-pro',
@@ -112,7 +113,8 @@ export class ExperienceProComponent
     private router: Router,
     private userDataService: UserDataService,
     private dialogService: DialogService,
-    private noteService: NoteService
+    private noteService: NoteService,
+    private alertService: AlertService,
   ) {}
 
   ngOnInit() {
@@ -342,6 +344,14 @@ export class ExperienceProComponent
   completeModule(): void {
     this.progressService.completeModule('experience');
     this.isModuleCompleted = true;
+
+    this.alertService.success(
+      `Module Expérinces professionnelles complété ! Toutes les expériences professionnelles ont été découvertes. 
+      Cliquez maintenant sur le bouton "Continuer" au fond de la page pour faire le mini jeu et passer au module suivant.`,
+      'Module terminé',
+      true,
+      20000
+    );
 
     // Ajouter une note automatique pour résumer ce qui a été fait
     this.addCompletionNote();

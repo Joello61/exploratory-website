@@ -37,6 +37,7 @@ import { FUTUREPROJECTSDATA } from '../../database/attentes/futureProjects.data'
 import { IDEALENVIRONMENTDATA } from '../../database/attentes/idealEnvironment.data';
 import { PRIORITIZATIONITEMSDATA } from '../../database/attentes/prioritizationItems.data';
 import { SCENARIOSDATA } from '../../database/attentes/scenarios.data';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
     selector: 'app-attentes',
@@ -145,7 +146,8 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
     private timeTrackerService: TimeTrackerService,
     private userDataService: UserDataService,
     private dialogService: DialogService,
-    private noteService: NoteService
+    private noteService: NoteService,
+    private alertService: AlertService
   ) {}
 
   ngOnInit() {
@@ -361,6 +363,14 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
     ) {
       this.progressService.completeModule('attentes');
       this.isModuleCompleted = true;
+
+      this.alertService.success(
+        `Module Attentes complété ! Toutes les attentes ont été découvertes. 
+        Cliquez maintenant sur le bouton "Continuer" au fond de la page pour faire le mini jeu et passer au module suivant.`,
+        'Module terminé',
+        true,
+        20000
+      );
 
       // Ajouter une note automatique pour résumer ce qui a été fait
       this.addCompletionNote();

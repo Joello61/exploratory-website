@@ -8,9 +8,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "e2e": "ng e2e",
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
@@ -40,11 +38,9 @@
     "@angular-devkit/build-angular": "^19.2.6",
     "@angular/cli": "^19.2.6",
     "@angular/compiler-cli": "^19.2.5",
-    "@cypress/schematic": "^3.0.0",
     "@types/jasmine": "~5.1.7",
     "@types/leaflet": "^1.9.17",
     "@types/three": "^0.175.0",
-    "cypress": "latest",
     "jasmine-core": "^5.6.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "~3.2.0",

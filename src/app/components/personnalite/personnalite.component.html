@@ -229,25 +229,7 @@
                 </div>
               </div>
 
-              <div
-                class="quiz-section"
-                *ngIf="isQuizAvailable() && !isModuleCompleted()"
-              >
-                <h4>
-                  <i class="bi bi-check-circle me-2"></i>
-                  Évaluation finale
-                </h4>
-                <p>
-                  Vous avez collecté suffisamment d'informations pour tenter de
-                  valider votre compréhension du profil psychologique.
-                </p>
-                <button class="quiz-btn" (click)="startQuiz()">
-                  <i class="bi bi-clipboard-check me-2"></i>
-                  Commencer l'évaluation
-                </button>
-              </div>
-
-              <div class="complete-section" *ngIf="isModuleCompleted()">
+              <div class="complete-section" *ngIf="isQuizPassed()">
                 <div class="complete-badge">
                   <i class="bi bi-trophy"></i>
                   Module complété
@@ -618,6 +600,21 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Section du bouton Continuer (modifiée) -->
+    <div class="continue-section" *ngIf="isModuleReady() && !isQuizPassed()">
+      <button class="primary-action action-btn mb-3" (click)="startQuiz()">
+        <i class="bi bi-clipboard-check me-2"></i>
+        Commencer l'évaluation
+      </button>
+    </div>
+    
+    <div class="continue-section" *ngIf="isQuizPassed()">
+      <button class="primary-action action-btn mb-3" (click)="continueToNextModule()">
+        <i class="bi bi-arrow-right-circle me-2"></i>
+        Continuer au module suivant
+      </button>
     </div>
   </div>
 

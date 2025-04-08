@@ -558,6 +558,8 @@
   border: 1px solid rgba(0, 191, 255, 0.05);
   opacity: 0.5;
   transition: all 0.3s ease;
+  width: 85%;
+ 
 }
 
 .trait-item.discovered {
@@ -2122,4 +2124,9 @@
   to {
     box-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
   }
+}
+
+.continue-section {
+  display: flex;
+  justify-content: center;
 }

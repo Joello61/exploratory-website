@@ -30,19 +30,20 @@ import { DialogMessage } from '../../models/others/dialod-message';
 import { QuizQuestion } from '../../models/competences/quiz-question';
 import { SKILLCATEGORIESDATA } from '../../database/competences/skillCategories.data';
 import { SKILLSDATA } from '../../database/competences/skills.data';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
-    selector: 'app-competences',
-    imports: [CommonModule],
-    standalone: true,
-    templateUrl: './competences.component.html',
-    styleUrls: ['./competences.component.css']
+  selector: 'app-competences',
+  imports: [CommonModule],
+  standalone: true,
+  templateUrl: './competences.component.html',
+  styleUrls: ['./competences.component.css'],
 })
 export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;
 
   @ViewChild('radarCanvas') radarCanvas!: ElementRef<HTMLCanvasElement>;
-  private radarChart!: Chart;
+  private radarChart: Chart | null = null;
 
   // Pour gérer la destruction proprement
   private destroy$ = new Subject<void>();
@@ -103,7 +104,8 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     private userDataService: UserDataService,
     private dialogService: DialogService,
     private noteService: NoteService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {}
 
   ngOnInit() {
@@ -112,7 +114,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       console.warn("Ce module n'est pas encore disponible");
     }
 
-    // Par défaut, aucune compétence n'est découverte sauf si on a des données sauvegardées
+    // Initialiser les compétences avec le statut discovered = false
     this.skills = this.skills.map((skill) => ({ ...skill, discovered: false }));
 
     // S'abonner au temps écoulé avec takeUntil
@@ -126,7 +128,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.progressService.moduleStatuses$
       .pipe(takeUntil(this.destroy$))
       .subscribe((statuses) => {
-        // Corriger cette ligne pour utiliser le bon module
+        // Utiliser la clé correcte pour le module de compétences
         this.isModuleCompleted = statuses.competences;
         this.moduleProgressPercentage =
           this.progressService.getCompletionPercentage();
@@ -137,6 +139,14 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
           this.userDataService.getModuleResponses('competences').length > 0
         ) {
           this.loadSavedState();
+          
+          // Initialiser le graphique radar si le module est complété
+          if (this.isModuleCompleted) {
+            // Utiliser un setTimeout pour s'assurer que le ViewChild est disponible
+            setTimeout(() => {
+              this.initRadarChart();
+            }, 0);
+          }
         }
       });
 
@@ -166,9 +176,6 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showIntroDialog();
       this.introDialogTimeoutId = null;
     }, 500);
-
-    // Initialiser le graphique radar dès que le canvas est disponible
-    this.initRadarChart();
   }
 
   ngOnDestroy(): void {
@@ -187,6 +194,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Détruire le graphique pour libérer des ressources
     if (this.radarChart) {
       this.radarChart.destroy();
+      this.radarChart = null; // Bonne pratique de mettre à null après destruction
     }
   }
 
@@ -194,23 +202,28 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
   private clearAllTimeoutsAndIntervals(): void {
     // Nettoyer les timeouts
     if (this.introDialogTimeoutId !== null) {
-      clearTimeout(this.introDialogTimeoutId);
+      window.clearTimeout(this.introDialogTimeoutId);
       this.introDialogTimeoutId = null;
     }
 
+    if (this.closeDialogTimeoutId !== null) {
+      window.clearTimeout(this.closeDialogTimeoutId);
+      this.closeDialogTimeoutId = null;
+    }
+
     if (this.categoryChangeTimeoutId !== null) {
-      clearTimeout(this.categoryChangeTimeoutId);
+      window.clearTimeout(this.categoryChangeTimeoutId);
       this.categoryChangeTimeoutId = null;
     }
 
     if (this.scanCompletionTimeoutId !== null) {
-      clearTimeout(this.scanCompletionTimeoutId);
+      window.clearTimeout(this.scanCompletionTimeoutId);
       this.scanCompletionTimeoutId = null;
     }
 
     // Nettoyer l'intervalle de scan
     if (this.scanIntervalId !== null) {
-      clearInterval(this.scanIntervalId);
+      window.clearInterval(this.scanIntervalId);
       this.scanIntervalId = null;
     }
   }
@@ -222,6 +235,11 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     };
     this.dialogService.openDialog(dialogMessage);
     this.dialogService.startTypewriter(this.fullText, () => {
+      // Nettoyer le timeout précédent s'il existe
+      if (this.closeDialogTimeoutId !== null) {
+        window.clearTimeout(this.closeDialogTimeoutId);
+      }
+      
       this.closeDialogTimeoutId = window.setTimeout(() => {
         this.dialogService.closeDialog();
         this.closeDialogTimeoutId = null;
@@ -235,14 +253,13 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Annuler tout timeout de fermeture programmé
     if (this.closeDialogTimeoutId !== null) {
-      clearTimeout(this.closeDialogTimeoutId);
+      window.clearTimeout(this.closeDialogTimeoutId);
       this.closeDialogTimeoutId = null;
     }
   }
 
   // Initialiser le graphique radar avec Chart.js
   initRadarChart(): void {
-
     if (!this.radarCanvas || !this.radarCanvas.nativeElement) {
       console.warn('Canvas pour le radar chart non disponible');
       return;
@@ -360,7 +377,6 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         animation: {
           duration: 1500,
-          // Utiliser un type d'easing valide selon Chart.js
           easing: 'easeOutQuart',
         },
       },
@@ -391,13 +407,20 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.radarChart = new Chart(this.radarCanvas.nativeElement, config);
   }
 
-  // Méthode optionnelle pour mettre à jour le graphique, par exemple après révélation d'une compétence
+  // Méthode pour mettre à jour le graphique après révélation d'une compétence
   updateRadarChart(): void {
     if (this.radarChart) {
-      this.radarChart.data.datasets[0].data = this.skillCategories.map(
-        (category) => this.getCategoryAverageLevel(category.id)
+      const data = this.skillCategories.map((category) => 
+        this.getCategoryAverageLevel(category.id)
       );
-      this.radarChart.update();
+      
+      if (this.radarChart.data.datasets && this.radarChart.data.datasets.length > 0) {
+        this.radarChart.data.datasets[0].data = data;
+        this.radarChart.update();
+      }
+    } else if (this.isModuleCompleted) {
+      // Si le graphique n'existe pas mais que le module est complété, l'initialiser
+      this.initRadarChart();
     }
   }
 
@@ -410,6 +433,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       const discoveredSkillsResponse = responses.find(
         (r) => r.questionId === 'discovered_skills'
       );
+      
       if (
         discoveredSkillsResponse &&
         Array.isArray(discoveredSkillsResponse.response)
@@ -425,6 +449,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       const categoryResponse = responses.find(
         (r) => r.questionId === 'selected_category'
       );
+      
       if (categoryResponse && typeof categoryResponse.response === 'string') {
         this.selectedCategory = categoryResponse.response as string;
       }
@@ -439,7 +464,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       .map((skill) => skill.id);
 
     this.userDataService.saveResponse(
-      'competences',
+      'competences', // Correction: utilisé 'personnalite' avant
       'discovered_skills',
       discoveredIds
     );
@@ -447,7 +472,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Sauvegarder la catégorie sélectionnée
     if (this.selectedCategory) {
       this.userDataService.saveResponse(
-        'competences',
+        'competences', // Correction: utilisé 'personnalite' avant
         'selected_category',
         this.selectedCategory
       );
@@ -457,27 +482,64 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.checkModuleCompletion();
   }
 
-  // Vérifier si les conditions de complétion du module sont remplies
-  checkModuleCompletion(): void {
-    // Par exemple, si un certain pourcentage des compétences sont découvertes
-    const discoveryThreshold = Math.ceil(this.skills.length * 0.7); // 70% des compétences
+// Vérifier si les conditions de complétion du module sont remplies
+checkModuleCompletion(): void {
+  // Par exemple, si un certain pourcentage des compétences sont découvertes
+  const discoveryThreshold = Math.ceil(this.skills.length * 0.5); // 50% des compétences
 
-    if (
-      this.getDiscoveredSkillsCount() >= discoveryThreshold &&
-      !this.isModuleCompleted
-    ) {
-      this.completeModule();
-    }
+  if (
+    this.getDiscoveredSkillsCount() >= discoveryThreshold &&
+    !this.isModuleCompleted
+  ) {
+    // On complète le module, ce qui va aussi révéler toutes les compétences
+    this.completeModule();
   }
+}
 
-  // Marquer le module comme complété
-  completeModule(): void {
-    this.progressService.completeModule('competences');
-    this.isModuleCompleted = true;
+// Marquer le module comme complété
+completeModule(): void {
+  // Marquer le module comme complété avant de révéler toutes les compétences
+  this.progressService.completeModule('competences');
+  this.isModuleCompleted = true;
 
-    // Ajouter une note automatique pour résumer ce qui a été fait
-    this.addCompletionNote();
-  }
+  // Déverrouiller toutes les compétences non découvertes
+  this.revealAllSkills();
+
+  // Initialiser ou mettre à jour le graphique radar
+  setTimeout(() => {
+    this.initRadarChart();
+  }, 0);
+
+  // Ajouter une note automatique pour résumer ce qui a été fait
+  this.addCompletionNote();
+
+  this.alertService.success(
+    `Module Compétences complété ! Toutes les compétences sont maintenant déverrouillées. 
+    Cliquez maintenant sur le bouton "Continuer" au fond de la page pour faire le mini jeu et passer au module suivant.`,
+    'Module terminé',
+    true,
+    20000
+  );
+}
+
+// Révéler toutes les compétences non encore découvertes
+revealAllSkills(): void {
+  const updatedSkills = this.skills.map(skill => ({
+    ...skill,
+    discovered: true // Marquer toutes les compétences comme découvertes
+  }));
+  
+  this.skills = updatedSkills;
+
+  // sans déclencher le check de complétion qui créerait une boucle infinie
+  const discoveredIds = this.skills.map(skill => skill.id);
+
+  this.userDataService.saveResponse(
+    'competences',
+    'discovered_skills',
+    discoveredIds
+  );
+}
 
   // Ajouter une note récapitulative automatique
   addCompletionNote(): void {
@@ -508,9 +570,9 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
   selectCategory(categoryId: string): void {
     this.selectedCategory = categoryId;
 
-    // Sauvegarder la sélection
+    // Sauvegarder la sélection avec le bon module name
     this.userDataService.saveResponse(
-      'personnalite',
+      'competences',
       'selected_category',
       categoryId
     );
@@ -522,7 +584,7 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
 
       // Nettoyer tout timeout précédent
       if (this.categoryChangeTimeoutId !== null) {
-        clearTimeout(this.categoryChangeTimeoutId);
+        window.clearTimeout(this.categoryChangeTimeoutId);
       }
 
       this.categoryChangeTimeoutId = window.setTimeout(() => {
@@ -562,9 +624,8 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
     const skillToDiscover = undiscoveredSkills[randomIndex];
 
     // Index dans la liste complète des compétences de la catégorie
-    this.scannedSkillIndex = this.getSkillsByCategory(
-      this.selectedCategory
-    ).findIndex((s) => s.id === skillToDiscover.id);
+    const categorySkills = this.getSkillsByCategory(this.selectedCategory);
+    this.scannedSkillIndex = categorySkills.findIndex((s) => s.id === skillToDiscover.id);
 
     // Animation de scan avec un intervalle géré
     this.scanIntervalId = window.setInterval(() => {
@@ -573,7 +634,7 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
       if (this.scanProgress >= 100) {
         // Nettoyer l'intervalle
         if (this.scanIntervalId !== null) {
-          clearInterval(this.scanIntervalId);
+          window.clearInterval(this.scanIntervalId);
           this.scanIntervalId = null;
         }
 
@@ -587,6 +648,11 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
           this.scannedSkillIndex = -1;
           this.scanningText = `Scan terminé - ${skillToDiscover.name} identifié`;
           this.scanCompletionTimeoutId = null;
+          
+          // Mettre à jour le radar chart si le module est complété
+          if (this.isModuleCompleted) {
+            this.updateRadarChart();
+          }
         }, 500);
       }
     }, 50);
@@ -596,13 +662,13 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
   private clearScanResources(): void {
     // Nettoyer l'intervalle de scan
     if (this.scanIntervalId !== null) {
-      clearInterval(this.scanIntervalId);
+      window.clearInterval(this.scanIntervalId);
       this.scanIntervalId = null;
     }
 
     // Nettoyer le timeout de complétion du scan
     if (this.scanCompletionTimeoutId !== null) {
-      clearTimeout(this.scanCompletionTimeoutId);
+      window.clearTimeout(this.scanCompletionTimeoutId);
       this.scanCompletionTimeoutId = null;
     }
   }
@@ -610,7 +676,7 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
   // Révéler une compétence spécifique
   revealSkill(skillId: string): void {
     const skillIndex = this.skills.findIndex((s) => s.id === skillId);
-    if (skillIndex >= 0) {
+    if (skillIndex >= 0 && !this.skills[skillIndex].discovered) {
       // Créer une nouvelle copie du tableau avec la compétence mise à jour
       const updatedSkills = [...this.skills];
       updatedSkills[skillIndex] = {
@@ -663,7 +729,7 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
       (total, skill) => total + skill.level,
       0
     );
-    return sum / discoveredSkills.length;
+    return parseFloat((sum / discoveredSkills.length).toFixed(1));
   }
 
   // Obtenir le niveau moyen des compétences techniques (hors soft skills)
@@ -724,18 +790,6 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
     }
   }
 
-  // Calculer l'angle pour positionner un nœud dans le graphique en étoile
-  getNodeAngle(index: number, total: number): number {
-    if (total <= 1) return 0;
-    return index * (360 / total);
-  }
-
-  // Calculer la distance depuis le centre en fonction du niveau de compétence
-  getNodeDistance(level: number): number {
-    // Normaliser le niveau pour qu'il soit entre 0.3 (plus proche du centre) et 1.0 (plus loin du centre)
-    return 0.3 + ((level - 1) / 4) * 0.7;
-  }
-
   // Méthode pour ouvrir le modal du quiz
   openQuizModal(): void {
     if (this.redirectInProgress) return;
@@ -758,6 +812,21 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
   generateQuizQuestions(): void {
     // Récupérer toutes les compétences découvertes
     const discoveredSkills = this.skills.filter((skill) => skill.discovered);
+    
+    // Vérifier qu'il y a assez de compétences découvertes
+    if (discoveredSkills.length < 5) {
+      console.warn("Pas assez de compétences découvertes pour le quiz");
+      // Créer quelques questions de base si nécessaire
+      this.quizQuestions = this.skills
+        .filter(skill => skill.discovered)
+        .slice(0, Math.min(5, discoveredSkills.length))
+        .map(skill => ({
+          skill: skill.name,
+          category: skill.category,
+          correctCategory: this.getCategoryName(skill.category)
+        }));
+      return;
+    }
 
     // Mélanger les compétences et prendre les 10 premières (ou moins si pas assez)
     this.shuffleArray(discoveredSkills);
@@ -767,21 +836,11 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
     );
 
     // Créer les questions
-    this.quizQuestions = selectedSkills.map((skill) => {
-      // Obtenir la catégorie correcte
-      const correctCategory = this.getCategoryName(skill.category);
-
-      // Créer des options incorrectes (autres catégories)
-      const otherCategories = this.skillCategories
-        .filter((cat) => cat.id !== skill.category)
-        .map((cat) => cat.name);
-
-      return {
-        skill: skill.name,
-        category: skill.category,
-        correctCategory: correctCategory,
-      };
-    });
+    this.quizQuestions = selectedSkills.map((skill) => ({
+      skill: skill.name,
+      category: skill.category,
+      correctCategory: this.getCategoryName(skill.category)
+    }));
   }
 
   // Mélanger un tableau (algorithme de Fisher-Yates)
@@ -807,33 +866,34 @@ Niveau moyen des compétences techniques: ${this.getAverageTechnicalSkillLevel()
     }
   }
 
-  // Terminer le quiz et calculer le score
-  completeQuiz(): void {
-    let correctAnswers = 0;
+// Terminer le quiz et calculer le score
+completeQuiz(): void {
+  let correctAnswers = 0;
 
-    // Compter les réponses correctes
-    for (let i = 0; i < this.quizQuestions.length; i++) {
-      if (this.userAnswers[i] === this.quizQuestions[i].category) {
-        correctAnswers++;
-      }
-    }
-
-    // Calculer le score en pourcentage
-    this.quizScore = Math.round(
-      (correctAnswers / this.quizQuestions.length) * 100
-    );
-
-    // Déterminer si le quiz est réussi (>= 80%)
-    this.quizPassed = this.quizScore >= 80;
-
-    // Marquer le quiz comme terminé
-    this.quizCompleted = true;
-
-    // Si le quiz est réussi, marquer le module comme complété
-    if (this.quizPassed && !this.isModuleCompleted) {
-      this.completeModule();
+  // Compter les réponses correctes
+  for (let i = 0; i < this.quizQuestions.length; i++) {
+    if (this.userAnswers[i] === this.quizQuestions[i].category) {
+      correctAnswers++;
     }
   }
+
+  // Calculer le score en pourcentage
+  this.quizScore = Math.round(
+    (correctAnswers / this.quizQuestions.length) * 100
+  );
+
+  // Déterminer si le quiz est réussi (>= 80%)
+  this.quizPassed = this.quizScore >= 80;
+
+  // Marquer le quiz comme terminé
+  this.quizCompleted = true;
+
+  // Si le quiz est réussi, marquer le module comme complété si ce n'est pas déjà fait
+  // completeModule() va aussi déverrouiller toutes les compétences
+  if (this.quizPassed && !this.isModuleCompleted) {
+    this.completeModule();
+  }
+}
 
   // Méthode pour fermer le modal du quiz
   closeQuizModal(): void {

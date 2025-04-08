@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ModuleStatus } from '../models/others/modul-status';
+import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,19 @@ export class ProgressService {
     'conclusion',
   ];
 
+  // Noms affichables des modules pour les alertes
+  private moduleDisplayNames: { [key: string]: string } = {
+    home: 'Accueil',
+    itineraire: 'Itinéraire',
+    experience: 'Expérience',
+    competences: 'Compétences',
+    attentes: 'Attentes',
+    personnalite: 'Personnalité',
+    centres: "Centres d'intérêt",
+    motivations: 'Motivations',
+    conclusion: 'Conclusion',
+  };
+
   private moduleStatusesSubject = new BehaviorSubject<ModuleStatus>({
     home: true, // L'intro est considérée comme complétée par défaut
     itineraire: false,
@@ -34,7 +48,7 @@ export class ProgressService {
   public moduleStatuses$: Observable<ModuleStatus> =
     this.moduleStatusesSubject.asObservable();
 
-  constructor() {
+  constructor(private alertService: AlertService) {
     this.loadModuleStatus();
   }
 
@@ -70,13 +84,91 @@ export class ProgressService {
   }
 
   /**
-   * Marque un module comme complété
+   * Marque un module comme complété et affiche une alerte
    */
   completeModule(moduleName: keyof ModuleStatus): void {
     const currentStatuses = { ...this.moduleStatusesSubject.value };
-    currentStatuses[moduleName] = true;
-    this.moduleStatusesSubject.next(currentStatuses);
-    this.saveModuleStatus();
+    
+    // Vérifier si le module n'est pas déjà complété pour éviter des alertes en double
+    if (!currentStatuses[moduleName]) {
+      currentStatuses[moduleName] = true;
+      this.moduleStatusesSubject.next(currentStatuses);
+      this.saveModuleStatus();
+      
+      // Émettre une alerte de complétion
+      this.showModuleCompletionAlert(moduleName);
+      
+      // Vérifier si des jalons de progression ont été atteints
+      this.checkProgressMilestones();
+      
+      // Vérifier si tous les modules sont maintenant complétés
+      if (this.allModulesCompleted()) {
+        this.showAllModulesCompletedAlert();
+      }
+    }
+  }
+
+  /**
+   * Affiche une alerte pour la complétion d'un module
+   */
+  private showModuleCompletionAlert(moduleName: keyof ModuleStatus): void {
+    const moduleDisplayName = this.moduleDisplayNames[moduleName] || String(moduleName);
+    
+    // Déterminer le prochain module disponible (pour l'indiquer dans l'alerte)
+    let nextModuleMessage = '';
+    const currentIndex = this.moduleOrder.indexOf(moduleName as string);
+    
+    if (currentIndex < this.moduleOrder.length - 1) {
+      const nextModuleName = this.moduleOrder[currentIndex + 1];
+      const nextModuleDisplayName = this.moduleDisplayNames[nextModuleName] || nextModuleName;
+      nextModuleMessage = ` Le module "${nextModuleDisplayName}" est maintenant disponible.`;
+    }
+    
+    this.alertService.success(
+      `Vous avez complété le module "${moduleDisplayName}" avec succès !${nextModuleMessage}`,
+      'Module terminé',
+      true,
+      6000 // Durée un peu plus longue pour laisser le temps de lire le message
+    );
+  }
+
+  /**
+   * Vérifie si des jalons de progression ont été atteints
+   */
+  private checkProgressMilestones(): void {
+    const percentage = this.getCompletionPercentage();
+    
+    // Alertes pour les jalons importants (25%, 50%, 75%)
+    if (percentage === 25) {
+      this.alertService.info(
+        'Vous avez complété 25% de votre parcours. Continuez !',
+        'Progression',
+        true
+      );
+    } else if (percentage === 50) {
+      this.alertService.info(
+        'Vous êtes à mi-parcours ! 50% de votre parcours est maintenant complété.',
+        'Progression',
+        true
+      );
+    } else if (percentage === 75) {
+      this.alertService.info(
+        'Vous avez complété 75% de votre parcours. La fin est proche !',
+        'Progression',
+        true
+      );
+    }
+  }
+
+  /**
+   * Affiche une alerte spéciale quand tous les modules sont complétés
+   */
+  private showAllModulesCompletedAlert(): void {
+    this.alertService.success(
+      'Félicitations ! Vous avez complété tous les modules principaux du parcours. Vous pouvez maintenant accéder à la conclusion.',
+      'Parcours complété',
+      false // Ne pas fermer automatiquement pour marquer l'importance
+    );
   }
 
   /**
@@ -90,7 +182,7 @@ export class ProgressService {
     if (moduleName === 'conclusion') return this.allModulesCompleted();
 
     // Pour les autres modules, vérifier que le module précédent est complété
-    const moduleIndex = this.moduleOrder.indexOf(moduleName);
+    const moduleIndex = this.moduleOrder.indexOf(moduleName as string);
     if (moduleIndex <= 0) return false;
 
     const previousModule = this.moduleOrder[
@@ -105,7 +197,7 @@ export class ProgressService {
   allModulesCompleted(): boolean {
     const statuses = this.moduleStatusesSubject.value;
     return this.moduleOrder
-      .filter((module) => module !== 'conclusion')
+      .filter((module) => module !== 'conclusion' && module !== 'home')
       .every((module) => statuses[module as keyof ModuleStatus]);
   }
 
@@ -138,5 +230,12 @@ export class ProgressService {
 
     this.moduleStatusesSubject.next(resetStatuses);
     this.saveModuleStatus();
+    
+    // Afficher une alerte de réinitialisation
+    this.alertService.info(
+      'Votre progression a été réinitialisée. Tous les modules (sauf l\'accueil) sont maintenant marqués comme non complétés.',
+      'Progression réinitialisée',
+      true
+    );
   }
 }

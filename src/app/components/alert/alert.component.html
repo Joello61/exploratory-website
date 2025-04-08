@@ -1,0 +1,22 @@
+<div class="alerts-container" *ngIf="alerts.length > 0">
+  <div
+    *ngFor="let alert of alerts"
+    class="alert-item"
+    [ngClass]="'alert-' + alert.type"
+  >
+    <div class="alert-icon" *ngIf="alert.icon">
+      <i [class]="alert.icon"></i>
+    </div>
+    <div class="alert-content">
+      <div class="alert-header" *ngIf="alert.title">
+        <h4>{{ alert.title }}</h4>
+      </div>
+      <div class="alert-message">
+        {{ alert.message }}
+      </div>
+    </div>
+    <button class="alert-close" (click)="closeAlert(alert.id)">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+</div>

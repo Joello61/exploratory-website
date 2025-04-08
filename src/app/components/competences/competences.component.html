@@ -181,7 +181,7 @@
       </div>
     </div>
 
-    <div class="top-skills" *ngIf="getTopSkills().length > 0">
+    <div class="top-skills" *ngIf="getTopSkills().length > 0 && !isModuleCompleted">
       <h4>Compétences clés identifiées</h4>
       <div class="top-skills-list">
         <div *ngFor="let skill of getTopSkills()" class="top-skill-item">
@@ -203,12 +203,63 @@
       </div>
     </div>
 
-    <!-- Cartographie des compétences avec Chart.js -->
+
+
+    <!-- Nouvelle section - Affichage de toutes les compétences quand le module est complété -->
+    <div class="all-skills" *ngIf="isModuleCompleted">
+      <h4>Toutes les compétences</h4>
+      
+      <!-- Navigation par onglets pour les catégories -->
+      <div class="skills-categories-tabs">
+        <button 
+          *ngFor="let category of skillCategories" 
+          class="category-tab-btn"
+          [class.active]="selectedCategory === category.id"
+          (click)="selectCategory(category.id)"
+        >
+          <i [class]="'bi ' + category.icon"></i>
+          <span>{{ category.name }}</span>
+        </button>
+      </div>
+      
+      <!-- Liste de toutes les compétences de la catégorie sélectionnée -->
+      <div class="all-skills-grid" *ngIf="selectedCategory">
+        <div *ngFor="let skill of getSkillsByCategory(selectedCategory)" class="skill-grid-item">
+          <div class="skill-header">
+            <div class="skill-icon">
+              <i [class]="'bi ' + skill.icon"></i>
+            </div>
+            <div class="skill-info">
+              <span class="skill-name">{{ skill.name }}</span>
+              <div class="skill-rating">
+                <span
+                  *ngFor="let _ of [].constructor(5); let j = index"
+                  class="rating-star"
+                  [class.filled]="j < skill.level"
+                >★</span>
+              </div>
+            </div>
+          </div>
+          <div class="skill-description">
+            <p>{{ skill.description }}</p>
+            <div
+              class="skill-projects"
+              *ngIf="skill.projects && skill.projects.length > 0"
+            >
+              <h5>Projets associés:</h5>
+              <ul>
+                <li *ngFor="let project of skill.projects">{{ project }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Cartographie des compétences avec Chart.js -->
     <div
       class="skill-map"
-      *ngIf="getDiscoveredSkillsCount() > 5"
-      [@fadeInAnimation]
+      *ngIf="isModuleCompleted"
     >
       <h4>
         <i class="fas fa-chart-radar me-2"></i>Cartographie des compétences

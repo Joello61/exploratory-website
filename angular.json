@@ -113,51 +113,6 @@
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ]
           }
-        },
-        "cypress-run": {
-          "builder": "@cypress/schematic:cypress",
-          "options": {
-            "devServerTarget": "exploratory-website:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "exploratory-website:serve:production"
-            }
-          }
-        },
-        "cypress-open": {
-          "builder": "@cypress/schematic:cypress",
-          "options": {
-            "watch": true,
-            "headless": false
-          }
-        },
-        "ct": {
-          "builder": "@cypress/schematic:cypress",
-          "options": {
-            "devServerTarget": "exploratory-website:serve",
-            "watch": true,
-            "headless": false,
-            "testingType": "component"
-          },
-          "configurations": {
-            "development": {
-              "devServerTarget": "exploratory-website:serve:development"
-            }
-          }
-        },
-        "e2e": {
-          "builder": "@cypress/schematic:cypress",
-          "options": {
-            "devServerTarget": "exploratory-website:serve",
-            "watch": true,
-            "headless": false
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "exploratory-website:serve:production"
-            }
-          }
         }
       }
     }
@@ -165,7 +120,6 @@
   "cli": {
     "analytics": false,
     "schematicCollections": [
-      "@cypress/schematic",
       "@schematics/angular"
     ]
   }
