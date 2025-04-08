@@ -17,11 +17,10 @@ import { DialogMessage } from '../../models/others/dialod-message';
 import { ModuleStatus } from '../../models/others/modul-status';
 
 @Component({
-  selector: 'app-menu',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.css'],
+    selector: 'app-menu',
+    imports: [CommonModule],
+    templateUrl: './menu.component.html',
+    styleUrls: ['./menu.component.css']
 })
 export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;

@@ -20,11 +20,10 @@ import { AuthService } from '../../services/auth.service';
 import { DialogMessage } from '../../models/others/dialod-message';
 
 @Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
+    selector: 'app-home',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('terminalInput') terminalInput!: ElementRef;

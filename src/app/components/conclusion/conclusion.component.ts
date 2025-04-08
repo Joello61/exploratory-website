@@ -41,11 +41,10 @@ import { RECOMMENDATIONCATEGORIESDATA } from '../../database/conclusion/recommen
 import { SUMMARYKEYWORDSDATA } from '../../database/conclusion/summaryKeywords.data';
 
 @Component({
-  selector: 'app-conclusion',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './conclusion.component.html',
-  styleUrls: ['./conclusion.component.css'],
+    selector: 'app-conclusion',
+    imports: [CommonModule],
+    templateUrl: './conclusion.component.html',
+    styleUrls: ['./conclusion.component.css']
 })
 export class ConclusionComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;

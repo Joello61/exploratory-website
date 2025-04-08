@@ -41,11 +41,10 @@ import { MOTIVATIONFACTORSDATA } from '../../database/motivations/motivationFact
 
 
 @Component({
-  selector: 'app-motivation-socio-pro',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './motivation-socio-pro.component.html',
-  styleUrls: ['./motivation-socio-pro.component.css'],
+    selector: 'app-motivation-socio-pro',
+    imports: [CommonModule],
+    templateUrl: './motivation-socio-pro.component.html',
+    styleUrls: ['./motivation-socio-pro.component.css']
 })
 export class MotivationSocioProComponent
   implements OnInit, AfterViewInit, OnDestroy

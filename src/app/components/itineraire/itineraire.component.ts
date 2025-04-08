@@ -30,11 +30,10 @@ import { KEYINDICATORSDATA } from '../../database/itineraire/keyIndicators.data'
 import { QUIZQUESTIONSDATA } from '../../database/itineraire/quizQuestions.data';
 
 @Component({
-  selector: 'app-itineraire',
-  standalone: true,
-  imports: [CommonModule, LeafletModule],
-  templateUrl: './itineraire.component.html',
-  styleUrls: ['./itineraire.component.css'],
+    selector: 'app-itineraire',
+    imports: [CommonModule, LeafletModule],
+    templateUrl: './itineraire.component.html',
+    styleUrls: ['./itineraire.component.css']
 })
 export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;

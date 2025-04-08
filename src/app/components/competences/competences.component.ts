@@ -32,11 +32,10 @@ import { SKILLCATEGORIESDATA } from '../../database/competences/skillCategories.
 import { SKILLSDATA } from '../../database/competences/skills.data';
 
 @Component({
-  selector: 'app-competences',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './competences.component.html',
-  styleUrls: ['./competences.component.css'],
+    selector: 'app-competences',
+    imports: [CommonModule],
+    templateUrl: './competences.component.html',
+    styleUrls: ['./competences.component.css']
 })
 export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;

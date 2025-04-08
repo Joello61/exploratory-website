@@ -35,11 +35,10 @@ import { COREVALUESDATA } from '../../database/personnalite/coreValues.data';
 import { WORKPREFERENCESDATA } from '../../database/personnalite/workPreferences.data';
 
 @Component({
-  selector: 'app-personnalite',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './personnalite.component.html',
-  styleUrls: ['./personnalite.component.css'],
+    selector: 'app-personnalite',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './personnalite.component.html',
+    styleUrls: ['./personnalite.component.css']
 })
 export class PersonnaliteComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;

@@ -39,11 +39,10 @@ import { PRIORITIZATIONITEMSDATA } from '../../database/attentes/prioritizationI
 import { SCENARIOSDATA } from '../../database/attentes/scenarios.data';
 
 @Component({
-  selector: 'app-attentes',
-  standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule],
-  templateUrl: './attentes.component.html',
-  styleUrls: ['./attentes.component.css'],
+    selector: 'app-attentes',
+    imports: [CommonModule, FormsModule, DragDropModule],
+    templateUrl: './attentes.component.html',
+    styleUrls: ['./attentes.component.css']
 })
 export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('typewriterText') typewriterText!: ElementRef;

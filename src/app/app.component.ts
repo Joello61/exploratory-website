@@ -15,11 +15,10 @@ import { ModuleStatus } from './models/others/modul-status';
 import { Note } from './models/others/note';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, RouterModule, CommonModule],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+    selector: 'app-root',
+    imports: [RouterOutlet, RouterModule, CommonModule],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'exploratory-website';

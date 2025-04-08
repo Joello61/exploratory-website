@@ -28,11 +28,10 @@ import { MATCHINGSKILLSDATA } from '../../database/experiences/matchingSkills.da
 import { MATCHINGJOBSDATA } from '../../database/experiences/matchingJobs.data';
 
 @Component({
-  selector: 'app-experience-pro',
-  standalone: true,
-  imports: [CommonModule, DragDropModule],
-  templateUrl: './experience-pro.component.html',
-  styleUrls: ['./experience-pro.component.css'],
+    selector: 'app-experience-pro',
+    imports: [CommonModule, DragDropModule],
+    templateUrl: './experience-pro.component.html',
+    styleUrls: ['./experience-pro.component.css']
 })
 export class ExperienceProComponent
   implements OnInit, AfterViewInit, OnDestroy
