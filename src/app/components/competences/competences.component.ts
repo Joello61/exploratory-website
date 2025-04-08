@@ -225,6 +225,12 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Initialiser le graphique radar avec Chart.js
   initRadarChart(): void {
+
+    if (!this.radarCanvas || !this.radarCanvas.nativeElement) {
+      console.warn('Canvas pour le radar chart non disponible');
+      return;
+    }
+
     // Enregistrer les composants nécessaires de Chart.js
     Chart.register(
       RadarController,

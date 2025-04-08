@@ -208,10 +208,19 @@ export class ItineraireComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Nettoyer la carte Leaflet
     if (this.map) {
-      this.markers.forEach((m) => {
-        m.removeFrom(this.map);
-      });
-      this.map.remove();
+      try {
+        // Supprimer les marqueurs
+        if (this.markers) {
+          this.markers.forEach(marker => {
+            if (marker) marker.remove();
+          });
+        }
+        
+        // Démonter la carte et libérer les ressources
+        this.map.remove();
+      } catch (e) {
+        console.warn('Erreur lors de la suppression de la carte:', e);
+      }
     }
 
     // Fermer tout dialogue ouvert
