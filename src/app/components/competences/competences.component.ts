@@ -49,6 +49,7 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Gérer les timeouts et intervalles
   private introDialogTimeoutId: number | null = null;
+  private closeDialogTimeoutId: number | null = null;
   private categoryChangeTimeoutId: number | null = null;
   private scanCompletionTimeoutId: number | null = null;
   private scanIntervalId: number | null = null;
@@ -220,7 +221,23 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       character: 'detective',
     };
     this.dialogService.openDialog(dialogMessage);
-    this.dialogService.startTypewriter(this.fullText);
+    this.dialogService.startTypewriter(this.fullText, () => {
+      this.closeDialogTimeoutId = window.setTimeout(() => {
+        this.dialogService.closeDialog();
+        this.closeDialogTimeoutId = null;
+      }, 3000);
+    });
+  }
+
+  // Fermer le dialogue
+  closeDialogTypeWriter(): void {
+    this.dialogService.closeDialog();
+
+    // Annuler tout timeout de fermeture programmé
+    if (this.closeDialogTimeoutId !== null) {
+      clearTimeout(this.closeDialogTimeoutId);
+      this.closeDialogTimeoutId = null;
+    }
   }
 
   // Initialiser le graphique radar avec Chart.js
@@ -382,11 +399,6 @@ export class CompetencesComponent implements OnInit, AfterViewInit, OnDestroy {
       );
       this.radarChart.update();
     }
-  }
-
-  // Fermer le dialogue
-  closeDialogTypeWriter(): void {
-    this.dialogService.closeDialog();
   }
 
   // Charger l'état sauvegardé précédemment
