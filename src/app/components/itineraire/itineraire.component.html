@@ -46,10 +46,12 @@
         <div *ngIf="questionState === 'ready'" class="text-center py-4">
           <h4 class="question-title mb-4">Question {{ currentMapQuestionIndex + 1 }}/{{ mapQuestions.length }}</h4>
           <p class="text-light mb-4">Prêt à découvrir un nouvel indice sur les origines du sujet?</p>
-          <button (click)="startQuestion()" class="primary-action action-btn">
-            <i class="bi bi-play-circle me-2"></i>
-            Commencer
-          </button>
+          <div class="d-flex justify-content-center">
+            <button (click)="startQuestion()" class="primary-action action-btn ">
+              <i class="bi bi-play-circle me-2"></i>
+              Commencer
+            </button>
+          </div>
         </div>
         
         <!-- État de la question en cours -->
@@ -81,7 +83,7 @@
             <span>{{ mapFeedbackMessage }}</span>
           </div>
           
-          <div class="text-center mt-4">
+          <div class="text-center mt-4 d-flex justify-content-center">
             <button (click)="nextQuestion()" class="secondary-action action-btn">
               <i class="bi bi-arrow-right-circle me-2"></i>
               Continuer

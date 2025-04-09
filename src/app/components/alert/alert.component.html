@@ -1,7 +1,7 @@
-<div class="alerts-container" *ngIf="alerts.length > 0">
+<div class="alert-modal-backdrop" *ngIf="alerts.length > 0">
   <div
     *ngFor="let alert of alerts"
-    class="alert-item"
+    class="alert-modal"
     [ngClass]="'alert-' + alert.type"
   >
     <div class="alert-icon" *ngIf="alert.icon">
