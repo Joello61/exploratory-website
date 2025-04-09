@@ -19,6 +19,6 @@ export const routes: Routes = [
     { path: 'attentes', component: AttentesComponent },
     { path: 'itineraire', component: ItineraireComponent},
     { path: 'experience', component: ExperienceProComponent},
-    { path: 'motivations', component: MotivationSocioProComponent},
+    /*{ path: 'motivations', component: MotivationSocioProComponent},*/
     {path: 'conclusion', component: ConclusionComponent}
   ];

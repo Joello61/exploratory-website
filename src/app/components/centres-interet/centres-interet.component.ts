@@ -627,7 +627,8 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
         this.clearAllTimeouts();
 
         // Naviguer vers le module suivant
-        this.router.navigate(['/motivations']);
+        //this.router.navigate(['/motivations']);
+        this.router.navigate(['/conclusion']);
 
         this.navigationTimeoutId = null;
       }, 5000);
