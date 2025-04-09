@@ -8,15 +8,10 @@
       </div>
     </div>
     <div class="dialog-box">
-      <button
-        (click)="closeDialogTypeWriter()"
-        type="button"
-        class="close-button"
-      >
+      <button (click)="closeDialogTypeWriter()" type="button" class="close-button">
         <i class="bi bi-x-circle fs-3"></i>
       </button>
       <div class="message px-5">
-        <!-- Utilisation du message directement depuis le service -->
         <div>
           {{ dialogMessage?.text }}<span class="cursor" *ngIf="isTyping"></span>
         </div>
@@ -34,26 +29,117 @@
   </div>
 
   <!-- Carte des origines -->
-  <div class="map-section">
-    <div class="section-title-container">
-      <div class="section-icon">
-        <i class="bi bi-geo-alt"></i>
-      </div>
-      <h3 class="subsection-title">Origines géographiques</h3>
+<div class="map-section">
+  <div class="section-title-container">
+    <div class="section-icon">
+      <i class="bi bi-geo-alt"></i>
     </div>
+    <h3 class="subsection-title">Origines géographiques</h3>
+  </div>
 
-    <div class="map-container">
-      <div class="map-overlay">
-        <div
-          style="height: 100%"
-          class="map"
-          leaflet
-          [leafletOptions]="options"
-          (leafletMapReady)="onMapReady($event)"
-        ></div>
+  <div class="map-container d-flex flex-column flex-md-row">
+    <!-- Partie gauche: jeu de questions -->
+    <div class="question-game-container flex-grow-1 p-3 me-md-3 mb-3 mb-md-0">
+      <!-- Questions du jeu -->
+      <div class="question-container" *ngIf="currentMapQuestion && !allLocationsDiscovered">
+        <!-- État initial avec bouton Commencer -->
+        <div *ngIf="questionState === 'ready'" class="text-center py-4">
+          <h4 class="question-title mb-4">Question {{ currentMapQuestionIndex + 1 }}/{{ mapQuestions.length }}</h4>
+          <p class="text-light mb-4">Prêt à découvrir un nouvel indice sur les origines du sujet?</p>
+          <button (click)="startQuestion()" class="primary-action action-btn">
+            <i class="bi bi-play-circle me-2"></i>
+            Commencer
+          </button>
+        </div>
+        
+        <!-- État de la question en cours -->
+        <div *ngIf="questionState === 'asking'">
+          <h4 class="question-title mb-3">Trouvez l'origine suivante:</h4>
+          <div class="question-text mb-3">
+            <span>{{ displayedQuestionText }}</span><span class="cursor" *ngIf="isTypingQuestion"></span>
+          </div>
+          
+          <div class="question-options">
+            <div 
+              *ngFor="let option of currentMapQuestion.options; let i = index"
+              class="option mb-2" 
+              [class.selected]="selectedMapOption === i"
+              [class.correct]="isMapAnswerCorrect && selectedMapOption === i"
+              [class.incorrect]="!isMapAnswerCorrect && selectedMapOption === i"
+              (click)="selectMapOption(i)"
+            >
+              <div class="option-marker">{{ ['A', 'B', 'C', 'D'][i] }}</div>
+              <div class="option-text">{{ option }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Feedback après réponse -->
+        <div class="feedback-container mt-3" *ngIf="questionState === 'feedback'">
+          <div class="feedback-message" [class.correct]="isMapAnswerCorrect" [class.incorrect]="!isMapAnswerCorrect">
+            <i class="bi" [ngClass]="isMapAnswerCorrect ? 'bi-check-circle' : 'bi-x-circle'"></i>
+            <span>{{ mapFeedbackMessage }}</span>
+          </div>
+          
+          <div class="text-center mt-4">
+            <button (click)="nextQuestion()" class="secondary-action action-btn">
+              <i class="bi bi-arrow-right-circle me-2"></i>
+              Continuer
+            </button>
+          </div>
+        </div>
       </div>
+
+      <!-- Message de complétion -->
+      <!-- Message de complétion mis à jour -->
+<div class="completion-message" *ngIf="allLocationsDiscovered">
+  <div class="alert" style="background: rgba(0, 191, 255, 0.1); border: 1px solid rgba(0, 191, 255, 0.3); color: #a0d8ff; padding: 15px; border-radius: 10px;">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    Félicitations ! Vous avez découvert toutes les origines géographiques du sujet.
+  </div>
+  
+  <!-- Statistiques de jeu ajoutées ici -->
+  <div class="game-stats mt-4">
+    <h4 class="stats-title mb-3">Vos performances</h4>
+    
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-value">{{ getCorrectAnswersCount() }}/{{ mapQuestions.length }}</div>
+        <div class="stat-label">Réponses correctes</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-value">{{ calculateSuccessRate() }}%</div>
+        <div class="stat-label">Taux de réussite</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-value">{{ getDiscoveredLocationsCount() }}/{{ originLocations.length }}</div>
+        <div class="stat-label">Origines découvertes</div>
+      </div>
+    </div>
+    
+    <!-- Message d'encouragement basé sur les performances -->
+    <div class="performance-message mt-4 text-center" [ngClass]="getPerformanceClass()">
+      <i class="bi" [ngClass]="getPerformanceIcon()"></i>
+      <p>{{ getPerformanceMessage() }}</p>
     </div>
   </div>
+</div>
+    </div>
+    
+    <!-- Partie droite: carte -->
+    <div class="map-display-container flex-grow-1">
+      <div
+        style="height: 350px"
+        class="map"
+        leaflet
+        [leafletOptions]="options"
+        (leafletMapReady)="onMapReady($event)"
+      ></div>
+    </div>
+  </div>
+</div>
 
   <!-- Timeline de formation -->
   <div class="timeline-section">
@@ -98,16 +184,13 @@
                   <span
                     class="skill-badge"
                     *ngFor="let skill of education.skills"
-                    >{{ skill }}</span
-                  >
+                  >{{ skill }}</span>
                 </div>
               </div>
 
               <div
                 class="timeline-achievements"
-                *ngIf="
-                  education.achievements && education.achievements.length > 0
-                "
+                *ngIf="education.achievements && education.achievements.length > 0"
               >
                 <h5>Réalisations notables:</h5>
                 <ul>
@@ -126,9 +209,7 @@
               >
                 <i
                   class="bi"
-                  [ngClass]="
-                    education.expanded ? 'bi-chevron-up' : 'bi-chevron-down'
-                  "
+                  [ngClass]="education.expanded ? 'bi-chevron-up' : 'bi-chevron-down'"
                 ></i>
                 {{ education.expanded ? "Réduire" : "Détails" }}
               </button>
@@ -153,7 +234,6 @@
       <div class="stats-evolution">
         <h4 class="stats-title">Évolution des compétences</h4>
         <div class="evolution-chart">
-          <!-- Utilisation de Chart.js avec un canvas -->
           <canvas id="skillsEvolutionChart"></canvas>
         </div>
       </div>
@@ -168,14 +248,11 @@
             <div class="indicator-trend" [ngClass]="indicator.trend">
               <i
                 class="bi"
-                [ngClass]="
-                  'bi-' +
-                  (indicator.trend === 'up'
-                    ? 'graph-up-arrow'
-                    : indicator.trend === 'down'
-                    ? 'graph-down-arrow'
-                    : 'dash')
-                "
+                [ngClass]="'bi-' + (indicator.trend === 'up' 
+                  ? 'graph-up-arrow' 
+                  : indicator.trend === 'down' 
+                  ? 'graph-down-arrow' 
+                  : 'dash')"
               ></i>
             </div>
           </div>
@@ -184,8 +261,8 @@
     </div>
   </div>
 
-  <!-- Bouton Continuer -->
-  <div class="continue-section">
+  <!-- Bouton Continuer (visible uniquement quand le module est complété) -->
+  <div class="continue-section" *ngIf="isModuleCompleted">
     <button class="primary-action action-btn" (click)="openQuizModal()">
       <i class="bi bi-arrow-right-circle"></i>
       Continuer
@@ -207,9 +284,7 @@
           <div class="progress-bar">
             <div
               class="progress-fill"
-              [style.width.%]="
-                ((currentQuestionIndex + 1) / quizQuestions.length) * 100
-              "
+              [style.width.%]="((currentQuestionIndex + 1) / quizQuestions.length) * 100"
             ></div>
           </div>
           <div class="progress-text">
@@ -238,10 +313,7 @@
               [class.correct]="isAnswerCorrect"
               [class.incorrect]="!isAnswerCorrect"
             >
-              <i
-                class="bi"
-                [ngClass]="isAnswerCorrect ? 'bi-check-circle' : 'bi-x-circle'"
-              ></i>
+              <i class="bi" [ngClass]="isAnswerCorrect ? 'bi-check-circle' : 'bi-x-circle'"></i>
               <span>{{ feedbackMessage }}</span>
             </div>
           </div>
@@ -261,8 +333,7 @@
 
           <div class="results-message">
             <p *ngIf="quizPassed">
-              Félicitations ! Vous avez bien compris les informations du
-              dossier.
+              Félicitations ! Vous avez bien compris les informations du dossier.
             </p>
             <p *ngIf="!quizPassed">
               Vous devriez revoir certaines informations du dossier.
@@ -284,7 +355,7 @@
         <button
           class="secondary-action action-btn"
           *ngIf="showFeedback && !quizCompleted"
-          (click)="nextQuestion()"
+          (click)="nextQuestionQuiz()"
         >
           Question suivante
         </button>
