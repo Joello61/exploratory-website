@@ -14,6 +14,7 @@ import { AuthService } from './services/auth.service';
 import { ModuleStatus } from './models/others/modul-status';
 import { Note } from './models/others/note';
 import { AlertComponent } from './components/alert/alert.component';
+import { injectSpeedInsights } from '@vercel/speed-insights';
 
 @Component({
     selector: 'app-root',
@@ -64,6 +65,9 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+
+    injectSpeedInsights();
+
     // Initialiser les effets visuels
     this.initMouseLightEffect();
     this.animateBackground();
