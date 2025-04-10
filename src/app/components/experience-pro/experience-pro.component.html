@@ -147,17 +147,6 @@
     </div>
   </div>
 
-  <!-- Message de confirmation de complétion du module -->
-  <div class="completion-message" *ngIf="isModuleCompleted">
-    <div class="alert alert-success">
-      <i class="bi bi-check-circle-fill"></i>
-      Module complété ! L'analyse des expériences professionnelles a été
-      réalisée avec succès.
-    </div>
-  </div>
-
-  <!-- Ajouter ce code juste avant la fermeture de la div .case-file-container -->
-
   <!-- Bouton Continuer (visible uniquement quand tous les dossiers sont déclassifiés) -->
   <div class="continue-section" *ngIf="areAllFilesCompleted()">
     <button class="primary-action action-btn" (click)="openQuizModal()">

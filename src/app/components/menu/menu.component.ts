@@ -64,7 +64,7 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     attentes: false,
     personnalite: false,
     centres: false,
-    motivations: false,
+    //motivations: false,
     conclusion: false,
   };
 
@@ -72,7 +72,7 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
   completionPercentage: number = 0;
   timeSpent: string = '00:00:00';
   modulesCompleted: number = 0;
-  totalModules: number = 7; // Nombre total de modules (sans compter home)
+  totalModules: number = 6; // Nombre total de modules (sans compter home, motivation et conclusion)
 
   constructor(
     private router: Router,

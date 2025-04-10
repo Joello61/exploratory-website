@@ -1225,10 +1225,11 @@
   padding: 25px;
   overflow-y: auto;
   flex-grow: 1;
+  max-height: 80vh;
 }
 
 .quiz-progress {
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 
 .progress-bar {
@@ -1258,7 +1259,7 @@
   color: #d0f0ff;
   font-size: 1.2rem;
   margin-top: 0;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   font-weight: 500;
   line-height: 1.5;
 }
@@ -1267,13 +1268,13 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 
 .option {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 7px;
   padding: 15px;
   background: rgba(26, 26, 46, 0.5);
   border: 1px solid rgba(0, 191, 255, 0.1);

@@ -287,8 +287,8 @@ export class CentresInteretComponent
     const allDiscovered = this.evidenceItems.every((item) => item.discovered);
     const discoveredCount = this.getDiscoveredCount();
 
-    // Ou un seuil minimum (par exemple 75%)
-    const discoveryThreshold = Math.ceil(this.evidenceItems.length * 0.75);
+    // Ou un seuil minimum (par exemple 100%)
+    const discoveryThreshold = Math.ceil(this.evidenceItems.length * 1);
 
     if (
       (allDiscovered || discoveredCount >= discoveryThreshold) &&
@@ -357,22 +357,15 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
   // Fonction pour découvrir un indice
   discoverEvidence(index: number): void {
     if (index < 0 || index >= this.evidenceItems.length) return;
-
+  
     const evidence = this.evidenceItems[index];
+    
+    // On vérifie si l'indice est déjà découvert, mais on ne le marque pas encore
     if (evidence.discovered) return;
-
-    // Marquer l'indice comme découvert
-    evidence.discovered = true;
-
+  
     // Afficher le modal de découverte
     this.currentEvidence = evidence;
     this.showEvidenceModal = true;
-
-    // Débloquer les intérêts associés
-    this.unlockInterests(evidence.unlocksInterests);
-
-    // Sauvegarder l'état
-    this.saveState();
   }
 
   // Débloquer les intérêts associés à un indice
@@ -389,9 +382,20 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
 
   // Fermer le modal d'indice
   closeEvidenceModal(): void {
+    // Marquer l'indice comme découvert
+    if (this.currentEvidence) {
+      this.currentEvidence.discovered = true;
+      
+      // Débloquer les intérêts associés
+      this.unlockInterests(this.currentEvidence.unlocksInterests);
+      
+      // Sauvegarder l'état après avoir marqué l'indice comme découvert
+      this.saveState();
+    }
+  
     this.showEvidenceModal = false;
     this.currentEvidence = null;
-
+  
     // Vérifier si le module peut être complété après chaque découverte
     this.checkModuleCompletion();
   }
@@ -567,20 +571,6 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
   // Fermer le modal du quiz
   closeQuizModal(): void {
     this.showQuizModal = false;
-
-    // Si le quiz a été réussi, afficher un message de félicitations
-    if (this.quizPassed) {
-      const message =
-        "Félicitations ! Vous avez correctement analysé les centres d'intérêt du sujet. Vous avez maintenant accès à l'ensemble des données et pouvez passer au module suivant.";
-
-      const dialogMessage: DialogMessage = {
-        text: message,
-        character: 'detective',
-      };
-
-      this.dialogService.openDialog(dialogMessage);
-      this.dialogService.startTypewriter(message);
-    }
   }
 
   // Obtenir le score de passage pour le quiz (70%)
@@ -600,18 +590,6 @@ Principaux centres d'intérêt: ${keyInterests} et autres.
 
       // Marquer officiellement le module comme complété
       this.progressService.completeModule(this.MODULE_ID);
-
-      // Afficher un message de confirmation
-      const message =
-        "Module d'analyse des centres d'intérêt complété. Vous pouvez maintenant passer au module suivant.";
-
-      const dialogMessage: DialogMessage = {
-        text: message,
-        character: 'detective',
-      };
-
-      this.dialogService.openDialog(dialogMessage);
-      this.dialogService.startTypewriter(message);
 
       // D'abord fermer le modal
       this.closeQuizModal();

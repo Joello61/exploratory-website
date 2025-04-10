@@ -139,9 +139,9 @@ export class MotivationSocioProComponent
 
   ngOnInit() {
     // Vérifier si le module est disponible
-    if (!this.progressService.isModuleAvailable('motivations')) {
+    /*if (!this.progressService.isModuleAvailable('motivations')) {
       console.warn("Ce module n'est pas encore disponible");
-    }
+    }*/
 
     // S'abonner au temps écoulé avec takeUntil
     this.timeTrackerService.elapsedTime$
@@ -154,7 +154,7 @@ export class MotivationSocioProComponent
     this.progressService.moduleStatuses$
       .pipe(takeUntil(this.destroy$))
       .subscribe((statuses) => {
-        this.isModuleCompleted = statuses.motivations;
+        //this.isModuleCompleted = statuses.motivations;
         this.moduleProgressPercentage =
           this.progressService.getCompletionPercentage();
 
@@ -374,7 +374,7 @@ export class MotivationSocioProComponent
   completeModule(): void {
     // Le module ne devrait être complété qu'après avoir réussi le quiz
     if (this.quizResult && this.quizResult.passed) {
-      this.progressService.completeModule('motivations');
+      //this.progressService.completeModule('motivations');
       this.isModuleCompleted = true;
 
       this.alertService.success(

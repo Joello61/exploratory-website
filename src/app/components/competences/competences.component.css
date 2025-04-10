@@ -1022,14 +1022,14 @@
 
 .quiz-modal {
   width: 90%;
-  max-width: 700px;
+  max-width: 900px;
   background: linear-gradient(to bottom, #1a1a2e, #13132a);
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  max-height: 100vh;
   border: 1px solid rgba(0, 191, 255, 0.2);
   animation: slideUp 0.4s ease;
 }
@@ -1075,18 +1075,18 @@
   padding: 25px;
   overflow-y: auto;
   flex-grow: 1;
-  max-height: 60vh;
+  max-height: 80vh;
 }
 
 .quiz-question {
-  margin-bottom: 25px;
+  margin-bottom: 12px;
   text-align: center;
 }
 
 .question-text {
   color: #a0d8ff;
   font-size: 1.1rem;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
 }
 
 .skill-name {
@@ -1099,8 +1099,8 @@
 .quiz-options {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  margin-bottom: 30px;
+  gap: 7px;
+  margin-bottom: 15px;
 }
 
 .option-btn {
@@ -1111,7 +1111,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
   color: #d0f0ff;
   cursor: pointer;
   transition: all 0.3s ease;

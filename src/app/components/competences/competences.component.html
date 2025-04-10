@@ -281,14 +281,6 @@
     </div>
   </div>
 
-  <!-- Message de confirmation de complétion du module -->
-  <div class="completion-message" *ngIf="isModuleCompleted">
-    <div class="alert alert-success">
-      <i class="bi bi-check-circle-fill"></i>
-      Module complété ! Analyse des compétences terminée avec succès.
-    </div>
-  </div>
-
   <div class="continue-section" *ngIf="getDiscoveredSkillsCount() >= 15 && !redirectInProgress">
     <button class="btn btn-primary action-btn" (click)="openQuizModal()">
       <i class="bi bi-arrow-right-circle"></i>

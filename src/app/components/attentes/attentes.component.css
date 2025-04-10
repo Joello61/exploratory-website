@@ -1262,14 +1262,14 @@
 
 .quiz-modal {
   width: 90%;
-  max-width: 750px;
+  max-width: 900px;
   background: linear-gradient(to bottom, #1a1a2e, #13132a);
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  max-height: 100vh;
   border: 1px solid rgba(0, 191, 255, 0.2);
   animation: slideUp 0.4s ease;
 }
@@ -1323,14 +1323,14 @@
 }
 
 .quiz-content {
-  padding: 25px;
+  padding: 15px;
   overflow-y: auto;
   flex-grow: 1;
-  max-height: 65vh;
+  max-height: 75vh;
 }
 
 .quiz-instructions {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   color: #a0d8ff;
   font-size: 1rem;
   line-height: 1.5;
@@ -1344,17 +1344,17 @@
 .prioritization-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 30px;
+  gap: 6px;
+  margin-bottom: 15px;
 }
 
 .priority-item {
   display: flex;
-  gap: 15px;
+  gap: 5px;
   align-items: center;
   background: rgba(26, 26, 46, 0.5);
   border-radius: 10px;
-  padding: 15px;
+  padding: 5px;
   cursor: grab;
   transition: all 0.3s ease;
   border: 1px solid rgba(0, 191, 255, 0.2);

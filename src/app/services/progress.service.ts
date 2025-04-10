@@ -16,22 +16,9 @@ export class ProgressService {
     'attentes',
     'personnalite',
     'centres',
-    'motivations',
+    //'motivations',
     'conclusion',
   ];
-
-  // Noms affichables des modules pour les alertes
-  private moduleDisplayNames: { [key: string]: string } = {
-    home: 'Accueil',
-    itineraire: 'Itinéraire',
-    experience: 'Expérience',
-    competences: 'Compétences',
-    attentes: 'Attentes',
-    personnalite: 'Personnalité',
-    centres: "Centres d'intérêt",
-    motivations: 'Motivations',
-    conclusion: 'Conclusion',
-  };
 
   private moduleStatusesSubject = new BehaviorSubject<ModuleStatus>({
     home: true, // L'intro est considérée comme complétée par défaut
@@ -41,7 +28,7 @@ export class ProgressService {
     attentes: false,
     personnalite: false,
     centres: false,
-    motivations: false,
+    //motivations: false,
     conclusion: false,
   });
 
@@ -95,9 +82,6 @@ export class ProgressService {
       this.moduleStatusesSubject.next(currentStatuses);
       this.saveModuleStatus();
       
-      // Émettre une alerte de complétion
-      this.showModuleCompletionAlert(moduleName);
-      
       // Vérifier si des jalons de progression ont été atteints
       this.checkProgressMilestones();
       
@@ -108,29 +92,6 @@ export class ProgressService {
     }
   }
 
-  /**
-   * Affiche une alerte pour la complétion d'un module
-   */
-  private showModuleCompletionAlert(moduleName: keyof ModuleStatus): void {
-    const moduleDisplayName = this.moduleDisplayNames[moduleName] || String(moduleName);
-    
-    // Déterminer le prochain module disponible (pour l'indiquer dans l'alerte)
-    let nextModuleMessage = '';
-    const currentIndex = this.moduleOrder.indexOf(moduleName as string);
-    
-    if (currentIndex < this.moduleOrder.length - 1) {
-      const nextModuleName = this.moduleOrder[currentIndex + 1];
-      const nextModuleDisplayName = this.moduleDisplayNames[nextModuleName] || nextModuleName;
-      nextModuleMessage = ` Le module "${nextModuleDisplayName}" est maintenant disponible.`;
-    }
-    
-    this.alertService.success(
-      `Vous avez complété le module "${moduleDisplayName}" avec succès !${nextModuleMessage}`,
-      'Module terminé',
-      true,
-      6000 // Durée un peu plus longue pour laisser le temps de lire le message
-    );
-  }
 
   /**
    * Vérifie si des jalons de progression ont été atteints
@@ -224,7 +185,7 @@ export class ProgressService {
       attentes: false,
       personnalite: false,
       centres: false,
-      motivations: false,
+      //motivations: false,
       conclusion: false,
     };
 

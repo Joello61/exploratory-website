@@ -6,6 +6,6 @@ export interface ModuleStatus {
   attentes: boolean;
   competences: boolean;
   centres: boolean;
-  motivations: boolean;
+  //motivations: boolean;
   conclusion: boolean;
 }

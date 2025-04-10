@@ -145,16 +145,7 @@ correctMapAnswers: { questionId: string, correct: boolean }[] = [];
   ) {}
 
   ngOnInit() {
-
-    this.alertService.success(
-      `Module Itinéraire complété ! L'itinéraire complet du sujet a été découvert. 
-      Cliquez maintenant sur le bouton "Continuer" au fond de la page pour faire le mini jeu et passer au module suivant.`,
-      'Module terminé',
-      true,
-      20000
-    );
-    
-    // Vérifier si le module est disponible
+// Vérifier si le module est disponible
     if (!this.progressService.isModuleAvailable('itineraire')) {
       console.warn("Ce module n'est pas encore disponible");
     }

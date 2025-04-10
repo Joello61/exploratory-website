@@ -294,16 +294,7 @@
       </div>
     </div>
   </div>
-
-  <!-- Message de confirmation de complétion du module -->
-  <div class="completion-message" *ngIf="isModuleCompleted">
-    <div class="alert alert-success">
-      <i class="bi bi-check-circle-fill"></i>
-      Module complété ! Toutes les projections futures ont été analysées avec
-      succès.
-    </div>
-  </div>
-
+  
   <!-- Bouton Continuer -->
   <div class="continue-section" *ngIf="canAccessQuiz()">
     <button class="primary-action action-btn" (click)="openQuizModal()">
@@ -350,9 +341,6 @@
                 </div>
                 <div class="priority-text">
                   <div class="priority-title">{{ aspiration.title }}</div>
-                  <div class="priority-description">
-                    {{ aspiration.description }}
-                  </div>
                 </div>
               </div>
             </div>
@@ -592,15 +580,6 @@
               ? "Scénario suivant"
               : "Quiz suivant"
           }}
-        </button>
-
-        <!-- Boutons pour le quiz de compatibilité -->
-        <button
-          *ngIf="quizType === 'compatibility' && compatibilityCompleted"
-          class="primary-action action-btn"
-          (click)="completeQuiz()"
-        >
-          Voir les résultats
         </button>
 
         <!-- Boutons pour les résultats -->

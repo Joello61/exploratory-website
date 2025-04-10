@@ -363,7 +363,7 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
     ) {
       this.progressService.completeModule('attentes');
       this.isModuleCompleted = true;
-
+  
       this.alertService.success(
         `Module Attentes complété ! Toutes les attentes ont été découvertes. 
         Cliquez maintenant sur le bouton "Continuer" au fond de la page pour faire le mini jeu et passer au module suivant.`,
@@ -371,7 +371,7 @@ export class AttentesComponent implements OnInit, AfterViewInit, OnDestroy {
         true,
         20000
       );
-
+  
       // Ajouter une note automatique pour résumer ce qui a été fait
       this.addCompletionNote();
     }
@@ -763,13 +763,18 @@ technologies, équipe, management, croissance, équilibre
 
   // Fonction pour vérifier si l'utilisateur peut accéder au quiz
   canAccessQuiz(): boolean {
-    // L'utilisateur peut accéder au quiz s'il a révélé au moins 2 sections sur 3
-    let sectionsRevealed = 0;
-    if (this.showAspirationsMap) sectionsRevealed++;
-    if (this.showFutureProjects) sectionsRevealed++;
-    if (this.showIdealProfile) sectionsRevealed++;
-
-    return sectionsRevealed >= 2;
+    // L'utilisateur peut accéder au quiz si toutes les sections sont révélées
+    const allSectionsRevealed = this.showAspirationsMap && 
+                                this.showFutureProjects && 
+                                this.showIdealProfile;
+    
+    // Si toutes les sections sont révélées, marquer le module comme complété
+    if (allSectionsRevealed && !this.isModuleCompleted) {
+      console.log("Quiz accessible, marquage du module comme complété");
+      this.completeModule();
+    }
+    
+    return allSectionsRevealed;
   }
 
   // Fonctions pour le quiz modal
@@ -952,11 +957,6 @@ technologies, équipe, management, croissance, équilibre
 
     // Sauvegarder le score
     this.saveUserResponse('quiz_score', this.quizScore);
-
-    // Si le quiz est réussi, compléter le module
-    if (this.quizPassed && !this.isModuleCompleted) {
-      this.completeModule();
-    }
   }
 
   // Recommencer le quiz

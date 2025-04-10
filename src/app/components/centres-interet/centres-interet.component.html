@@ -286,29 +286,11 @@
     </div>
   </div>
 
-  <!-- Message de confirmation de complétion du module -->
-  <div class="completion-message" *ngIf="isModuleCompleted">
-    <div class="alert alert-success">
-      <i class="bi bi-check-circle-fill"></i>
-      Module complété ! L'enquête sur les centres d'intérêt du sujet a été menée
-      avec succès.
-    </div>
-  </div>
-
-  <!-- Ajouter le bouton "Continuer" après le message de complétion du module -->
-  <div class="completion-message" *ngIf="isModuleCompleted">
-    <div class="alert alert-success">
-      <i class="bi bi-check-circle-fill"></i>
-      Module complété ! L'enquête sur les centres d'intérêt du sujet a été menée
-      avec succès.
-    </div>
-  </div>
-
   <!-- Ajouter le bouton continuer -->
   <div
     class="continue-module-section"
     *ngIf="
-      getDiscoveredCount() >= evidenceItems.length * 0.75 || isModuleCompleted
+      getDiscoveredCount() == evidenceItems.length || isModuleCompleted
     "
   >
     <button class="continue-module-btn" (click)="startQuiz()">

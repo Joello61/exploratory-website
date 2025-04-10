@@ -333,7 +333,7 @@ export class ExperienceProComponent
     ).length;
 
     // Si au moins 75% des jobs sont complètement explorés
-    const completionThreshold = Math.ceil(totalJobs * 0.75);
+    const completionThreshold = Math.ceil(totalJobs * 1);
 
     if (completedJobs >= completionThreshold && !this.isModuleCompleted) {
       this.completeModule();
@@ -572,7 +572,7 @@ Réalisations notables: ${this.getCompletedAchievements().join(', ')}.
     const completedFilesCount = this.jobCompletionStatus.filter(
       (status) => status === 100
     ).length;
-    return completedFilesCount >= 3;
+    return completedFilesCount == 4;
   }
 
   // Ouvrir le modal du quiz

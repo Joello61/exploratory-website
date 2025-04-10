@@ -1116,18 +1116,6 @@ Aspects de collaboration: ${collaborationAspects}.
       // Marquer officiellement le module comme complété dans le service de progression
       this.progressService.completeModule(this.MODULE_ID);
 
-      // Envoyer un message de confirmation
-      const message =
-        'Module de profil psychologique complété. Vous pouvez maintenant passer au module suivant avec une compréhension approfondie de ma personnalité.';
-
-      const dialogMessage: DialogMessage = {
-        text: message,
-        character: 'detective',
-      };
-
-      this.dialogService.openDialog(dialogMessage);
-      this.dialogService.startTypewriter(message);
-
       // Nettoyer tout timeout précédent
       if (this.navigationTimeoutId !== null) {
         clearTimeout(this.navigationTimeoutId);
@@ -1138,26 +1126,11 @@ Aspects de collaboration: ${collaborationAspects}.
         // Nettoyer les ressources avant la navigation
         this.clearAllTimeouts();
 
-        // Fermeture du dialogue
-        this.dialogService.closeDialog();
-
         // Navigation au module suivant
         this.router.navigate(['/centres']);
 
         this.navigationTimeoutId = null;
-      }, 5000);
-    } else {
-      // Si le quiz n'est pas réussi, informer l'utilisateur
-      const message =
-        "Vous devez d'abord réussir l'évaluation finale pour continuer.";
-
-      const dialogMessage: DialogMessage = {
-        text: message,
-        character: 'detective',
-      };
-
-      this.dialogService.openDialog(dialogMessage);
-      this.dialogService.startTypewriter(message);
+      }, 1000);
     }
   }
 
